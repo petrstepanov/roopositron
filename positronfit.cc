@@ -222,7 +222,8 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 		fullTH1F[i] = new TH1F(TString::Format("fullTH1F_%d", i + 1), TString::Format("fullTH1F_%d", i + 1), MAX_CHANNEL - MIN_CHANNEL + 1, 0, MAX_CHANNEL-MIN_CHANNEL+1);
                 // Open File
                 std::cout << "Spectrum " << i + 1 << " filename is \"" << sFileNames[i] << "\"" << std::endl;
-		fileUtils->importTH1F(fullTH1F[i], sFileNames[i], CHANNELS, SKIP_LINES, MIN_CHANNEL, MAX_CHANNEL);
+                std::string path = sInputPath + sFileNames[i];
+		fileUtils->importTH1F(fullTH1F[i], path, CHANNELS, SKIP_LINES, MIN_CHANNEL, MAX_CHANNEL);
 
 		iTopChannel[i] = fullTH1F[i]->GetMaximumBin();
 		iLowChannel[i] = fullTH1F[i]->GetMinimumBin();
@@ -628,23 +629,22 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	// POPUP CANVAS WITH BOTH FRAMES
 	TCanvas** canvas = new TCanvas*[iNumberOfFiles];
 	for (unsigned i = 0; i<iNumberOfFiles; i++){
-		canvas[i] = new TCanvas(TString::Format("canvas-%d", i + 1), TString::Format("Spectrum N%d \"%s\"", i + 1, sFileNames[i].c_str()), constants->getImageWidth(), constants->getImageHeight());
-		canvas[i]->SetFillColor(0);
-		canvas[i]->Divide(1, 2);
-		canvas[i]->cd(1);
-		canvas[i]->cd(1)->SetLogy();
-		graphFrame[i]->GetYaxis()->SetRangeUser(1, iUpperLimit[i]);
-		graphFrame[i]->Draw();
-		canvas[i]->cd(2);
-		chiFrame[i]->Draw();
-                if (!isRoot){
-                    canvas[i]->Modified();
-                    canvas[i]->Update();                
-//                    gSystem->ProcessEvents();
-                }
-		std::string sImageURL = (sOutputPath + "simultaneousFit");
-		sImageURL += ".png";
-		fileUtils->saveImage(canvas[i], sImageURL);
+            canvas[i] = new TCanvas(TString::Format("canvas-%d", i + 1), TString::Format("Spectrum N%d \"%s\"", i + 1, sFileNames[i].c_str()), constants->getImageWidth(), constants->getImageHeight());
+            canvas[i]->SetFillColor(0);
+            canvas[i]->Divide(1, 2);
+            canvas[i]->cd(1);
+            canvas[i]->cd(1)->SetLogy();
+            graphFrame[i]->GetYaxis()->SetRangeUser(1, iUpperLimit[i]);
+            graphFrame[i]->Draw();
+            canvas[i]->cd(2);
+            chiFrame[i]->Draw();
+            if (!isRoot){
+                canvas[i]->Modified();
+                canvas[i]->Update();                
+//              gSystem->ProcessEvents();
+            }
+            TString imageFilename = TString::Format("%sfit%d.png", sOutputPath.c_str(), i+1);
+            fileUtils->saveImage(canvas[i], imageFilename.Data());
 	}
        
 	std::cout << "Current date and time is " << getCurrentTime() << std::endl;

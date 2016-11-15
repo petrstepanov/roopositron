@@ -33,7 +33,7 @@ public:
     
     std::list<std::string> getFilenamesInDrectory(std::string directory, const char* extension);
     void importTH1F(TH1F* fullTH1F, std::string& filename, int channels, int skipLines, int minChannel, int maxChannel);
-    void saveImage(TCanvas* canvas, std::string& sURL);
+    void saveImage(TCanvas*, const char*);
 
 private:
     bool stringEnds(std::string& string, std::string& ending);

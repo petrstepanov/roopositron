@@ -30,7 +30,9 @@ void Constants::init(){
     channelWidth  = 0.0061626;   // ns
     skipLines     = 12;          // spectrum header size
     minChannel    = 2200;        // left channel
-    maxChannel    = 3500;        // right channel    
+    maxChannel    = 3500;        // right channel   
+    decayModel    = "1exp";
+    sourceModel   = "1exp";
     imageWidth    = 1024;
     imageHeight   = 500;
     // Read from file

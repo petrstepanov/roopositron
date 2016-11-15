@@ -35,6 +35,7 @@ void FileUtils::importTH1F(TH1F* fullTH1F, std::string& filename, int channels, 
 	std::string sLine = filename;
 	for (unsigned j = 0; j <= skipLines; j++){
 		getline(inFile, sLine);
+//                std::cout << sLine << std::endl;
 	}
 	// Now `sLine` contains first line with data. Read spectrum data
 	Int_t iChannel = 1;
@@ -47,6 +48,7 @@ void FileUtils::importTH1F(TH1F* fullTH1F, std::string& filename, int channels, 
 			fullTH1F->SetBinError(iChannel - minChannel + 1, sqrt(dCount));
 		}
 		getline(inFile, sLine);
+//                std::cout << sLine << std::endl;
 		iChannel++;
 	}
 	inFile.close();
@@ -95,9 +97,9 @@ std::list<std::string> FileUtils::getFilenamesInDrectory(std::string directoryPa
     return lFileNames;
 }
 
-void FileUtils::saveImage(TCanvas* canvas, std::string& sURL){
+void FileUtils::saveImage(TCanvas* canvas, const char* filename){
     TImage *imgCanvas = TImage::Create();
     imgCanvas->FromPad(canvas);
-    imgCanvas->WriteImage(sURL.c_str());
+    imgCanvas->WriteImage(filename);
     delete imgCanvas;
 }
