@@ -107,7 +107,7 @@ Contributor(s):
           <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
         </runcommandpicklist>
         <runcommand>"${OUTPUT_PATH}"</runcommand>
-        <rundir>/Users/petrstepanov/Development/NetBeansProjects/PositronFit/.</rundir>
+        <rundir>/Users/petrstepanov/Development/NetBeansProjects/positronfit/.</rundir>
         <buildfirst>true</buildfirst>
         <console-type>2</console-type>
         <terminal-type>0</terminal-type>

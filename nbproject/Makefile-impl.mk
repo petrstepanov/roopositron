@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=PositronFit
+PROJECTNAME=positronfit
 
 # Active Configuration
 DEFAULTCONF=Debug_Win
