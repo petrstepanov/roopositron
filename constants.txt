@@ -1,0 +1,9 @@
+8192        # number of channels in Maestro .Spe file
+0.0061626   # channel width, ns d
+12          # Maestro header size
+2300        # minimum channel (>= 1), included in plot
+3500        # maximum channel, included in plot
+1exp        # decay model - "1exp", "2exp", "grain"
+1exp        # source contribution - "1exp", "2exp" (annihilation in air?)
+1280        # image width
+600         # image height
