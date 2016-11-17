@@ -50,6 +50,7 @@ Contributor(s):
       <itemPath>MyPdfCache.h</itemPath>
       <itemPath>ParamStorage.h</itemPath>
       <itemPath>StructParams.h</itemPath>
+      <itemPath>TrapPdf.h</itemPath>
       <itemPath>TwoExpPdf.h</itemPath>
       <itemPath>TwoGaussian.h</itemPath>
     </logicalFolder>
@@ -73,6 +74,7 @@ Contributor(s):
       <itemPath>MyPdfCache.cpp</itemPath>
       <itemPath>ParamStorage.cpp</itemPath>
       <itemPath>StructParams.cpp</itemPath>
+      <itemPath>TrapPdf.cpp</itemPath>
       <itemPath>TwoExpPdf.cpp</itemPath>
       <itemPath>TwoGaussian.cpp</itemPath>
       <itemPath>positronfit.cc</itemPath>
@@ -93,13 +95,14 @@ Contributor(s):
       </toolsSet>
       <compileType>
         <cTool>
+          <standard>10</standard>
           <commandLine>-pthread</commandLine>
         </cTool>
         <ccTool>
-          <standard>8</standard>
           <incDir>
             <pElem>C:\root_v5.34.36\include</pElem>
           </incDir>
+          <commandLine>-std=c++11</commandLine>
         </ccTool>
         <linkerTool>
           <linkerAddLib>
@@ -128,13 +131,14 @@ Contributor(s):
             <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
+            <pElem>.</pElem>
           </linkerDynSerch>
           <linkerDepDynSerchKind>0</linkerDepDynSerchKind>
           <commandlineTool>g++</commandlineTool>
           <linkerLibItems>
             <linkerLibStdlibItem>Mathematics</linkerLibStdlibItem>
           </linkerLibItems>
-          <commandLine>-I/cygdrive/C/root_v5.34.36/include -pthread -stdlib=libc++ -std=c++11 -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -rpath /cygdrive/C/root_v5.34.36/lib</commandLine>
+          <commandLine>-I/cygdrive/C/root_v5.34.36/include -pthread -std=c++11 -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread</commandLine>
         </linkerTool>
       </compileType>
       <item path="Constants.cpp" ex="false" tool="1" flavor2="0">
@@ -175,6 +179,10 @@ Contributor(s):
       </item>
       <item path="StructParams.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="TrapPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="TrapPdf.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="TwoExpPdf.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="TwoExpPdf.h" ex="false" tool="3" flavor2="0">
@@ -210,6 +218,7 @@ Contributor(s):
             <pElem>/Applications/root_v6.06.02/lib</pElem>
           </linkerAddLib>
           <linkerDynSerch>
+            <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
@@ -280,6 +289,10 @@ Contributor(s):
       </item>
       <item path="StructParams.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="TrapPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="TrapPdf.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="TwoExpPdf.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="TwoExpPdf.h" ex="false" tool="3" flavor2="0">
@@ -314,6 +327,7 @@ Contributor(s):
         </asmTool>
         <linkerTool>
           <linkerDynSerch>
+            <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
@@ -376,6 +390,10 @@ Contributor(s):
       <item path="StructParams.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="StructParams.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="TrapPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="TrapPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="TwoExpPdf.cpp" ex="false" tool="1" flavor2="0">
       </item>

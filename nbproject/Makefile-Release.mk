@@ -42,6 +42,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/MyPdfCache.o \
 	${OBJECTDIR}/ParamStorage.o \
 	${OBJECTDIR}/StructParams.o \
+	${OBJECTDIR}/TrapPdf.o \
 	${OBJECTDIR}/TwoExpPdf.o \
 	${OBJECTDIR}/TwoGaussian.o \
 	${OBJECTDIR}/positronfit.o
@@ -105,6 +106,11 @@ ${OBJECTDIR}/StructParams.o: StructParams.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/StructParams.o StructParams.cpp
+
+${OBJECTDIR}/TrapPdf.o: TrapPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TrapPdf.o TrapPdf.cpp
 
 ${OBJECTDIR}/TwoExpPdf.o: TwoExpPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}

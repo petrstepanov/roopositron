@@ -21,8 +21,8 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-MacOSX
-CND_DLIB_EXT=dylib
+CND_PLATFORM=Cygwin-Windows
+CND_DLIB_EXT=dll
 CND_CONF=Debug_Win
 CND_DISTDIR=dist
 CND_BUILDDIR=build
@@ -35,15 +35,24 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/posfit_grain_new.o
+	${OBJECTDIR}/Constants.o \
+	${OBJECTDIR}/ExpPdf.o \
+	${OBJECTDIR}/FileUtils.o \
+	${OBJECTDIR}/MyPdf.o \
+	${OBJECTDIR}/MyPdfCache.o \
+	${OBJECTDIR}/ParamStorage.o \
+	${OBJECTDIR}/StructParams.o \
+	${OBJECTDIR}/TwoExpPdf.o \
+	${OBJECTDIR}/TwoGaussian.o \
+	${OBJECTDIR}/positronfit.o
 
 
 # C Compiler Flags
 CFLAGS=-pthread
 
 # CC Compiler Flags
-CCFLAGS=
-CXXFLAGS=
+CCFLAGS=-std=c++11
+CXXFLAGS=-std=c++11
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -52,20 +61,65 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-L/Applications/root_v6.06.02/lib -lm -ldl
+LDLIBSOPTIONS=-L/cygdrive/C/root_v5.34.36/lib -lm
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
-	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/roottest
+	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/positronfit.exe
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/roottest: ${OBJECTFILES}
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/positronfit.exe: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	g++ -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/roottest ${OBJECTFILES} ${LDLIBSOPTIONS} -I/Applications/root_v6.06.02/include -pthread -stdlib=libc++ -std=c++11 -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -rpath /Applications/root_v6.06.02/lib
+	g++ -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/positronfit ${OBJECTFILES} ${LDLIBSOPTIONS} -I/cygdrive/C/root_v5.34.36/include -pthread -std=c++11 -lRooFit -lRooFitCore -lHtml -lMinuit -lFumili -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread
 
-${OBJECTDIR}/posfit_grain_new.o: posfit_grain_new.cc
+${OBJECTDIR}/Constants.o: Constants.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/Applications/root_v6.06.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/posfit_grain_new.o posfit_grain_new.cc
+	$(COMPILE.cc) -g -I/cygdrive/C/root_v5.34.36/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Constants.o Constants.cpp
+
+${OBJECTDIR}/ExpPdf.o: ExpPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/cygdrive/C/root_v5.34.36/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ExpPdf.o ExpPdf.cpp
+
+${OBJECTDIR}/FileUtils.o: FileUtils.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/cygdrive/C/root_v5.34.36/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FileUtils.o FileUtils.cpp
+
+${OBJECTDIR}/MyPdf.o: MyPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/cygdrive/C/root_v5.34.36/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/MyPdf.o MyPdf.cpp
+
+${OBJECTDIR}/MyPdfCache.o: MyPdfCache.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/cygdrive/C/root_v5.34.36/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/MyPdfCache.o MyPdfCache.cpp
+
+${OBJECTDIR}/ParamStorage.o: ParamStorage.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/cygdrive/C/root_v5.34.36/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ParamStorage.o ParamStorage.cpp
+
+${OBJECTDIR}/StructParams.o: StructParams.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/cygdrive/C/root_v5.34.36/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/StructParams.o StructParams.cpp
+
+${OBJECTDIR}/TwoExpPdf.o: TwoExpPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/cygdrive/C/root_v5.34.36/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TwoExpPdf.o TwoExpPdf.cpp
+
+${OBJECTDIR}/TwoGaussian.o: TwoGaussian.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/cygdrive/C/root_v5.34.36/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TwoGaussian.o TwoGaussian.cpp
+
+${OBJECTDIR}/positronfit.o: positronfit.cc
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/cygdrive/C/root_v5.34.36/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/positronfit.o positronfit.cc
 
 # Subprojects
 .build-subprojects:

@@ -360,6 +360,16 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
             RooFormulaVar* I_tau2_ = new RooFormulaVar("I_tau2_", "@0/100.", *I_tau2);
             decay_model = new TwoExpPdf("decay_model", "decay_model", *rChannels, *tau1_ch, *tau2_ch, *I_tau2_);        
         }
+        // Trapping Model
+        else if (constants->getDecayModel() == "trapping"){
+            RooRealVar* tauBulk = storage->getOrMakeNew("tauBulk", "e+_lifetime_in_source", 0.15, 0.1, 0.3, "ns");
+            RooFormulaVar* tauBulk_ch = new RooFormulaVar("tauBulk_ch", "@0/@1", RooArgList(*tauBulk, *channelWidth));            
+            RooRealVar* tauVac = storage->getOrMakeNew("tauVac", "e+_lifetime_in_vacancy", 0.2, 0.1, 0.3, "ns");
+            RooFormulaVar* tauVac_ch = new RooFormulaVar("tauVac_ch", "@0/@1", RooArgList(*tauVac, *channelWidth));            
+            RooRealVar* kappaVac = storage->getOrMakeNew("kappaVac", "vacancy_trapping_rate", 1, 1E-2, 1E2, "1/ns");
+            RooFormulaVar* kappaVac_ch = new RooFormulaVar("kappaVac_ch", "@0*@1", RooArgList(*kappaVac, *channelWidth));
+            decay_model = new TrapPdf("decay_model", "decay_model", *rChannels, *tauBulk_ch, *tauVac_ch, *kappaVac_ch);
+        }        
         // Grain Boundary Model
         else if (constants->getDecayModel() == "grain"){
             RooRealVar* tauBulk = storage->getOrMakeNew("tauBulk", "e+_lifetime_in_source", 0.120, 0.120, 0.120, "ns");
