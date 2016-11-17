@@ -176,7 +176,8 @@ build/Debug_OS_X/GNU-MacOSX/positronfit.o: positronfit.cc \
   /Applications/root_v6.06.02/include/TStyle.h \
   /Applications/root_v6.06.02/include/TColor.h MyPdfCache.h \
   StructParams.h ParamStorage.h TwoGaussian.h ExpPdf.h TwoExpPdf.h \
-  MyPdf.h FileUtils.h /Applications/root_v6.06.02/include/TImage.h \
+  MyPdf.h TrapPdf.h FileUtils.h \
+  /Applications/root_v6.06.02/include/TImage.h \
   /Applications/root_v6.06.02/include/TAttImage.h Constants.h
 
 /Applications/root_v6.06.02/include/RooGlobalFunc.h:
@@ -544,6 +545,8 @@ ExpPdf.h:
 TwoExpPdf.h:
 
 MyPdf.h:
+
+TrapPdf.h:
 
 FileUtils.h:
 

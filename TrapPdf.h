@@ -14,6 +14,10 @@
 #ifndef MY_TRAPPDF
 #define MY_TRAPPDF
 
+#include "RooAbsReal.h"
+#include "RooAbsPdf.h"
+#include "TObject.h"
+#include "RooRealProxy.h"
 
 class TrapPdf : public RooAbsPdf {
 public:

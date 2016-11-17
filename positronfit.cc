@@ -126,6 +126,10 @@
 #include "MyPdf.h"
 #endif
 
+#ifndef MY_TRAPPDF
+#include "TrapPdf.h"
+#endif
+
 #ifndef MY_FILEUTILS
 #include "FileUtils.h"
 #endif
