@@ -657,7 +657,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
                 canvas[i]->Update();                
 //              gSystem->ProcessEvents();
             }
-            TString imageFilename = TString::Format("%sfit%d.png", sOutputPath.c_str(), i+1);
+            TString imageFilename = TString::Format("%sfit-%s-%d.png", sOutputPath.c_str(), (constants->getDecayModel()).c_str(), i+1);
             fileUtils->saveImage(canvas[i], imageFilename.Data());
 	}
        

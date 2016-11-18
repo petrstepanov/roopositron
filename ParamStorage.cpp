@@ -94,7 +94,38 @@ RooRealVar* ParamStorage::getOrMakeNew(const char* name, const char* description
         return get(name);
     }
     // Or just define a new one
-    RooRealVar* var = new RooRealVar(name, description, value, minValue, maxValue, unit);
+    RooRealVar* var;
+    std::string strDescription(description);  
+    std::string strName(name); 
+    // If parameter is resolution function related - use default values
+    if (strName.find("zero")*strName.find("g1")*strName.find("g2")==0){
+        var = new RooRealVar(name, description, value, minValue, maxValue, unit);
+    }
+    // For model parameters - ask to input from keyboard 
+    else {
+        Double_t inputValue;
+        Double_t inputMinValue;
+        Double_t inputMaxValue;
+        Bool_t isFixed;
+        std::replace(strDescription.begin(), strDescription.end(), '_', ' ');
+        std::cout << std::endl << "Input \"" << name << "\" - " << strDescription << ", " << unit << "." << std::endl;
+        std::cout << "Value: ";
+        std::cin >> inputValue;
+        std::cout << "Free \"0\" or fixed \"1\": ";
+        std::cin >> isFixed;
+        if (!isFixed){
+            std::cout << "Min value: ";
+            std::cin >> inputMinValue;        
+            std::cout << "Max value: ";
+            std::cin >> inputMaxValue;
+        }
+        if (isFixed){
+            var = new RooRealVar(name, description, inputValue, inputValue, inputValue, unit);      
+        }
+        else {
+            var = new RooRealVar(name, description, inputValue, inputMinValue, inputMaxValue, unit);        
+        }
+    }
     parameters->Add(var);
     return var;
 }
