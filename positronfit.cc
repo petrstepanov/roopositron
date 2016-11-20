@@ -294,7 +294,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
         std::string modelName = constants->getDecayModel();
 	ParamStorage* storage = new ParamStorage(modelName);
         
-	RooRealVar* fwhm2disp = new RooRealVar("fwhm2disp", "Coefficient to convert fwhm to dispersion", 0.4247);  //1.0/(2.0*Sqrt(2.0*Log(2.0)))
+	RooConstVar* fwhm2disp = new RooConstVar("fwhm2disp", "Coefficient to convert fwhm to dispersion", 0.4247);  //1.0/(2.0*Sqrt(2.0*Log(2.0)))
 
 	// Zero channel value is relative to the MIN_CHANNEL value
 	RooRealVar** zero_ch = new RooRealVar*[iNumberOfFiles];
@@ -513,15 +513,6 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
         // in case   user doesnt want to wait till fitting ends
         storage->save();        
         
-	// Variable to store chi2 values for every spectrum
-	RooChi2Var** chi2 = new RooChi2Var*[iNumberOfFiles];
-	//  for (i=0; i<iNumberOfFiles; i++) chi2[i] = new RooChi2Var (TString::Format("chi2_%d",i+1),"chi powered",*decay_model_with_source_bg[i],*histSpectrum[i],NumCPU(2),DataError(RooAbsData::Poisson));
-	for (unsigned i = 0; i<iNumberOfFiles; i++){
-		chi2[i] = new RooChi2Var(TString::Format("chi2_%d", i + 1), "chi powered", *decay_model_with_source_bg[i], *histSpectrum[i], NumCPU(8), DataError(RooAbsData::None));
-	}
-	RooChi2Var* simChi2;
-	Int_t simNp;
-
 	// CASE: FIT SPECTRUMS SEPARATELY WITH ROOMINUIT
 
 	// Create Category Types
@@ -574,7 +565,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	// simPdf->fitTo(*combData, NumCPU(NUM_CPU));
 
 	// Use RooMinuit interface to minimize chi^2
-	simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combData); // , NumCPU(NUM_CPU) , DataError(RooAbsData::None));
+	RooChi2Var* simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combData); // , NumCPU(NUM_CPU) , DataError(RooAbsData::None));
 	RooMinuit m(*simChi2);
 	m.migrad();
 	m.improve();
@@ -584,7 +575,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 
 	RooArgSet* simFloatPars = simPdf->getParameters(*combData);
 	RooAbsCollection* simFloatPars1 = simFloatPars->selectByAttrib("Constant", kFALSE);
-	simNp = simFloatPars1->getSize();
+	Int_t simNp = simFloatPars1->getSize();
 
 	std::cout << "Fit Performed OK!" << std::endl;
 
@@ -592,6 +583,12 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	// if (!storage->fileExists(filename)) storage->save();
 	storage->save();
 
+      	// Variable to store chi2 values for every spectrum
+	RooChi2Var** chi2 = new RooChi2Var*[iNumberOfFiles];
+	//  for (i=0; i<iNumberOfFiles; i++) chi2[i] = new RooChi2Var (TString::Format("chi2_%d",i+1),"chi powered",*decay_model_with_source_bg[i],*histSpectrum[i],NumCPU(2),DataError(RooAbsData::Poisson));
+	for (unsigned i = 0; i<iNumberOfFiles; i++){
+            chi2[i] = new RooChi2Var(TString::Format("chi2_%d", i + 1), "chi powered", *decay_model_with_source_bg[i], *histSpectrum[i]); // NumCPU(8) , , DataError(RooAbsData::None)
+	}
 
 	/*
 	________                    .__    .__
@@ -615,7 +612,8 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 		histSpectrum[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kBlack), LineWidth(1), MarkerSize(0.5), MarkerColor(kBlack));
 		// res_funct[i]->plotOn(graphFrame[i], LineStyle(3), LineColor(kGray + 3), LineWidth(1));
 		decay_model_with_source_bg[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kPink - 4), LineWidth(2));
-		decay_model_with_source_bg[i]->paramOn(graphFrame[i], Layout(0.6), Format("NEU", AutoPrecision(1)));// Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);
+                std::string legendLabel = constants->getDecayModel() + " model parameters";
+		decay_model_with_source_bg[i]->paramOn(graphFrame[i], Layout(0.6), Format("NEU", AutoPrecision(1)), ShowConstants(kTRUE), Label(legendLabel.c_str()));// Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);
 		// test_model[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kPink-4), LineWidth(2));
 		// test_model[i]->paramOn(graphFrame[i], Layout(0.6), Format("NEU", AutoPrecision(1)));// Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);
 	}
@@ -628,14 +626,16 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	RooPlot** chiFrame = new RooPlot*[iNumberOfFiles];
 	Double_t* n_Degree = new Double_t[iNumberOfFiles];
 	for (unsigned i = 0; i<iNumberOfFiles; i++){
-		n_Degree[i] = MAX_CHANNEL - MIN_CHANNEL + 1.0 - simNp;
-		std::cout << "simNp: " << simNp << std::endl;
-		chi2Value[i] = (simChi2->getVal()) / n_Degree[i];
+                RooAbsCollection* freeParameters = (decay_model_with_source_bg[i]->getParameters(*histSpectrum[i]))->selectByAttrib("Constant",kFALSE);
+		n_Degree[i] = MAX_CHANNEL - MIN_CHANNEL + 1 - freeParameters->getSize();
+		// std::cout << "simNp: " << simNp << std::endl;
+		// chi2Value[i] = (simChi2->getVal()) / n_Degree[i];  // multiply on number of files
+		chi2Value[i] = chi2[i]->getVal() / n_Degree[i];  // multiply on number of files
 		hresid[i] = graphFrame[i]->pullHist();
-		chiFrame[i] = rChannels->frame(Title(TString::Format("Chi^2/N_Degree is %f (%e)", chi2Value[i], TMath::Sqrt(2 / n_Degree[i]))));
+		chiFrame[i] = rChannels->frame(Title(TString::Format("Goodness of fit: chi^2 = %.3f +/- %.3f", chi2Value[i], TMath::Sqrt(2 / n_Degree[i]))));
 		chiFrame[i]->addPlotable(hresid[i], "BX");
 		chiFrame[i]->GetXaxis()->SetRangeUser(0, MAX_CHANNEL-MIN_CHANNEL+1);
-		histSpectrum[i]->statOn(chiFrame[i]);
+		// histSpectrum[i]->statOn(chiFrame[i]);
 	}
 	std::cout << "Chi2 Frames Created OK!" << std::endl;
 
