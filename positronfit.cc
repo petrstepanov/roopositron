@@ -624,7 +624,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	Double_t* chi2Value = new Double_t[iNumberOfFiles];
 	RooHist** hresid = new RooHist*[iNumberOfFiles];
 	RooPlot** chiFrame = new RooPlot*[iNumberOfFiles];
-	Double_t* n_Degree = new Double_t[iNumberOfFiles];
+	Int_t* n_Degree = new Int_t[iNumberOfFiles];
 	for (unsigned i = 0; i<iNumberOfFiles; i++){
                 RooAbsCollection* freeParameters = (decay_model_with_source_bg[i]->getParameters(*histSpectrum[i]))->selectByAttrib("Constant",kFALSE);
 		n_Degree[i] = MAX_CHANNEL - MIN_CHANNEL + 1 - freeParameters->getSize();
@@ -632,7 +632,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 		// chi2Value[i] = (simChi2->getVal()) / n_Degree[i];  // multiply on number of files
 		chi2Value[i] = chi2[i]->getVal() / n_Degree[i];  // multiply on number of files
 		hresid[i] = graphFrame[i]->pullHist();
-		chiFrame[i] = rChannels->frame(Title(TString::Format("Goodness of fit: chi^2 = %.3f +/- %.3f", chi2Value[i], TMath::Sqrt(2 / n_Degree[i]))));
+		chiFrame[i] = rChannels->frame(Title(TString::Format("Goodness of fit: chi^2 = %.1f / %d = %.3f", chi2[i]->getVal(), n_Degree[i], chi2Value[i])));
 		chiFrame[i]->addPlotable(hresid[i], "BX");
 		chiFrame[i]->GetXaxis()->SetRangeUser(0, MAX_CHANNEL-MIN_CHANNEL+1);
 		// histSpectrum[i]->statOn(chiFrame[i]);
