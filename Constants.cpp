@@ -91,17 +91,16 @@ void Constants::print(){
 void Constants::writeDefaultConstants(){
     std::ofstream myfile;
     myfile.open (filename.c_str());
-    myfile << "Writing default constants file.\n";
-    myfile.close();    
-    std::cout << "channels:      " << std::setw(12) << channels     << "# number of channels in Maestro .Spe file" << std::endl;
-    std::cout << "channel width: " << std::setw(12) << channelWidth << "# channel width, ns" << std::endl;
-    std::cout << "skip lines:    " << std::setw(12) << skipLines    << "# Maestro header size" << std::endl;
-    std::cout << "minChannel:    " << std::setw(12) << minChannel   << "# minimum channel (>= 1), included in plot" << std::endl;
-    std::cout << "maxChannel:    " << std::setw(12) << maxChannel   << "# maximum channel, included in plot" << std::endl;
-    std::cout << "decayModel:    " << std::setw(12) << decayModel   << "# decay model - \"1exp\", \"2exp\", \"trapping\", \"grain\"" << std::endl;
-    std::cout << "sourceModel:   " << std::setw(12) << sourceModel  << "# source contribution - \"1exp\", \"2exp\" (annihilation in air?)" << std::endl;    
-    std::cout << "imageWidth:    " << std::setw(12) << imageWidth   << "# image width" << std::endl;   
-    std::cout << "imageHeight:   " << std::setw(12) << imageHeight  << "# image height" << std::endl;       
+    myfile << std::left << std::setw(12) << channels     << "# number of channels in Maestro .Spe file" << std::endl;
+    myfile << std::left << std::setw(12) << channelWidth << "# channel width, ns" << std::endl;
+    myfile << std::left << std::setw(12) << skipLines    << "# Maestro header size" << std::endl;
+    myfile << std::left << std::setw(12) << minChannel   << "# minimum channel (>= 1), included in plot" << std::endl;
+    myfile << std::left << std::setw(12) << maxChannel   << "# maximum channel, included in plot" << std::endl;
+    myfile << std::left << std::setw(12) << decayModel   << "# decay model - \"1exp\", \"2exp\", \"trapping\", \"grain\"" << std::endl;
+    myfile << std::left << std::setw(12) << sourceModel  << "# source contribution - \"1exp\", \"2exp\" (annihilation in air?)" << std::endl;    
+    myfile << std::left << std::setw(12) << imageWidth   << "# image width" << std::endl;   
+    myfile << std::left << std::setw(12) << imageHeight  << "# image height" << std::endl;       
+    myfile.close();  
 }
 
 int Constants::getNumberOfChannels(){
