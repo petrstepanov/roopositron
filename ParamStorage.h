@@ -19,6 +19,7 @@
 #include "TList.h"
 #include "RooRealVar.h"
 #include <iostream>
+#include <algorithm>
 
 class ParamStorage {
 public:

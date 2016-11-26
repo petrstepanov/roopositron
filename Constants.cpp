@@ -37,9 +37,10 @@ void Constants::init(){
     imageHeight   = 500;
     // Read from file
     std::string line;
-    std::ifstream constantsFile("constants.txt");
+    std::ifstream constantsFile(filename.c_str());
     if (!constantsFile.is_open()) {
-        std::cout << "Constants: \"constants.txt\" not found. Using default values." << std::endl;        
+        std::cout << "Constants: \"" << filename << "\" not found. Using default values." << std::endl;        
+        writeDefaultConstants();
         return;
     }
 
@@ -85,6 +86,22 @@ void Constants::print(){
     std::cout << "sourceModel:   " << sourceModel << std::endl;    
     std::cout << "imageWidth:    " << imageWidth << std::endl;   
     std::cout << "imageHeight:   " << imageHeight << std::endl;       
+}
+
+void Constants::writeDefaultConstants(){
+    std::ofstream myfile;
+    myfile.open (filename.c_str());
+    myfile << "Writing default constants file.\n";
+    myfile.close();    
+    std::cout << "channels:      " << std::setw(12) << channels     << "# number of channels in Maestro .Spe file" << std::endl;
+    std::cout << "channel width: " << std::setw(12) << channelWidth << "# channel width, ns" << std::endl;
+    std::cout << "skip lines:    " << std::setw(12) << skipLines    << "# Maestro header size" << std::endl;
+    std::cout << "minChannel:    " << std::setw(12) << minChannel   << "# minimum channel (>= 1), included in plot" << std::endl;
+    std::cout << "maxChannel:    " << std::setw(12) << maxChannel   << "# maximum channel, included in plot" << std::endl;
+    std::cout << "decayModel:    " << std::setw(12) << decayModel   << "# decay model - \"1exp\", \"2exp\", \"trapping\", \"grain\"" << std::endl;
+    std::cout << "sourceModel:   " << std::setw(12) << sourceModel  << "# source contribution - \"1exp\", \"2exp\" (annihilation in air?)" << std::endl;    
+    std::cout << "imageWidth:    " << std::setw(12) << imageWidth   << "# image width" << std::endl;   
+    std::cout << "imageHeight:   " << std::setw(12) << imageHeight  << "# image height" << std::endl;       
 }
 
 int Constants::getNumberOfChannels(){

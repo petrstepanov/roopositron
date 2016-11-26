@@ -15,6 +15,7 @@
 #define MY_CONSTANTS
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <string>
 
@@ -46,6 +47,8 @@ private:
     int         imageWidth;
     int         imageHeight;
     void init();
+    void writeDefaultConstants();
+    const std::string filename = "constants.txt";
 };
 
 #endif /* MY_CONSTANTS */

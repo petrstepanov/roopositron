@@ -158,8 +158,10 @@ Double_t getConstBackgroundFraction(TH1F* hist){
     Int_t nBins = hist->GetXaxis()->GetNbins();
     const Int_t wingBins = 40;
     Double_t fullInt = hist->Integral(1, nBins);
-    Double_t rightWingAverage = (hist->Integral(nBins - wingBins, nBins)) / (Double_t)(wingBins);
-    Double_t bgInt = nBins * rightWingAverage;
+    Double_t leftWingAverage = (hist->Integral(1, wingBins)) / (Double_t)(wingBins);
+//    Double_t rightWingAverage = (hist->Integral(nBins - wingBins, nBins)) / (Double_t)(wingBins);
+//    Double_t bgInt = nBins * rightWingAverage;
+    Double_t bgInt = nBins * leftWingAverage;
     return bgInt / fullInt;
 }
 
