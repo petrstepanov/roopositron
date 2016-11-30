@@ -495,15 +495,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 		floatPars1[i] = floatPars[i]->selectByAttrib("Constant", kFALSE);
 		np[i] = floatPars1[i]->getSize();
 	}
-
-        // bg plus resolution function test
-        RooAddPdf** resFuncPlusBg = new RooAddPdf*[iNumberOfFiles];   
-        RooRealVar** bgFractionReal = new RooRealVar*[iNumberOfFiles];
-	for (unsigned i = 0; i<iNumberOfFiles; i++){
-            bgFractionReal[i] = new RooRealVar(TString::Format("bg_fraction_real_%d", i+1), "", bgFraction[i]);
-            resFuncPlusBg[i] = new RooAddPdf(TString::Format("res_funct_with_bg_%d", i+1), TString::Format("res_funct_with_bg_%d", i+1), RooArgList(*bg[i], *res_funct[i]), RooArgList(*bgFractionReal[i]), kTRUE);
-        }
-        
+       
         
 	/*
 	___________.__  __                         __
@@ -624,10 +616,11 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 
 		histSpectrum[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kBlack), LineWidth(1), MarkerSize(0.5), MarkerColor(kBlack));
 
-                // Draw only Resolution Function
-		resFuncPlusBg[i]->plotOn(graphFrame[i], LineStyle(3), LineColor(kGray + 3), LineWidth(1));
-
-//       		res_funct[i]->plotOn(graphFrame[i], LineStyle(3), LineColor(kGray + 3), LineWidth(1));
+                // Draw Resolution Function sumed with Background
+                RooRealVar* bgFractionReal = new RooRealVar(TString::Format("bg_fraction_real_%d", i+1), "", bgFraction[i]);
+                RooAddPdf* resFuncPlusBg = new RooAddPdf(TString::Format("res_funct_with_bg_%d", i+1), TString::Format("res_funct_with_bg_%d", i+1), RooArgList(*bg[i], *res_funct[i]), RooArgList(*bgFractionReal), kTRUE);
+		resFuncPlusBg->plotOn(graphFrame[i], LineStyle(3), LineColor(kGray + 3), LineWidth(1));
+//    		res_funct[i]->plotOn(graphFrame[i], LineStyle(3), LineColor(kGray + 3), LineWidth(1));
                 
                 // Draw complete fit
 		decay_model_with_source_bg[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kPink - 4), LineWidth(2));
