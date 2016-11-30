@@ -9,6 +9,8 @@
         <group>
             <file>file:/Users/petrstepanov/Development/NetBeansProjects/positronfit/ParamStorage.cpp</file>
             <file>file:/Users/petrstepanov/Development/NetBeansProjects/positronfit/TrapPdf.cpp</file>
+            <file>file:/Users/petrstepanov/Development/NetBeansProjects/positronfit/Constants.cpp</file>
+            <file>file:/Users/petrstepanov/Development/NetBeansProjects/positronfit/Constants.h</file>
             <file>file:/Users/petrstepanov/Development/NetBeansProjects/positronfit/positronfit.cc</file>
         </group>
     </open-files>

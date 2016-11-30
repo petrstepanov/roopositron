@@ -470,9 +470,10 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 
 	// Background fractions array
 	RooRealVar** I_bg = new RooRealVar*[iNumberOfFiles];
+        Double_t* bgFraction = new Double_t[iNumberOfFiles];
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
-		Double_t bgFraction = getConstBackgroundFraction(fullTH1F[i]);
-		I_bg[i] = new RooRealVar(TString::Format("I_bg_%d", i + 1), "background_fraction", bgFraction); //, bgFraction / 100, bgFraction*10);
+		bgFraction[i] = getConstBackgroundFraction(fullTH1F[i]);
+		I_bg[i] = new RooRealVar(TString::Format("I_bg_%d", i + 1), "background_fraction", bgFraction[i]); //, bgFraction / 100, bgFraction*10);
 	}
 
 	// ADD BACKGROUND PDF
@@ -495,6 +496,15 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 		np[i] = floatPars1[i]->getSize();
 	}
 
+        // bg plus resolution function test
+        RooAddPdf** resFuncPlusBg = new RooAddPdf*[iNumberOfFiles];   
+        RooRealVar** bgFractionReal = new RooRealVar*[iNumberOfFiles];
+	for (unsigned i = 0; i<iNumberOfFiles; i++){
+            bgFractionReal[i] = new RooRealVar(TString::Format("bg_fraction_real_%d", i+1), "", bgFraction[i]);
+            resFuncPlusBg[i] = new RooAddPdf(TString::Format("res_funct_with_bg_%d", i+1), TString::Format("res_funct_with_bg_%d", i+1), RooArgList(*bg[i], *res_funct[i]), RooArgList(*bgFractionReal[i]), kTRUE);
+        }
+        
+        
 	/*
 	___________.__  __                         __
 	\_   _____/|__|/  |_  _____   ____   _____/  |_
@@ -570,8 +580,9 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	RooChi2Var* simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combData); // , NumCPU(NUM_CPU) , DataError(RooAbsData::None));
 	RooMinuit m(*simChi2);
 	m.migrad();
-	m.improve();
-	m.hesse();
+//	m.improve();
+//	m.hesse();
+
 	// m.save();
 	// m.fit("r");
 
@@ -612,7 +623,13 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 		graphFrame[i]->GetXaxis()->SetRangeUser(0, MAX_CHANNEL-MIN_CHANNEL + 1);
 
 		histSpectrum[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kBlack), LineWidth(1), MarkerSize(0.5), MarkerColor(kBlack));
-		// res_funct[i]->plotOn(graphFrame[i], LineStyle(3), LineColor(kGray + 3), LineWidth(1));
+
+                // Draw only Resolution Function
+		resFuncPlusBg[i]->plotOn(graphFrame[i], LineStyle(3), LineColor(kGray + 3), LineWidth(1));
+
+//       		res_funct[i]->plotOn(graphFrame[i], LineStyle(3), LineColor(kGray + 3), LineWidth(1));
+                
+                // Draw complete fit
 		decay_model_with_source_bg[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kPink - 4), LineWidth(2));
                 std::string legendLabel = constants->getDecayModel() + " model parameters";
 		decay_model_with_source_bg[i]->paramOn(graphFrame[i], Layout(0.6), Format("NEU", AutoPrecision(1)), ShowConstants(kTRUE), Label(legendLabel.c_str()));// Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);

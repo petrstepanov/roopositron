@@ -120,7 +120,8 @@ RooRealVar* ParamStorage::getOrMakeNew(const char* name, const char* description
             std::cin >> inputMaxValue;
         }
         if (isFixed){
-            var = new RooRealVar(name, description, inputValue, inputValue, inputValue, unit);      
+            var = new RooRealVar(name, description, inputValue, inputValue, inputValue, unit);     
+            var->setConstant(kTRUE);
         }
         else {
             var = new RooRealVar(name, description, inputValue, inputMinValue, inputMaxValue, unit);        

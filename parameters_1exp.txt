@@ -1,0 +1,17 @@
+Variable name       Description                     Value               Minimum             Maximum             Error               Unit      Type                
+zero_ch_1           zero_channel_1                  342.576320          296.000000          366.000000          0.036195            ch        free                
+zero_ch_2           zero_channel_2                  343.001084          298.000000          368.000000          0.036393            ch        free                
+zero_ch_3           zero_channel_3                  343.299399          296.000000          366.000000          0.036205            ch        free                
+zero_ch_4           zero_channel_4                  343.526749          297.000000          367.000000          0.036148            ch        free                
+zero_ch_5           zero_channel_5                  342.906901          292.000000          362.000000          0.036235            ch        free                
+g1_fwhm             1st_gauss_fwhm                  0.337364            0.100000            0.500000            0.000222            ns        free                
+g1_frac             1st_gauss_fraction              97.789879           95.000000           100.000000          0.062581            %         free                
+g2_fwhm             2nd_gauss_fwhm                  1.030600            0.500000            1.500000            0.011290            ns        free                
+g2_shift_1          2nd_gauss_shift_1               32.795735           -50.000000          50.000000           0.930405            ch        free                
+g2_shift_2          2nd_gauss_shift_2               29.860166           -50.000000          50.000000           0.909823            ch        free                
+g2_shift_3          2nd_gauss_shift_3               30.707607           -50.000000          50.000000           0.919306            ch        free                
+g2_shift_4          2nd_gauss_shift_4               31.170701           -50.000000          50.000000           0.934113            ch        free                
+g2_shift_5          2nd_gauss_shift_5               30.461132           -50.000000          50.000000           0.923966            ch        free                
+tau                 positron_lifetime               0.142578            0.100000            0.200000            0.000309            ns        free                
+t_source            source_e+_lifetime              0.380000            0.380000            0.380000            0.000000            ns        fixed               
+I_source            source_contribution             12.000000           12.000000           12.000000           0.000000            %         fixed               
