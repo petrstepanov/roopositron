@@ -26,6 +26,7 @@ Constants::~Constants() {
 
 void Constants::init(){
     // Default values
+    convolutionBins = 200;
     numCPU          = 1;
     channels        = 8192;        // entries in maestro file
     channelWidth    = 0.0061626;   // ns
@@ -46,6 +47,9 @@ void Constants::init(){
         return;
     }
 
+    constantsFile >> convolutionBins;
+    std::getline(constantsFile, line);    
+    
     constantsFile >> numCPU;
     std::getline(constantsFile, line);
     
@@ -85,6 +89,7 @@ void Constants::init(){
 }
 
 void Constants::print(){
+    std::cout << "convolutionBins:    " << convolutionBins << std::endl;
     std::cout << "numCPU:             " << numCPU << std::endl;
     std::cout << "channels:           " << channels << std::endl;
     std::cout << "channel width:      " << channelWidth << std::endl;
@@ -101,6 +106,7 @@ void Constants::print(){
 void Constants::writeDefaultConstants(){
     std::ofstream myfile;
     myfile.open (filename.c_str());
+    myfile << std::left << std::setw(12) << convolutionBins   << "# number of bins for convolution" << std::endl;
     myfile << std::left << std::setw(12) << numCPU            << "# number of CPU (careful with \"grain\" model)" << std::endl;
     myfile << std::left << std::setw(12) << channels          << "# number of channels in Maestro .Spe file" << std::endl;
     myfile << std::left << std::setw(12) << channelWidth      << "# channel width, ns" << std::endl;
@@ -113,6 +119,10 @@ void Constants::writeDefaultConstants(){
     myfile << std::left << std::setw(12) << imageWidth        << "# image width" << std::endl;   
     myfile << std::left << std::setw(12) << imageHeight       << "# image height" << std::endl;       
     myfile.close();  
+}
+
+int Constants::getConvolutionBins(){
+    return convolutionBins;
 }
 
 int Constants::getNumCPU(){

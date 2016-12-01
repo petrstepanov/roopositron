@@ -106,6 +106,10 @@
 #include "TPaveStats.h"
 #endif
 
+#ifndef ROOT_TLegend
+#include "TLegend.h"
+#endif
+
 #ifndef MY_MYPDFCACHE
 #include "MyPdfCache.h"
 #endif
@@ -175,8 +179,11 @@ Double_t getConstBackgroundFraction(TH1F* hist){
 
 int run(TApplication* theApp, Bool_t isRoot = kFALSE){
         // Output current time
-	std::cout << "Current date and time is " << getCurrentTime() << std::endl;
+	// std::cout << "Current date and time is " << getCurrentTime() << std::endl;
 
+        TStopwatch watch;
+        watch.Start();    
+    
 	// Print command line arguments
 	int argc = theApp->Argc();
 	char **argv = theApp->Argv();
@@ -318,11 +325,11 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	}
 
 	// 1st Gauss FWHM
-	RooRealVar* g1_fwhm = storage->getOrMakeNew("g1_fwhm", "1st_gauss_fwhm", 0.300, 0.100, 0.400, "ns");
+	RooRealVar* g1_fwhm = storage->getOrMakeNew("g1_fwhm", "1st_gauss_fwhm", 0.330, 0.150, 0.400, "ns");
 	RooFormulaVar* gauss_1_dispersion = new RooFormulaVar("gauss_1_dispersion", "@0*@1/@2", RooArgList(*g1_fwhm, *fwhm2disp, *channelWidth));
 
 	// 2nd gauss dispertion
-	RooRealVar* g2_fwhm = storage->getOrMakeNew("g2_fwhm", "2nd_gauss_fwhm", 1.0, 0.3, 1.5, "ns");
+	RooRealVar* g2_fwhm = storage->getOrMakeNew("g2_fwhm", "2nd_gauss_fwhm", 0.7, 0.4, 1.0, "ns");
 	RooFormulaVar* gauss_2_dispersion = new RooFormulaVar("gauss_2_dispersion", "@0*@1/@2", RooArgList(*g2_fwhm, *fwhm2disp, *channelWidth));
 
        	// Fraction of the 2nd gauss
@@ -346,7 +353,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
             }            
         } else {
             // 3rd gauss dispertion
-            RooRealVar* g3_fwhm = storage->getOrMakeNew("g3_fwhm", "3rd_gauss_fwhm", 2, 1, 5, "ns");
+            RooRealVar* g3_fwhm = storage->getOrMakeNew("g3_fwhm", "3rd_gauss_fwhm", 1.5, 1, 5, "ns");
             RooFormulaVar* gauss_3_dispersion = new RooFormulaVar("gauss_3_dispersion", "@0*@1/@2", RooArgList(*g3_fwhm, *fwhm2disp, *channelWidth));
 
             // Fraction of the 2nd gauss
@@ -465,7 +472,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
         
 	RooAddPdf* decay_model_sum = new RooAddPdf("decay_model_sum", "decay_model_sum", RooArgList(*decay_source, *decay_model), *I_source_);
 	RooFFTConvPdf** decay_model_with_source = new RooFFTConvPdf*[iNumberOfFiles];
-	rChannels->setBins(MAX_CHANNEL-MIN_CHANNEL, "cache");
+	rChannels->setBins(constants->getConvolutionBins(), "cache");
 	for (unsigned i = 0; i<iNumberOfFiles; i++){
 		decay_model_with_source[i] = new RooFFTConvPdf(TString::Format("decay_model_with_source_%d", i + 1), TString::Format("Grain Boundary Model N%d", i + 1), *rChannels, *decay_model_sum, *res_funct[i]);
 		decay_model_with_source[i]->setBufferFraction(0);
@@ -597,6 +604,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
             new RooChi2Var("simChi2", "chi2", *simPdf, *combData, NumCPU(constants->getNumCPU()));                        
 
 	RooMinuit m(*simChi2);
+        m.optimizeConst(1);
 	m.migrad();
 //	m.improve();
 //	m.hesse();
@@ -646,14 +654,11 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
                 RooRealVar* bgFractionReal = new RooRealVar(TString::Format("bg_fraction_real_%d", i+1), "", bgFraction[i]);
                 RooAddPdf* resFuncPlusBg = new RooAddPdf(TString::Format("res_funct_with_bg_%d", i+1), TString::Format("res_funct_with_bg_%d", i+1), RooArgList(*bg[i], *res_funct[i]), RooArgList(*bgFractionReal), kTRUE);
 		resFuncPlusBg->plotOn(graphFrame[i], LineStyle(3), LineColor(kGray + 3), LineWidth(1));
-//    		res_funct[i]->plotOn(graphFrame[i], LineStyle(3), LineColor(kGray + 3), LineWidth(1));
                 
                 // Draw complete fit
 		decay_model_with_source_bg[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kPink - 4), LineWidth(2));
-                std::string legendLabel = constants->getDecayModel() + " model parameters";
-		decay_model_with_source_bg[i]->paramOn(graphFrame[i], Layout(0.6), Format("NEU", AutoPrecision(1)), ShowConstants(kTRUE), Label(legendLabel.c_str()));// Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);
-		// test_model[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kPink-4), LineWidth(2));
-		// test_model[i]->paramOn(graphFrame[i], Layout(0.6), Format("NEU", AutoPrecision(1)));// Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);
+//                std::string legendLabel = constants->getDecayModel() + " model parameters";
+		decay_model_with_source_bg[i]->paramOn(graphFrame[i], Layout(0.78, 0.97, 0.9), Format("NEU", AutoPrecision(1)), ShowConstants(kTRUE));// , Label(legendLabel.c_str()) Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);
 	}
 	std::cout << "Plot Frames Created OK!" << std::endl;
 
@@ -672,11 +677,13 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 		hresid[i] = graphFrame[i]->pullHist();
                 hresid[i]->SetLineWidth(0);
                 hresid[i]->SetMarkerSize(0.2);
-		chiFrame[i] = rChannels->frame(Title(TString::Format("Goodness of fit: chi^2 = %.1f / %d = %.3f", chi2[i]->getVal(), n_Degree[i], chi2Value[i])));
+		chiFrame[i] = rChannels->frame(Title(" ")); //Title(TString::Format("Goodness of fit: chi^2 = %.1f / %d = %.3f", chi2[i]->getVal(), n_Degree[i], chi2Value[i])));
 //                ((RooDataHist*)hresid[i])->plotOn(chiFrame[i],DataError(RooAbsData::None));
                 chiFrame[i]->addPlotable(hresid[i]);
 		chiFrame[i]->GetXaxis()->SetRangeUser(0, MAX_CHANNEL-MIN_CHANNEL+1);
-		// histSpectrum[i]->statOn(chiFrame[i]);
+
+                // Write RooDataHist statistics on chi frame (to create TPaveStats object)
+		// histSpectrum[i]->statOn(chiFrame[i]);                
 	}
 	std::cout << "Chi2 Frames Created OK!" << std::endl;
 
@@ -687,27 +694,53 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
             canvas[i] = new TCanvas(TString::Format("canvas-%d", i + 1), TString::Format("Spectrum N%d \"%s\"", i + 1, sFileNames[i].c_str()), constants->getImageWidth(), constants->getImageHeight());
             canvas[i]->SetFillColor(0);
             canvas[i]->Divide(1, 2);
-            canvas[i]->cd(1);
+//            canvas[i]->cd(1)->SetPad(0, 0.4, 1, 1); // xlow ylow xup yup
+            canvas[i]->cd(1)->SetMargin(0.08, 0.03, 0.05, 0.1); // left right bottom top
             canvas[i]->cd(1)->SetLogy();
+            Double_t fontSize = 0.06;
+            graphFrame[i]->GetXaxis()->SetLabelSize(0);
+            graphFrame[i]->GetXaxis()->SetTitleSize(0);
+            graphFrame[i]->GetYaxis()->SetLabelSize(fontSize - 0.01);
             graphFrame[i]->GetYaxis()->SetRangeUser(1, iUpperLimit[i]);
+            graphFrame[i]->GetYaxis()->SetTitleSize(fontSize);             
+            graphFrame[i]->GetYaxis()->SetTitleOffset(0.5);  
             graphFrame[i]->Draw();
-            canvas[i]->cd(2);
+
+//            canvas[i]->cd(2)->SetPad(0, 0, 1, 0.4);
+            canvas[i]->cd(2)->SetMargin(0.08, 0.03, 0.3, 0.05); // left right bottom top - margin for bottom title space
+
+            chiFrame[i]->GetXaxis()->SetLabelSize(fontSize - 0.01);
+            chiFrame[i]->GetYaxis()->SetLabelSize(fontSize - 0.01);            
+            chiFrame[i]->GetYaxis()->SetLabelOffset(0.01);            
+            chiFrame[i]->GetXaxis()->SetLabelOffset(0.04);  
+            chiFrame[i]->GetXaxis()->SetTitleSize(fontSize); 
+            chiFrame[i]->GetXaxis()->SetTitleOffset(2); 
+
             chiFrame[i]->Draw();
+            
+            TLegend* leg = new TLegend(0.78,0.8,0.97-0.01,0.95-0.01);  // x1 y1 x2 y2
+            leg->SetHeader(TString::Format("chi^2 = %.1f / %d = %.3f", chi2[i]->getVal(), n_Degree[i], chi2Value[i]));
+            leg->SetTextSize(0.05);
+            leg->SetLineWidth(0);
+            leg->Draw();
+            
+            //            ps->SetName("mystats");
+            
             if (!isRoot){
                 canvas[i]->Modified();
                 canvas[i]->Update();                
 //              gSystem->ProcessEvents();
             }
 
-            // Legend
-            // TPaveStats *ps = ((TPaveStats*)histSpectrum[i])->GetPrimitive("stats");
-            
             TString imageFilename = TString::Format("%sfit-%s-%d.png", sOutputPath.c_str(), (constants->getDecayModel()).c_str(), i+1);
             fileUtils->saveImage(canvas[i], imageFilename.Data());
 	}
        
-	std::cout << "Current date and time is " << getCurrentTime() << std::endl;
-
+	//std::cout << "Current date and time is " << getCurrentTime() << std::endl;
+        
+        watch.Stop();
+        watch.Print();
+        
 	return 1;
 }
 

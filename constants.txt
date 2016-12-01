@@ -1,3 +1,5 @@
+500         # convolution bins
+8           # CPU number
 8192        # number of channels in Maestro .Spe file
 0.0061626   # channel width, ns d
 12          # Maestro header size

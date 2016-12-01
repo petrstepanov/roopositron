@@ -25,6 +25,7 @@ public:
     Constants(const Constants& orig);
     virtual ~Constants();
     
+    int getConvolutionBins();
     int getNumCPU();
     int getNumberOfChannels();
     double getChannelWidth();
@@ -39,6 +40,7 @@ public:
     void print();
     
 private:
+    int         convolutionBins; // Convolution bins
     int         numCPU;          // CPU number
     int         channels;        // entries in maestro file
     double      channelWidth;    // ns

@@ -180,7 +180,8 @@ build/Debug_OS_X/GNU-MacOSX/positronfit.o: positronfit.cc \
   /Applications/root_v6.06.02/include/TPave.h \
   /Applications/root_v6.06.02/include/TBox.h \
   /Applications/root_v6.06.02/include/TText.h \
-  /Applications/root_v6.06.02/include/TLine.h MyPdfCache.h \
+  /Applications/root_v6.06.02/include/TLine.h \
+  /Applications/root_v6.06.02/include/TLegend.h MyPdfCache.h \
   StructParams.h ParamStorage.h TwoGaussian.h ThreeGaussian.h ExpPdf.h \
   TwoExpPdf.h MyPdf.h TrapPdf.h FileUtils.h \
   /Applications/root_v6.06.02/include/TImage.h \
@@ -549,6 +550,8 @@ build/Debug_OS_X/GNU-MacOSX/positronfit.o: positronfit.cc \
 /Applications/root_v6.06.02/include/TText.h:
 
 /Applications/root_v6.06.02/include/TLine.h:
+
+/Applications/root_v6.06.02/include/TLegend.h:
 
 MyPdfCache.h:
 
