@@ -465,7 +465,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
         
 	RooAddPdf* decay_model_sum = new RooAddPdf("decay_model_sum", "decay_model_sum", RooArgList(*decay_source, *decay_model), *I_source_);
 	RooFFTConvPdf** decay_model_with_source = new RooFFTConvPdf*[iNumberOfFiles];
-	rChannels->setBins(600, "cache");
+	rChannels->setBins(MAX_CHANNEL-MIN_CHANNEL, "cache");
 	for (unsigned i = 0; i<iNumberOfFiles; i++){
 		decay_model_with_source[i] = new RooFFTConvPdf(TString::Format("decay_model_with_source_%d", i + 1), TString::Format("Grain Boundary Model N%d", i + 1), *rChannels, *decay_model_sum, *res_funct[i]);
 		decay_model_with_source[i]->setBufferFraction(0);
@@ -592,7 +592,10 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	// simPdf->fitTo(*combData, NumCPU(NUM_CPU));
 
 	// Use RooMinuit interface to minimize chi^2
-	RooChi2Var* simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combData); // , NumCPU(NUM_CPU) , DataError(RooAbsData::None));
+        RooChi2Var* simChi2 = (constants->getNumCPU() < 2) ?
+            new RooChi2Var("simChi2", "chi2", *simPdf, *combData) : // DataError(RooAbsData::None));            
+            new RooChi2Var("simChi2", "chi2", *simPdf, *combData, NumCPU(constants->getNumCPU()));                        
+
 	RooMinuit m(*simChi2);
 	m.migrad();
 //	m.improve();

@@ -26,6 +26,7 @@ Constants::~Constants() {
 
 void Constants::init(){
     // Default values
+    numCPU          = 1;
     channels        = 8192;        // entries in maestro file
     channelWidth    = 0.0061626;   // ns
     skipLines       = 12;          // spectrum header size
@@ -45,6 +46,9 @@ void Constants::init(){
         return;
     }
 
+    constantsFile >> numCPU;
+    std::getline(constantsFile, line);
+    
     constantsFile >> channels;
     std::getline(constantsFile, line);
 
@@ -81,6 +85,7 @@ void Constants::init(){
 }
 
 void Constants::print(){
+    std::cout << "numCPU:             " << numCPU << std::endl;
     std::cout << "channels:           " << channels << std::endl;
     std::cout << "channel width:      " << channelWidth << std::endl;
     std::cout << "skip lines:         " << skipLines << std::endl;
@@ -96,6 +101,7 @@ void Constants::print(){
 void Constants::writeDefaultConstants(){
     std::ofstream myfile;
     myfile.open (filename.c_str());
+    myfile << std::left << std::setw(12) << numCPU            << "# number of CPU (careful with \"grain\" model)" << std::endl;
     myfile << std::left << std::setw(12) << channels          << "# number of channels in Maestro .Spe file" << std::endl;
     myfile << std::left << std::setw(12) << channelWidth      << "# channel width, ns" << std::endl;
     myfile << std::left << std::setw(12) << skipLines         << "# Maestro header size" << std::endl;
@@ -107,6 +113,10 @@ void Constants::writeDefaultConstants(){
     myfile << std::left << std::setw(12) << imageWidth        << "# image width" << std::endl;   
     myfile << std::left << std::setw(12) << imageHeight       << "# image height" << std::endl;       
     myfile.close();  
+}
+
+int Constants::getNumCPU(){
+    return numCPU;
 }
 
 int Constants::getNumberOfChannels(){

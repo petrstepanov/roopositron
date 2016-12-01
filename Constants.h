@@ -25,6 +25,7 @@ public:
     Constants(const Constants& orig);
     virtual ~Constants();
     
+    int getNumCPU();
     int getNumberOfChannels();
     double getChannelWidth();
     int getSkipLines();
@@ -38,6 +39,7 @@ public:
     void print();
     
 private:
+    int         numCPU;          // CPU number
     int         channels;        // entries in maestro file
     double      channelWidth;    // ns
     int         skipLines;       // spectrum header size
