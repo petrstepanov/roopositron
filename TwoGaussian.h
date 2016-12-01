@@ -23,7 +23,7 @@ class TwoGaussian : public RooAbsPdf {
 public:
 	TwoGaussian() {    };
 	TwoGaussian(const char *name, const char *title,
-		RooAbsReal& _x, RooAbsReal& _mean1, RooAbsReal& _sigma1, RooAbsReal& _mean2, RooAbsReal& _sigma2, RooAbsReal& _i1);
+		RooAbsReal& _x, RooAbsReal& _mean1, RooAbsReal& _sigma1, RooAbsReal& _mean2, RooAbsReal& _sigma2, RooAbsReal& _i2);
 	TwoGaussian(const TwoGaussian& other, const char* name = 0);
 	virtual TObject* clone(const char* newname) const { return new TwoGaussian(*this, newname); }
 	inline virtual ~TwoGaussian() {  }
@@ -35,7 +35,7 @@ protected:
 	RooRealProxy sigma1;
 	RooRealProxy mean2;
 	RooRealProxy sigma2;
-	RooRealProxy i1;
+	RooRealProxy i2;
 
 	Double_t evaluate() const;
 

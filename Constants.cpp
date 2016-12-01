@@ -26,15 +26,16 @@ Constants::~Constants() {
 
 void Constants::init(){
     // Default values
-    channels      = 8192;        // entries in maestro file
-    channelWidth  = 0.0061626;   // ns
-    skipLines     = 12;          // spectrum header size
-    minChannel    = 2200;        // left channel
-    maxChannel    = 3500;        // right channel   
-    decayModel    = "1exp";
-    sourceModel   = "1exp";
-    imageWidth    = 1024;
-    imageHeight   = 500;
+    channels        = 8192;        // entries in maestro file
+    channelWidth    = 0.0061626;   // ns
+    skipLines       = 12;          // spectrum header size
+    minChannel      = 2100;        // left channel
+    maxChannel      = 5500;        // right channel   
+    resolutionModel = "2gauss";
+    decayModel      = "1exp";
+    sourceModel     = "1exp";
+    imageWidth      = 1024;
+    imageHeight     = 500;
     // Read from file
     std::string line;
     std::ifstream constantsFile(filename.c_str());
@@ -59,6 +60,9 @@ void Constants::init(){
     constantsFile >> maxChannel;
     std::getline(constantsFile, line);
 
+    constantsFile >> resolutionModel;
+    std::getline(constantsFile, line);
+
     constantsFile >> decayModel;
     std::getline(constantsFile, line);
 
@@ -77,29 +81,31 @@ void Constants::init(){
 }
 
 void Constants::print(){
-    std::cout << "channels:      " << channels << std::endl;
-    std::cout << "channel width: " << channelWidth << std::endl;
-    std::cout << "skip lines:    " << skipLines << std::endl;
-    std::cout << "minChannel:    " << minChannel << std::endl;
-    std::cout << "maxChannel:    " << maxChannel << std::endl;
-    std::cout << "decayModel:    " << decayModel << std::endl;
-    std::cout << "sourceModel:   " << sourceModel << std::endl;    
-    std::cout << "imageWidth:    " << imageWidth << std::endl;   
-    std::cout << "imageHeight:   " << imageHeight << std::endl;       
+    std::cout << "channels:           " << channels << std::endl;
+    std::cout << "channel width:      " << channelWidth << std::endl;
+    std::cout << "skip lines:         " << skipLines << std::endl;
+    std::cout << "minChannel:         " << minChannel << std::endl;
+    std::cout << "maxChannel:         " << maxChannel << std::endl;
+    std::cout << "resolutionModel:    " << resolutionModel << std::endl;
+    std::cout << "decayModel:         " << decayModel << std::endl;
+    std::cout << "sourceModel:        " << sourceModel << std::endl;    
+    std::cout << "imageWidth:         " << imageWidth << std::endl;   
+    std::cout << "imageHeight:        " << imageHeight << std::endl;       
 }
 
 void Constants::writeDefaultConstants(){
     std::ofstream myfile;
     myfile.open (filename.c_str());
-    myfile << std::left << std::setw(12) << channels     << "# number of channels in Maestro .Spe file" << std::endl;
-    myfile << std::left << std::setw(12) << channelWidth << "# channel width, ns" << std::endl;
-    myfile << std::left << std::setw(12) << skipLines    << "# Maestro header size" << std::endl;
-    myfile << std::left << std::setw(12) << minChannel   << "# minimum channel (>= 1), included in plot" << std::endl;
-    myfile << std::left << std::setw(12) << maxChannel   << "# maximum channel, included in plot" << std::endl;
-    myfile << std::left << std::setw(12) << decayModel   << "# decay model - \"1exp\", \"2exp\", \"trapping\", \"grain\"" << std::endl;
-    myfile << std::left << std::setw(12) << sourceModel  << "# source contribution - \"1exp\", \"2exp\" (annihilation in air?)" << std::endl;    
-    myfile << std::left << std::setw(12) << imageWidth   << "# image width" << std::endl;   
-    myfile << std::left << std::setw(12) << imageHeight  << "# image height" << std::endl;       
+    myfile << std::left << std::setw(12) << channels          << "# number of channels in Maestro .Spe file" << std::endl;
+    myfile << std::left << std::setw(12) << channelWidth      << "# channel width, ns" << std::endl;
+    myfile << std::left << std::setw(12) << skipLines         << "# Maestro header size" << std::endl;
+    myfile << std::left << std::setw(12) << minChannel        << "# minimum channel (>= 1), included in plot" << std::endl;
+    myfile << std::left << std::setw(12) << maxChannel        << "# maximum channel, included in plot" << std::endl;
+    myfile << std::left << std::setw(12) << resolutionModel   << "# resolution model - \"2gauss\" or \"3gauss\"" << std::endl;
+    myfile << std::left << std::setw(12) << decayModel        << "# decay model - \"1exp\", \"2exp\", \"trapping\", \"grain\"" << std::endl;
+    myfile << std::left << std::setw(12) << sourceModel       << "# source contribution - \"1exp\", \"2exp\" (annihilation in air?)" << std::endl;    
+    myfile << std::left << std::setw(12) << imageWidth        << "# image width" << std::endl;   
+    myfile << std::left << std::setw(12) << imageHeight       << "# image height" << std::endl;       
     myfile.close();  
 }
 
@@ -121,6 +127,10 @@ int Constants::getMinChannel(){
 
 int Constants::getMaxChannel(){
     return maxChannel;
+}
+
+std::string Constants::getResolutionFunctionModel(){
+    return resolutionModel;
 }
 
 std::string Constants::getDecayModel(){

@@ -30,6 +30,7 @@ public:
     int getSkipLines();
     int getMinChannel();
     int getMaxChannel();
+    std::string getResolutionFunctionModel();    
     std::string getDecayModel();
     std::string getSourceContributionModel();
     int getImageWidth();
@@ -37,13 +38,14 @@ public:
     void print();
     
 private:
-    int         channels;       // entries in maestro file
-    double      channelWidth;   // ns
-    int         skipLines;      // spectrum header size
-    int         minChannel;     // left channel
-    int         maxChannel;     // right channel
-    std::string decayModel;     // decay model 1exp, 2exp, 3exp, grain
-    std::string sourceModel;    // 1exp, 2exp (annihilation in air?)
+    int         channels;        // entries in maestro file
+    double      channelWidth;    // ns
+    int         skipLines;       // spectrum header size
+    int         minChannel;      // left channel
+    int         maxChannel;      // right channel
+    std::string resolutionModel; // resolution function model `2gauss` or `3gauss`
+    std::string decayModel;      // decay model `1exp`, `2exp`, `trapping` or `grain`
+    std::string sourceModel;     // 1exp, 2exp (annihilation in air?)
     int         imageWidth;
     int         imageHeight;
     void init();

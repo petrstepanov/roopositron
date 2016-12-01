@@ -50,6 +50,7 @@ Contributor(s):
       <itemPath>MyPdfCache.h</itemPath>
       <itemPath>ParamStorage.h</itemPath>
       <itemPath>StructParams.h</itemPath>
+      <itemPath>ThreeGaussian.h</itemPath>
       <itemPath>TrapPdf.h</itemPath>
       <itemPath>TwoExpPdf.h</itemPath>
       <itemPath>TwoGaussian.h</itemPath>
@@ -75,6 +76,7 @@ Contributor(s):
       <itemPath>MyPdfCache.cpp</itemPath>
       <itemPath>ParamStorage.cpp</itemPath>
       <itemPath>StructParams.cpp</itemPath>
+      <itemPath>ThreeGaussian.cpp</itemPath>
       <itemPath>TrapPdf.cpp</itemPath>
       <itemPath>TwoExpPdf.cpp</itemPath>
       <itemPath>TwoGaussian.cpp</itemPath>
@@ -181,6 +183,10 @@ Contributor(s):
       <item path="StructParams.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="StructParams.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ThreeGaussian.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ThreeGaussian.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="TrapPdf.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -296,6 +302,10 @@ Contributor(s):
       </item>
       <item path="StructParams.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="ThreeGaussian.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ThreeGaussian.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="TrapPdf.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="TrapPdf.h" ex="false" tool="3" flavor2="0">
@@ -401,6 +411,10 @@ Contributor(s):
       <item path="StructParams.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="StructParams.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ThreeGaussian.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ThreeGaussian.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="TrapPdf.cpp" ex="false" tool="1" flavor2="0">
       </item>

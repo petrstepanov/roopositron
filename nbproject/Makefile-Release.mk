@@ -42,6 +42,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/MyPdfCache.o \
 	${OBJECTDIR}/ParamStorage.o \
 	${OBJECTDIR}/StructParams.o \
+	${OBJECTDIR}/ThreeGaussian.o \
 	${OBJECTDIR}/TrapPdf.o \
 	${OBJECTDIR}/TwoExpPdf.o \
 	${OBJECTDIR}/TwoGaussian.o \
@@ -106,6 +107,11 @@ ${OBJECTDIR}/StructParams.o: StructParams.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/StructParams.o StructParams.cpp
+
+${OBJECTDIR}/ThreeGaussian.o: ThreeGaussian.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ThreeGaussian.o ThreeGaussian.cpp
 
 ${OBJECTDIR}/TrapPdf.o: TrapPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}

@@ -102,6 +102,10 @@
 #include "TStyle.h"
 #endif
 
+#ifndef ROOT_TPaveStats
+#include "TPaveStats.h"
+#endif
+
 #ifndef MY_MYPDFCACHE
 #include "MyPdfCache.h"
 #endif
@@ -112,6 +116,10 @@
 
 #ifndef MY_TWOGAUSSIAN
 #include "TwoGaussian.h"
+#endif
+
+#ifndef MY_THREEGAUSSIAN
+#include "ThreeGaussian.h"
 #endif
 
 #ifndef MY_EXPPDF
@@ -296,7 +304,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
         std::string modelName = constants->getDecayModel();
 	ParamStorage* storage = new ParamStorage(modelName);
         
-	RooConstVar* fwhm2disp = new RooConstVar("fwhm2disp", "Coefficient to convert fwhm to dispersion", 0.4247);  //1.0/(2.0*Sqrt(2.0*Log(2.0)))
+	RooConstVar* fwhm2disp = new RooConstVar("fwhm2disp", "Coefficient to convert fwhm to dispersion", 0.42466);  //1.0/(2.0*Sqrt(2.0*Log(2.0)))
 
 	// Zero channel value is relative to the MIN_CHANNEL value
 	RooRealVar** zero_ch = new RooRealVar*[iNumberOfFiles];
@@ -310,30 +318,45 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	}
 
 	// 1st Gauss FWHM
-	RooRealVar* g1_fwhm = storage->getOrMakeNew("g1_fwhm", "1st_gauss_fwhm", 0.300, 0.100, 0.500, "ns");
+	RooRealVar* g1_fwhm = storage->getOrMakeNew("g1_fwhm", "1st_gauss_fwhm", 0.300, 0.100, 0.400, "ns");
 	RooFormulaVar* gauss_1_dispersion = new RooFormulaVar("gauss_1_dispersion", "@0*@1/@2", RooArgList(*g1_fwhm, *fwhm2disp, *channelWidth));
 
-	// Fraction of the 1st gauss
-	RooRealVar* gauss_1_fraction_pct = storage->getOrMakeNew("g1_frac", "1st_gauss_fraction", 98, 95, 100, "%");
-	RooFormulaVar* gauss_1_fraction = new RooFormulaVar("g1_fraction", "@0/100", *gauss_1_fraction_pct);
-
 	// 2nd gauss dispertion
-	RooRealVar* g2_fwhm = storage->getOrMakeNew("g2_fwhm", "2nd_gauss_fwhm", 1.0, 0.5, 1.5, "ns");
+	RooRealVar* g2_fwhm = storage->getOrMakeNew("g2_fwhm", "2nd_gauss_fwhm", 1.0, 0.3, 1.5, "ns");
 	RooFormulaVar* gauss_2_dispersion = new RooFormulaVar("gauss_2_dispersion", "@0*@1/@2", RooArgList(*g2_fwhm, *fwhm2disp, *channelWidth));
+
+       	// Fraction of the 2nd gauss
+	RooRealVar* gauss_2_fraction_pct = storage->getOrMakeNew("g2_frac", "2nd_gauss_fraction", 5, 0, 10, "%");
+	RooFormulaVar* gauss_2_fraction = new RooFormulaVar("g2_fraction", "@0/100", *gauss_2_fraction_pct);
 
 	// 2nd Gauss shift
 	RooRealVar** g2_shift = new RooRealVar*[iNumberOfFiles];
 	RooFormulaVar** zero_ch_relative_2 = new RooFormulaVar*[iNumberOfFiles];
 	for (unsigned i = 0; i < iNumberOfFiles; i++) {
-		g2_shift[i] = storage->getOrMakeNew(TString::Format("g2_shift_%d", i + 1), TString::Format("2nd_gauss_shift_%d", i + 1), 0, -50, 50, "ch");
+		g2_shift[i] = storage->getOrMakeNew(TString::Format("g2_shift_%d", i + 1), TString::Format("2nd_gauss_shift_%d", i + 1), 0, -70, 50, "ch");
 		zero_ch_relative_2[i] = new RooFormulaVar(TString::Format("zero_ch_relative_2_%d", i + 1), "@0+@1", RooArgList(*zero_ch[i], *g2_shift[i]));
 	}
 
 	// Two-Gauss PDF
-	TwoGaussian** res_funct = new TwoGaussian*[iNumberOfFiles];
-	for (unsigned i = 0; i<iNumberOfFiles; i++){
-		res_funct[i] = new TwoGaussian(TString::Format("res_funct_%d", i + 1), "Resolution Function for Convolution (2 Gauss)", *rChannels, *zero_ch[i], *gauss_1_dispersion, *zero_ch_relative_2[i], *gauss_2_dispersion, *gauss_1_fraction);
-	}
+	RooAbsPdf** res_funct = new RooAbsPdf*[iNumberOfFiles];
+        
+        if (constants->getResolutionFunctionModel() == "2gauss"){
+            for (unsigned i = 0; i<iNumberOfFiles; i++){
+                res_funct[i] = new TwoGaussian(TString::Format("res_funct_%d", i + 1), "Resolution Function for Convolution (2 Gauss)", *rChannels, *zero_ch[i], *gauss_1_dispersion, *zero_ch_relative_2[i], *gauss_2_dispersion, *gauss_2_fraction);
+            }            
+        } else {
+            // 3rd gauss dispertion
+            RooRealVar* g3_fwhm = storage->getOrMakeNew("g3_fwhm", "3rd_gauss_fwhm", 2, 1, 5, "ns");
+            RooFormulaVar* gauss_3_dispersion = new RooFormulaVar("gauss_3_dispersion", "@0*@1/@2", RooArgList(*g3_fwhm, *fwhm2disp, *channelWidth));
+
+            // Fraction of the 2nd gauss
+            RooRealVar* gauss_3_fraction_pct = storage->getOrMakeNew("g3_frac", "3rd_gauss_fraction", 0.2, 0, 2, "%");
+            RooFormulaVar* gauss_3_fraction = new RooFormulaVar("g3_fraction", "@0/100", *gauss_3_fraction_pct);
+        
+            for (unsigned i = 0; i<iNumberOfFiles; i++){
+                res_funct[i] = new ThreeGaussian(TString::Format("res_funct_%d", i + 1), "Resolution Function for Convolution (3 Gauss)", *rChannels, *zero_ch[i], *gauss_1_dispersion, *zero_ch_relative_2[i], *gauss_2_dispersion, *gauss_3_dispersion, *gauss_2_fraction, *gauss_3_fraction);
+            }            
+        }
 
 	// Output
 	std::cout << "Resolution Functions Created OK!" << std::endl;
@@ -442,7 +465,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
         
 	RooAddPdf* decay_model_sum = new RooAddPdf("decay_model_sum", "decay_model_sum", RooArgList(*decay_source, *decay_model), *I_source_);
 	RooFFTConvPdf** decay_model_with_source = new RooFFTConvPdf*[iNumberOfFiles];
-	rChannels->setBins(100, "cache");
+	rChannels->setBins(600, "cache");
 	for (unsigned i = 0; i<iNumberOfFiles; i++){
 		decay_model_with_source[i] = new RooFFTConvPdf(TString::Format("decay_model_with_source_%d", i + 1), TString::Format("Grain Boundary Model N%d", i + 1), *rChannels, *decay_model_sum, *res_funct[i]);
 		decay_model_with_source[i]->setBufferFraction(0);
@@ -469,11 +492,11 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	}
 
 	// Background fractions array
-	RooRealVar** I_bg = new RooRealVar*[iNumberOfFiles];
+	RooConstVar** I_bg = new RooConstVar*[iNumberOfFiles];
         Double_t* bgFraction = new Double_t[iNumberOfFiles];
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
 		bgFraction[i] = getConstBackgroundFraction(fullTH1F[i]);
-		I_bg[i] = new RooRealVar(TString::Format("I_bg_%d", i + 1), "background_fraction", bgFraction[i]); //, bgFraction / 100, bgFraction*10);
+		I_bg[i] = new RooConstVar(TString::Format("I_bg_%d", i + 1), "background_fraction", bgFraction[i]); //, bgFraction[i]/2, bgFraction[i]*2);
 	}
 
 	// ADD BACKGROUND PDF
@@ -565,7 +588,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 		simPdf->addPdf(*decay_model_with_source_bg[i], sTypes[i].Data());
 	}
 
-	// simPdf->fitTo(*combData) ;
+        // simPdf->fitTo(*combData) ;
 	// simPdf->fitTo(*combData, NumCPU(NUM_CPU));
 
 	// Use RooMinuit interface to minimize chi^2
@@ -614,7 +637,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 
 		graphFrame[i]->GetXaxis()->SetRangeUser(0, MAX_CHANNEL-MIN_CHANNEL + 1);
 
-		histSpectrum[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kBlack), LineWidth(1), MarkerSize(0.5), MarkerColor(kBlack));
+		histSpectrum[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kBlack), LineWidth(0), MarkerSize(0.2), MarkerColor(kBlack));
 
                 // Draw Resolution Function sumed with Background
                 RooRealVar* bgFractionReal = new RooRealVar(TString::Format("bg_fraction_real_%d", i+1), "", bgFraction[i]);
@@ -644,8 +667,11 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 		// chi2Value[i] = (simChi2->getVal()) / n_Degree[i];  // multiply on number of files
 		chi2Value[i] = chi2[i]->getVal() / n_Degree[i];  // multiply on number of files
 		hresid[i] = graphFrame[i]->pullHist();
+                hresid[i]->SetLineWidth(0);
+                hresid[i]->SetMarkerSize(0.2);
 		chiFrame[i] = rChannels->frame(Title(TString::Format("Goodness of fit: chi^2 = %.1f / %d = %.3f", chi2[i]->getVal(), n_Degree[i], chi2Value[i])));
-		chiFrame[i]->addPlotable(hresid[i], "BX");
+//                ((RooDataHist*)hresid[i])->plotOn(chiFrame[i],DataError(RooAbsData::None));
+                chiFrame[i]->addPlotable(hresid[i]);
 		chiFrame[i]->GetXaxis()->SetRangeUser(0, MAX_CHANNEL-MIN_CHANNEL+1);
 		// histSpectrum[i]->statOn(chiFrame[i]);
 	}
@@ -669,6 +695,10 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
                 canvas[i]->Update();                
 //              gSystem->ProcessEvents();
             }
+
+            // Legend
+            // TPaveStats *ps = ((TPaveStats*)histSpectrum[i])->GetPrimitive("stats");
+            
             TString imageFilename = TString::Format("%sfit-%s-%d.png", sOutputPath.c_str(), (constants->getDecayModel()).c_str(), i+1);
             fileUtils->saveImage(canvas[i], imageFilename.Data());
 	}

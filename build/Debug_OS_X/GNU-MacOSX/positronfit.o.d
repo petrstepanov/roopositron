@@ -174,9 +174,15 @@ build/Debug_OS_X/GNU-MacOSX/positronfit.o: positronfit.cc \
   /Applications/root_v6.06.02/include/TAttCanvas.h \
   /Applications/root_v6.06.02/include/TCanvasImp.h \
   /Applications/root_v6.06.02/include/TStyle.h \
-  /Applications/root_v6.06.02/include/TColor.h MyPdfCache.h \
-  StructParams.h ParamStorage.h TwoGaussian.h ExpPdf.h TwoExpPdf.h \
-  MyPdf.h TrapPdf.h FileUtils.h \
+  /Applications/root_v6.06.02/include/TColor.h \
+  /Applications/root_v6.06.02/include/TPaveStats.h \
+  /Applications/root_v6.06.02/include/TPaveText.h \
+  /Applications/root_v6.06.02/include/TPave.h \
+  /Applications/root_v6.06.02/include/TBox.h \
+  /Applications/root_v6.06.02/include/TText.h \
+  /Applications/root_v6.06.02/include/TLine.h MyPdfCache.h \
+  StructParams.h ParamStorage.h TwoGaussian.h ThreeGaussian.h ExpPdf.h \
+  TwoExpPdf.h MyPdf.h TrapPdf.h FileUtils.h \
   /Applications/root_v6.06.02/include/TImage.h \
   /Applications/root_v6.06.02/include/TAttImage.h Constants.h
 
@@ -532,6 +538,18 @@ build/Debug_OS_X/GNU-MacOSX/positronfit.o: positronfit.cc \
 
 /Applications/root_v6.06.02/include/TColor.h:
 
+/Applications/root_v6.06.02/include/TPaveStats.h:
+
+/Applications/root_v6.06.02/include/TPaveText.h:
+
+/Applications/root_v6.06.02/include/TPave.h:
+
+/Applications/root_v6.06.02/include/TBox.h:
+
+/Applications/root_v6.06.02/include/TText.h:
+
+/Applications/root_v6.06.02/include/TLine.h:
+
 MyPdfCache.h:
 
 StructParams.h:
@@ -539,6 +557,8 @@ StructParams.h:
 ParamStorage.h:
 
 TwoGaussian.h:
+
+ThreeGaussian.h:
 
 ExpPdf.h:
 
