@@ -698,7 +698,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
             canvas[i]->cd(1)->SetMargin(0.08, 0.03, 0.05, 0.1); // left right bottom top
             canvas[i]->cd(1)->SetLogy();
             Double_t fontSize = 0.06;
-            graphFrame[i]->GetXaxis()->SetLabelSize(0);
+            graphFrame[i]->GetXaxis()->SetLabelColor(0);
             graphFrame[i]->GetXaxis()->SetTitleSize(0);
             graphFrame[i]->GetYaxis()->SetLabelSize(fontSize - 0.01);
             graphFrame[i]->GetYaxis()->SetRangeUser(1, iUpperLimit[i]);
@@ -769,6 +769,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
                    << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Time, ns\""                
                    << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Count\""
                    << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Error\""
+                   << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Resolution\""
                    << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Fit\""
                    << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Chi^2\"" << std::endl;        
 
@@ -778,7 +779,8 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
             Double_t error = fullTH1F[i]->GetBinError(j-MIN_CHANNEL+1);
             Double_t resolution = graphFrame[i]->getCurve("resolution")->Eval(j-MIN_CHANNEL+0.5);            
             Double_t fit = graphFrame[i]->getCurve("fit")->Eval(j-MIN_CHANNEL+0.5);
-            Double_t chi = hresid[i]->GetHistogram()->GetBinContent(j-MIN_CHANNEL+1);
+            Double_t channel, chi;
+            hresid[i]->GetPoint(j-MIN_CHANNEL+1, channel, chi);
 //            
             outputFile << std::left << std::setw(FILE_COLUMN_WIDTH) << j
                        << std::left << std::setw(FILE_COLUMN_WIDTH) << time
