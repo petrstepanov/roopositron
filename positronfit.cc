@@ -282,7 +282,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	RooDataHist** histSpectrum = new RooDataHist*[iNumberOfFiles];
 	TCanvas** histCanvas = new TCanvas*[iNumberOfFiles];
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
-		histSpectrum[i] = new RooDataHist(TString::Format("histSpectrum_%d", i + 1), sFileNames[i].c_str(), RooArgSet(*rChannels), fullTH1F[i]);
+            histSpectrum[i] = new RooDataHist(TString::Format("histSpectrum_%d", i + 1), sFileNames[i].c_str(), RooArgSet(*rChannels), fullTH1F[i]);
 	}
 
 	/*
@@ -308,8 +308,8 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 
 	// Read resolution function parameters from file
         // parameters filename is "parameters_XXX.txt", where XXX is model name (1exp, 2exp etc)
-        std::string modelName = constants->getDecayModel();
-	ParamStorage* storage = new ParamStorage(modelName);
+        std::string suffix = constants->getDecayModel() + "_" + constants->getResolutionFunctionModel();
+	ParamStorage* storage = new ParamStorage(suffix);
         
 	RooConstVar* fwhm2disp = new RooConstVar("fwhm2disp", "Coefficient to convert fwhm to dispersion", 0.42466);  //1.0/(2.0*Sqrt(2.0*Log(2.0)))
 
@@ -641,24 +641,24 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	// Define frame for data points and fit
 	RooPlot** graphFrame = new RooPlot*[iNumberOfFiles];
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
-		// graphFrame[i] = rChannels -> frame(CHANNELS+1);
-		graphFrame[i] = rChannels->frame(MAX_CHANNEL - MIN_CHANNEL + 1);
-		graphFrame[i]->SetTitle(TString::Format("Spectrum N%d \"%s\"", i + 1, sFileNames[i].c_str()));
-		graphFrame[i]->SetName(TString::Format("spectrum_%d", i));
+            // graphFrame[i] = rChannels -> frame(CHANNELS+1);
+            graphFrame[i] = rChannels->frame(MAX_CHANNEL - MIN_CHANNEL + 1);
+            graphFrame[i]->SetTitle(TString::Format("Spectrum N%d \"%s\"", i + 1, sFileNames[i].c_str()));
+            graphFrame[i]->SetName(TString::Format("spectrum_%d", i));
 
-		graphFrame[i]->GetXaxis()->SetRangeUser(0, MAX_CHANNEL-MIN_CHANNEL + 1);
+            graphFrame[i]->GetXaxis()->SetRangeUser(0, MAX_CHANNEL-MIN_CHANNEL + 1);
 
-		histSpectrum[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kBlack), LineWidth(0), MarkerSize(0.2), MarkerColor(kBlack));
+            histSpectrum[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kBlack), LineWidth(0), MarkerSize(0.2), MarkerColor(kBlack));
 
-                // Draw Resolution Function sumed with Background
-                RooRealVar* bgFractionReal = new RooRealVar(TString::Format("bg_fraction_real_%d", i+1), "", bgFraction[i]);
-                RooAddPdf* resFuncPlusBg = new RooAddPdf(TString::Format("res_funct_with_bg_%d", i+1), TString::Format("res_funct_with_bg_%d", i+1), RooArgList(*bg[i], *res_funct[i]), RooArgList(*bgFractionReal), kTRUE);
-		resFuncPlusBg->plotOn(graphFrame[i], LineStyle(3), LineColor(kGray + 3), LineWidth(1));
-                
-                // Draw complete fit
-		decay_model_with_source_bg[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kPink - 4), LineWidth(2));
+            // Draw Resolution Function sumed with Background
+            RooRealVar* bgFractionReal = new RooRealVar(TString::Format("bg_fraction_real_%d", i+1), "", bgFraction[i]);
+            RooAddPdf* resFuncPlusBg = new RooAddPdf(TString::Format("res_funct_with_bg_%d", i+1), TString::Format("res_funct_with_bg_%d", i+1), RooArgList(*bg[i], *res_funct[i]), RooArgList(*bgFractionReal), kTRUE);
+            resFuncPlusBg->plotOn(graphFrame[i], LineStyle(3), LineColor(kGray + 3), LineWidth(1), Name("resolution"));
+
+            // Draw complete fit
+            decay_model_with_source_bg[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kPink - 4), LineWidth(2), Name("fit"));
 //                std::string legendLabel = constants->getDecayModel() + " model parameters";
-		decay_model_with_source_bg[i]->paramOn(graphFrame[i], Layout(0.78, 0.97, 0.9), Format("NEU", AutoPrecision(1)), ShowConstants(kTRUE));// , Label(legendLabel.c_str()) Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);
+            decay_model_with_source_bg[i]->paramOn(graphFrame[i], Layout(0.78, 0.97, 0.9), Format("NEU", AutoPrecision(1)), ShowConstants(kTRUE));// , Label(legendLabel.c_str()) Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);
 	}
 	std::cout << "Plot Frames Created OK!" << std::endl;
 
@@ -726,22 +726,80 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
             
             //            ps->SetName("mystats");
             
-            if (!isRoot){
+//            if (!isRoot){
                 canvas[i]->Modified();
                 canvas[i]->Update();                
 //              gSystem->ProcessEvents();
-            }
+//            }
 
-            TString imageFilename = TString::Format("%sfit-%s-%d.png", sOutputPath.c_str(), (constants->getDecayModel()).c_str(), i+1);
+            TString imageFilename = TString::Format("%sfit-%s-%s-%d.png", 
+                    sOutputPath.c_str(), 
+                    (constants->getDecayModel()).c_str(), 
+                    (constants->getResolutionFunctionModel()).c_str(), i+1);
             fileUtils->saveImage(canvas[i], imageFilename.Data());
 	}
-       
-	//std::cout << "Current date and time is " << getCurrentTime() << std::endl;
+
         
-        watch.Stop();
-        watch.Print();
+        /*
+            __________                                     __                       
+            \______   \_____ ____________    _____   _____/  |_  ___________  ______
+             |     ___/\__  \\_  __ \__  \  /     \_/ __ \   __\/ __ \_  __ \/  ___/
+             |    |     / __ \|  | \// __ \|  Y Y  \  ___/|  | \  ___/|  | \/\___ \ 
+             |____|    (____  /__|  (____  /__|_|  /\___  >__|  \___  >__|  /____  >
+                            \/           \/      \/     \/          \/           \/ 
+                           ________          __                 __   
+                           \_____  \  __ ___/  |_______  __ ___/  |_ 
+                            /   |   \|  |  \   __\____ \|  |  \   __\
+                           /    |    \  |  /|  | |  |_> >  |  /|  |  
+                           \_______  /____/ |__| |   __/|____/ |__|  
+                                   \/            |__|                
+
+        */
+    for (unsigned i = 0; i<iNumberOfFiles; i++){
+        std::ofstream outputFile;
+        TString dataFilename = TString::Format("%sdata-%s-%s-%d.txt", 
+                sOutputPath.c_str(), 
+                (constants->getDecayModel()).c_str(), 
+                (constants->getResolutionFunctionModel()).c_str(), i+1);        
+        outputFile.open(dataFilename.Data());
+
+        const unsigned FILE_COLUMN_WIDTH = 20;
+        // Write file header
+        outputFile << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Channel\""
+                   << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Time, ns\""                
+                   << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Count\""
+                   << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Error\""
+                   << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Fit\""
+                   << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Chi^2\"" << std::endl;        
+
+        for (unsigned j=MIN_CHANNEL; j<=MAX_CHANNEL; j++){
+            Double_t time = (double)(j-MIN_CHANNEL)*(constants->getChannelWidth());
+            Double_t count = fullTH1F[i]->GetBinContent(j-MIN_CHANNEL+1);
+            Double_t error = fullTH1F[i]->GetBinError(j-MIN_CHANNEL+1);
+            Double_t resolution = graphFrame[i]->getCurve("resolution")->Eval(j-MIN_CHANNEL+0.5);            
+            Double_t fit = graphFrame[i]->getCurve("fit")->Eval(j-MIN_CHANNEL+0.5);
+            Double_t chi = hresid[i]->GetHistogram()->GetBinContent(j-MIN_CHANNEL+1);
+//            
+            outputFile << std::left << std::setw(FILE_COLUMN_WIDTH) << j
+                       << std::left << std::setw(FILE_COLUMN_WIDTH) << time
+                       << std::left << std::setw(FILE_COLUMN_WIDTH) << count
+                       << std::left << std::setw(FILE_COLUMN_WIDTH) << error
+                       << std::left << std::setw(FILE_COLUMN_WIDTH) << resolution                    
+                       << std::left << std::setw(FILE_COLUMN_WIDTH) << fit
+                       << std::left << std::setw(FILE_COLUMN_WIDTH) << chi;
+            outputFile << std::endl;                                    
+        }
         
-	return 1;
+        outputFile.close();
+    }
+        
+    // Write
+    //std::cout << "Current date and time is " << getCurrentTime() << std::endl;
+
+    watch.Stop();
+    watch.Print();
+
+    return 1;
 }
 
 

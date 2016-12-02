@@ -64,7 +64,8 @@ Contributor(s):
       <itemPath>Spectrum_003.Spe</itemPath>
       <itemPath>Spectrum_004.Spe</itemPath>
       <itemPath>constants.txt</itemPath>
-      <itemPath>parameters_1exp.txt</itemPath>
+      <itemPath>data-1exp-2gauss-1.txt</itemPath>
+      <itemPath>parameters_1exp_2gauss.txt</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
@@ -112,6 +113,7 @@ Contributor(s):
             <pElem>/cygdrive/C/root_v5.34.36/lib</pElem>
           </linkerAddLib>
           <linkerDynSerch>
+            <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
@@ -202,7 +204,9 @@ Contributor(s):
       </item>
       <item path="constants.txt" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="parameters_1exp.txt" ex="false" tool="3" flavor2="0">
+      <item path="data-1exp-2gauss-1.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="parameters_1exp_2gauss.txt" ex="false" tool="3" flavor2="0">
       </item>
       <item path="positronfit.cc" ex="false" tool="1" flavor2="0">
       </item>
@@ -229,6 +233,7 @@ Contributor(s):
             <pElem>/Applications/root_v6.06.02/lib</pElem>
           </linkerAddLib>
           <linkerDynSerch>
+            <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
@@ -320,7 +325,9 @@ Contributor(s):
       </item>
       <item path="constants.txt" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="parameters_1exp.txt" ex="false" tool="3" flavor2="0">
+      <item path="data-1exp-2gauss-1.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="parameters_1exp_2gauss.txt" ex="false" tool="3" flavor2="0">
       </item>
       <item path="positronfit.cc" ex="false" tool="1" flavor2="8">
       </item>
@@ -346,6 +353,7 @@ Contributor(s):
         </asmTool>
         <linkerTool>
           <linkerDynSerch>
+            <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
@@ -430,7 +438,9 @@ Contributor(s):
       </item>
       <item path="constants.txt" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="parameters_1exp.txt" ex="false" tool="3" flavor2="0">
+      <item path="data-1exp-2gauss-1.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="parameters_1exp_2gauss.txt" ex="false" tool="3" flavor2="0">
       </item>
       <item path="positronfit.cc" ex="false" tool="1" flavor2="0">
       </item>
