@@ -36,6 +36,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/Constants.o \
+	${OBJECTDIR}/ConvPdf.o \
 	${OBJECTDIR}/ExpPdf.o \
 	${OBJECTDIR}/FileUtils.o \
 	${OBJECTDIR}/MyPdf.o \
@@ -77,6 +78,11 @@ ${OBJECTDIR}/Constants.o: Constants.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Constants.o Constants.cpp
+
+${OBJECTDIR}/ConvPdf.o: ConvPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ConvPdf.o ConvPdf.cpp
 
 ${OBJECTDIR}/ExpPdf.o: ExpPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}

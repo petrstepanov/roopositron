@@ -148,6 +148,7 @@
 
 #ifndef MY_CONSTANTS
 #include "Constants.h"
+#include "ConvPdf.h"
 #endif
 
 //#ifndef _UNISTD_H_
@@ -471,6 +472,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
         }
         
 	RooAddPdf* decay_model_sum = new RooAddPdf("decay_model_sum", "decay_model_sum", RooArgList(*decay_source, *decay_model), *I_source_);
+
 	RooFFTConvPdf** decay_model_with_source = new RooFFTConvPdf*[iNumberOfFiles];
 	rChannels->setBins(constants->getConvolutionBins(), "cache");
 	for (unsigned i = 0; i<iNumberOfFiles; i++){
@@ -478,6 +480,11 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 		decay_model_with_source[i]->setBufferFraction(0);
 	}
 
+//        ConvPdf** decay_model_with_source = new ConvPdf*[iNumberOfFiles];
+//	for (unsigned i = 0; i<iNumberOfFiles; i++){
+//            decay_model_with_source[i] = new ConvPdf(TString::Format("decay_model_with_source_%d", i + 1), TString::Format("Convoluted model N%d", i + 1), *rChannels, *decay_model_sum, *res_funct[i]);
+//            decay_model_with_source[i]->init(MIN_CHANNEL, MAX_CHANNEL);
+//        }        
 
 	/*
 	__________                __                                          .___

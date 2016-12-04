@@ -30,36 +30,36 @@ MyPdfCache::MyPdfCache(unsigned _cacheSize, int _minChannel, int _maxChannel) {
 }
 
 double MyPdfCache::getCachedOrEvaluate(double t, double lambdaJ, double lambdaBulk, double lambdaGrain, double lambdaVac, double kappaVac){
-    // if hist with parameters exist in cache return cached value
-    // std::cout << "For parameters t=" << t << ", lJ=" << lambdaJ << ", lB=" << lambdaBulk << ", lG=" << lambdaGrain << ", lV=" << lambdaVac << ", kV=" << kappaVac << std::endl;
+    // make struct with parameters
     const StructParams tempParams(lambdaJ, lambdaBulk, lambdaGrain, lambdaVac, kappaVac);
     std::map<StructParams, TH1F*>::iterator it = histMap.find(tempParams);
-    // if hist was not found in cache
+    
+    // if a set of parameters met for the first time - calculate histogram (function)
     if (it == histMap.end()){
-        // if hist with these paramaters does not exist - calculate it and remember
         if (size >= cacheSize){
                 std::cout << "over the limit; deleting old hist" << std::endl;
                 // delete std::prev(histMap.end());
                 histMap.erase(std::prev(histMap.end()));
                 size--;
         }
-
         TH1F* newHist = createHist(t, lambdaJ, lambdaBulk, lambdaGrain, lambdaVac, kappaVac);
+        std::cout << "Parameters: t=" << t << ", lJ=" << lambdaJ << ", lB=" << lambdaBulk << ", lG=" << lambdaGrain << ", lV=" << lambdaVac << ", kV=" << kappaVac << std::endl;
+        std::cout << "New historgam \"" << newHist->GetName() << "\" created."<< std::endl;
+
         // newHist->Print();
         histMap.insert(std::pair<StructParams, TH1F*>(tempParams, newHist));
         size++;
-        std::cout << "hists remembered: " << size << std::endl;
-        // std::cout << "object id: " << id << std::endl;
+        std::cout << "Hists remembered: " << size << std::endl;
 
         // return the correspondent value
         TAxis *xAxis = newHist->GetXaxis();
         Int_t bin = xAxis->FindBin(t);
         return newHist->GetBinContent(bin);
     }
-    // if hist was found - return cached
+    // use cached histogram that corresponds to this specific set of parameters
     else {
         TH1F* hist = it->second;
-        // std::cout << "using cached histogram \"" << hist->GetName() << "\""<< std::endl;
+        // std::cout << "Using cached histogram \"" << hist->GetName() << "\"."<< std::endl;
         TAxis *xAxis = hist->GetXaxis();
         Int_t bin = xAxis->FindBin(t);
         return hist->GetBinContent(bin);
@@ -73,8 +73,6 @@ TH1F* MyPdfCache::createHist(double t, double lambdaJ, double lambdaBulk, double
             double val = evaluate(hist->GetBinCenter(i), lambdaJ, lambdaBulk, lambdaGrain, lambdaVac, kappaVac);
             hist->SetBinContent(i, val);
     }
-    std::cout << "For parameters t=" << t << ", lJ=" << lambdaJ << ", lB=" << lambdaBulk << ", lG=" << lambdaGrain << ", lV=" << lambdaVac << ", kV=" << kappaVac << std::endl;
-    std::cout << "making new historgam \"" << hist->GetName() << "\""<< std::endl;
     return hist;
 }
 
