@@ -39,7 +39,7 @@ double MyPdfCache::getCachedOrEvaluate(double t, double lambdaJ, double lambdaBu
         if (size >= cacheSize){
                 std::cout << "over the limit; deleting old hist" << std::endl;
                 // delete std::prev(histMap.end());
-                histMap.erase(std::prev(histMap.end()));
+                histMap.erase(histMap.begin()); // histMap.erase(std::prev(histMap.begin()));
                 size--;
         }
         TH1F* newHist = createHist(t, lambdaJ, lambdaBulk, lambdaGrain, lambdaVac, kappaVac);
