@@ -36,12 +36,15 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/Constants.o \
+	${OBJECTDIR}/ConvPdf.o \
 	${OBJECTDIR}/ExpPdf.o \
 	${OBJECTDIR}/FileUtils.o \
 	${OBJECTDIR}/MyPdf.o \
 	${OBJECTDIR}/MyPdfCache.o \
 	${OBJECTDIR}/ParamStorage.o \
 	${OBJECTDIR}/StructParams.o \
+	${OBJECTDIR}/ThreeGaussian.o \
+	${OBJECTDIR}/TrapPdf.o \
 	${OBJECTDIR}/TwoExpPdf.o \
 	${OBJECTDIR}/TwoGaussian.o \
 	${OBJECTDIR}/positronfit.o
@@ -76,6 +79,11 @@ ${OBJECTDIR}/Constants.o: Constants.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/cygdrive/C/root_v5.34.36/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Constants.o Constants.cpp
 
+${OBJECTDIR}/ConvPdf.o: ConvPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/cygdrive/C/root_v5.34.36/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ConvPdf.o ConvPdf.cpp
+
 ${OBJECTDIR}/ExpPdf.o: ExpPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
@@ -105,6 +113,16 @@ ${OBJECTDIR}/StructParams.o: StructParams.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/cygdrive/C/root_v5.34.36/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/StructParams.o StructParams.cpp
+
+${OBJECTDIR}/ThreeGaussian.o: ThreeGaussian.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/cygdrive/C/root_v5.34.36/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ThreeGaussian.o ThreeGaussian.cpp
+
+${OBJECTDIR}/TrapPdf.o: TrapPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/cygdrive/C/root_v5.34.36/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TrapPdf.o TrapPdf.cpp
 
 ${OBJECTDIR}/TwoExpPdf.o: TwoExpPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}

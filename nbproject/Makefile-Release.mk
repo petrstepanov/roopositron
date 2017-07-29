@@ -39,6 +39,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/ConvPdf.o \
 	${OBJECTDIR}/ExpPdf.o \
 	${OBJECTDIR}/FileUtils.o \
+	${OBJECTDIR}/MyConvPdf.o \
 	${OBJECTDIR}/MyPdf.o \
 	${OBJECTDIR}/MyPdfCache.o \
 	${OBJECTDIR}/ParamStorage.o \
@@ -93,6 +94,11 @@ ${OBJECTDIR}/FileUtils.o: FileUtils.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FileUtils.o FileUtils.cpp
+
+${OBJECTDIR}/MyConvPdf.o: MyConvPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/MyConvPdf.o MyConvPdf.cpp
 
 ${OBJECTDIR}/MyPdf.o: MyPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}
