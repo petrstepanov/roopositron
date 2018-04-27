@@ -172,9 +172,9 @@ Double_t getConstBackgroundFraction(TH1F* hist){
     const Int_t wingBins = 20;
     Double_t fullInt = hist->Integral(1, nBins);
     Double_t leftWingAverage = (hist->Integral(1, wingBins)) / (Double_t)(wingBins);
-    Double_t rightWingAverage = (hist->Integral(nBins - wingBins, nBins)) / (Double_t)(wingBins);
+//    Double_t rightWingAverage = (hist->Integral(nBins - wingBins, nBins)) / (Double_t)(wingBins);
 //    Double_t bgInt = nBins * rightWingAverage;
-    Double_t bgInt = nBins * rightWingAverage;
+    Double_t bgInt = nBins * leftWingAverage;
     return bgInt / fullInt;
 }
 
@@ -318,23 +318,24 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	RooRealVar** zero_ch = new RooRealVar*[iNumberOfFiles];
 	RooConstVar* minChannel = new RooConstVar("minChannel", "Channel of Left Fitment Interval", MIN_CHANNEL);
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
-		Double_t zeroChannelVal = iTopChannel[i] - 25;
-		Double_t zeroChannelDelta = 35;
+		Double_t zeroChannelVal = iTopChannel[i];
+		Double_t zeroChannelDelta = 50;
 		TString name = TString::Format("zero_ch_%d", i + 1);
 		TString description = TString::Format("zero_channel_%d", i + 1);
 		zero_ch[i] = storage->getOrMakeNew(name, description, zeroChannelVal, zeroChannelVal - zeroChannelDelta, zeroChannelVal + zeroChannelDelta, "ch");
+                
 	}
 
 	// 1st Gauss FWHM
-	RooRealVar* g1_fwhm = storage->getOrMakeNew("g1_fwhm", "1st_gauss_fwhm", 0.330, 0.150, 0.400, "ns");
+	RooRealVar* g1_fwhm = storage->getOrMakeNew("g1_fwhm", "1st_gauss_fwhm", 0.30, 0.1, 0.450, "ns");
 	RooFormulaVar* gauss_1_dispersion = new RooFormulaVar("gauss_1_dispersion", "@0*@1/@2", RooArgList(*g1_fwhm, *fwhm2disp, *channelWidth));
 
 	// 2nd gauss dispertion
-	RooRealVar* g2_fwhm = storage->getOrMakeNew("g2_fwhm", "2nd_gauss_fwhm", 0.7, 0.4, 1.0, "ns");
+	RooRealVar* g2_fwhm = storage->getOrMakeNew("g2_fwhm", "2nd_gauss_fwhm", 0.7, 0.3, 1.2, "ns");
 	RooFormulaVar* gauss_2_dispersion = new RooFormulaVar("gauss_2_dispersion", "@0*@1/@2", RooArgList(*g2_fwhm, *fwhm2disp, *channelWidth));
 
        	// Fraction of the 2nd gauss
-	RooRealVar* gauss_2_fraction_pct = storage->getOrMakeNew("g2_frac", "2nd_gauss_fraction", 5, 0, 10, "%");
+	RooRealVar* gauss_2_fraction_pct = storage->getOrMakeNew("g2_frac", "2nd_gauss_fraction", 5, 0, 25, "%");
 	RooFormulaVar* gauss_2_fraction = new RooFormulaVar("g2_fraction", "@0/100", *gauss_2_fraction_pct);
 
 	// 2nd Gauss shift
@@ -354,7 +355,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
             }            
         } else {
             // 3rd gauss dispertion
-            RooRealVar* g3_fwhm = storage->getOrMakeNew("g3_fwhm", "3rd_gauss_fwhm", 1.5, 1, 5, "ns");
+            RooRealVar* g3_fwhm = storage->getOrMakeNew("g3_fwhm", "3rd_gauss_fwhm", 1.5, 1, 2, "ns");
             RooFormulaVar* gauss_3_dispersion = new RooFormulaVar("gauss_3_dispersion", "@0*@1/@2", RooArgList(*g3_fwhm, *fwhm2disp, *channelWidth));
 
             // Fraction of the 2nd gauss
