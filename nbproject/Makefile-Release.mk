@@ -15,8 +15,8 @@ NM=nm
 CCADMIN=CCadmin
 RANLIB=ranlib
 CC=gcc
-CCC=g++
-CXX=g++
+CCC=clang
+CXX=clang
 FC=gfortran
 AS=as
 
@@ -65,7 +65,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=
+LDLIBSOPTIONS=-L/Users/petrstepanov/root_v6.11.02/lib
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
@@ -73,77 +73,77 @@ LDLIBSOPTIONS=
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/positronfit: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/positronfit ${OBJECTFILES} ${LDLIBSOPTIONS}
+	clang -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/positronfit ${OBJECTFILES} ${LDLIBSOPTIONS} -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl -lRooFit -lRooFitCore -lc++
 
 ${OBJECTDIR}/Constants.o: Constants.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Constants.o Constants.cpp
+	$(COMPILE.cc) -O2 -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Constants.o Constants.cpp
 
 ${OBJECTDIR}/ConvPdf.o: ConvPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ConvPdf.o ConvPdf.cpp
+	$(COMPILE.cc) -O2 -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ConvPdf.o ConvPdf.cpp
 
 ${OBJECTDIR}/ExpPdf.o: ExpPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ExpPdf.o ExpPdf.cpp
+	$(COMPILE.cc) -O2 -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ExpPdf.o ExpPdf.cpp
 
 ${OBJECTDIR}/FileUtils.o: FileUtils.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FileUtils.o FileUtils.cpp
+	$(COMPILE.cc) -O2 -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FileUtils.o FileUtils.cpp
 
 ${OBJECTDIR}/MyConvPdf.o: MyConvPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/MyConvPdf.o MyConvPdf.cpp
+	$(COMPILE.cc) -O2 -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/MyConvPdf.o MyConvPdf.cpp
 
 ${OBJECTDIR}/MyPdf.o: MyPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/MyPdf.o MyPdf.cpp
+	$(COMPILE.cc) -O2 -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/MyPdf.o MyPdf.cpp
 
 ${OBJECTDIR}/MyPdfCache.o: MyPdfCache.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/MyPdfCache.o MyPdfCache.cpp
+	$(COMPILE.cc) -O2 -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/MyPdfCache.o MyPdfCache.cpp
 
 ${OBJECTDIR}/ParamStorage.o: ParamStorage.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ParamStorage.o ParamStorage.cpp
+	$(COMPILE.cc) -O2 -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ParamStorage.o ParamStorage.cpp
 
 ${OBJECTDIR}/StructParams.o: StructParams.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/StructParams.o StructParams.cpp
+	$(COMPILE.cc) -O2 -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/StructParams.o StructParams.cpp
 
 ${OBJECTDIR}/ThreeGaussian.o: ThreeGaussian.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ThreeGaussian.o ThreeGaussian.cpp
+	$(COMPILE.cc) -O2 -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ThreeGaussian.o ThreeGaussian.cpp
 
 ${OBJECTDIR}/TrapPdf.o: TrapPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TrapPdf.o TrapPdf.cpp
+	$(COMPILE.cc) -O2 -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TrapPdf.o TrapPdf.cpp
 
 ${OBJECTDIR}/TwoExpPdf.o: TwoExpPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TwoExpPdf.o TwoExpPdf.cpp
+	$(COMPILE.cc) -O2 -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TwoExpPdf.o TwoExpPdf.cpp
 
 ${OBJECTDIR}/TwoGaussian.o: TwoGaussian.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TwoGaussian.o TwoGaussian.cpp
+	$(COMPILE.cc) -O2 -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/TwoGaussian.o TwoGaussian.cpp
 
 ${OBJECTDIR}/positronfit.o: positronfit.cc
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/positronfit.o positronfit.cc
+	$(COMPILE.cc) -O2 -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/positronfit.o positronfit.cc
 
 # Subprojects
 .build-subprojects:
