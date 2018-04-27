@@ -27,11 +27,11 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 PROJECTNAME=positronfit
 
 # Active Configuration
-DEFAULTCONF=Debug_Win
+DEFAULTCONF=Debug
 CONF=${DEFAULTCONF}
 
 # All Configurations
-ALLCONFS=Debug_Win Debug_OS_X Release 
+ALLCONFS=Debug Release 
 
 
 # build

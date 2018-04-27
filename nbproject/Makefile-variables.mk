@@ -6,22 +6,14 @@
 CND_BASEDIR=`pwd`
 CND_BUILDDIR=build
 CND_DISTDIR=dist
-# Debug_Win configuration
-CND_PLATFORM_Debug_Win=Cygwin-Windows
-CND_ARTIFACT_DIR_Debug_Win=dist/Debug_Win/Cygwin-Windows
-CND_ARTIFACT_NAME_Debug_Win=positronfit
-CND_ARTIFACT_PATH_Debug_Win=dist/Debug_Win/Cygwin-Windows/positronfit
-CND_PACKAGE_DIR_Debug_Win=dist/Debug_Win/Cygwin-Windows/package
-CND_PACKAGE_NAME_Debug_Win=positronfit.tar
-CND_PACKAGE_PATH_Debug_Win=dist/Debug_Win/Cygwin-Windows/package/positronfit.tar
-# Debug_OS_X configuration
-CND_PLATFORM_Debug_OS_X=GNU-MacOSX
-CND_ARTIFACT_DIR_Debug_OS_X=dist/Debug_OS_X/GNU-MacOSX
-CND_ARTIFACT_NAME_Debug_OS_X=positronfit
-CND_ARTIFACT_PATH_Debug_OS_X=dist/Debug_OS_X/GNU-MacOSX/positronfit
-CND_PACKAGE_DIR_Debug_OS_X=dist/Debug_OS_X/GNU-MacOSX/package
-CND_PACKAGE_NAME_Debug_OS_X=positronfit.tar
-CND_PACKAGE_PATH_Debug_OS_X=dist/Debug_OS_X/GNU-MacOSX/package/positronfit.tar
+# Debug configuration
+CND_PLATFORM_Debug=GNU-MacOSX
+CND_ARTIFACT_DIR_Debug=dist/Debug/GNU-MacOSX
+CND_ARTIFACT_NAME_Debug=positronfit
+CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-MacOSX/positronfit
+CND_PACKAGE_DIR_Debug=dist/Debug/GNU-MacOSX/package
+CND_PACKAGE_NAME_Debug=positronfit.tar
+CND_PACKAGE_PATH_Debug=dist/Debug/GNU-MacOSX/package/positronfit.tar
 # Release configuration
 CND_PLATFORM_Release=GNU-MacOSX
 CND_ARTIFACT_DIR_Release=dist/Release/GNU-MacOSX

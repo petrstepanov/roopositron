@@ -52,11 +52,7 @@ Contributor(s):
             <sourceRootList/>
             <confList>
                 <confElem>
-                    <name>Debug_Win</name>
-                    <type>1</type>
-                </confElem>
-                <confElem>
-                    <name>Debug_OS_X</name>
+                    <name>Debug</name>
                     <type>1</type>
                 </confElem>
                 <confElem>
