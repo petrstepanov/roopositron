@@ -14,11 +14,11 @@
 #include "ExpPdf.h"
 
 ExpPdf::ExpPdf(const char *name, const char *title,
-	RooAbsReal& _t,
-	RooAbsReal& _tau) :
-	RooAbsPdf(name, title),
-	t("t", "t", this, _t),
-	tau("tau", "tau", this, _tau){
+    RooAbsReal& _t,
+    RooAbsReal& _tau) :
+    RooAbsPdf(name, title),
+    t("t", "t", this, _t),
+    tau("tau", "tau", this, _tau){
 }
 
 ExpPdf::ExpPdf(const ExpPdf& other, const char* name) :
@@ -27,9 +27,10 @@ t("t", this, other.t),
 tau("tau", this, other.tau){
 }
 
+// No normalization here: https://root.cern.ch/doc/master/classRooAbsPdf.html
 Double_t ExpPdf::evaluate() const {
     if (t < 0) return 0.;
-    return exp(-(t / tau)) / tau;
+    return exp(-t/tau);
 }
 
 // Indefinite integral without normalization [0;+infty)
