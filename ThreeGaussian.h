@@ -18,32 +18,36 @@
 #include "RooAbsPdf.h"
 #include "TObject.h"
 #include "RooRealProxy.h"
+#include "TMath.h"
+#include "RooMath.h"
 
 class ThreeGaussian : public RooAbsPdf {
 public:
-	ThreeGaussian() {    };
-	ThreeGaussian(const char *name, const char *title,
-		RooAbsReal& _x, RooAbsReal& _mean1, RooAbsReal& _sigma1, RooAbsReal& _mean2, RooAbsReal& _sigma2, RooAbsReal& _sigma3, RooAbsReal& _i2, RooAbsReal& _i3);
-	ThreeGaussian(const ThreeGaussian& other, const char* name = 0);
-	virtual TObject* clone(const char* newname) const { return new ThreeGaussian(*this, newname); }
-	inline virtual ~ThreeGaussian() {  }
+    ThreeGaussian() {};
+    ThreeGaussian(const char *name, const char *title,
+            RooAbsReal& _x, RooAbsReal& _mean1, RooAbsReal& _sigma1, RooAbsReal& _mean2, RooAbsReal& _sigma2, RooAbsReal& _sigma3, RooAbsReal& _i2, RooAbsReal& _i3);
+    ThreeGaussian(const ThreeGaussian& other, const char* name = 0);
+    virtual TObject* clone(const char* newname) const { return new ThreeGaussian(*this, newname); }
+    inline virtual ~ThreeGaussian() {}
 
+    Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const ;
+    Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const ;
+    
 protected:
+    RooRealProxy x;
+    RooRealProxy mean1;
+    RooRealProxy sigma1;
+    RooRealProxy mean2;
+    RooRealProxy sigma2;
+    RooRealProxy sigma3;
+    RooRealProxy i2;
+    RooRealProxy i3;        
 
-	RooRealProxy x;
-	RooRealProxy mean1;
-	RooRealProxy sigma1;
-	RooRealProxy mean2;
-	RooRealProxy sigma2;
-	RooRealProxy sigma3;
-	RooRealProxy i2;
-	RooRealProxy i3;        
-
-	Double_t evaluate() const;
+    Double_t evaluate() const;
+    Double_t indefiniteIntegral(Double_t y) const;    
 
 private:
-
-	// ClassDef(ThreeGaussian, 1) // Gaussian PDF
+//    ClassDef(ThreeGaussian, 1)           
 };
 
 #endif /* MY_TWOGAUSSIAN */

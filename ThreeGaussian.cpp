@@ -14,23 +14,23 @@
 #include "ThreeGaussian.h"
 
 ThreeGaussian::ThreeGaussian(const char *name, const char *title,
-	RooAbsReal& _x,
-	RooAbsReal& _mean1,
-	RooAbsReal& _sigma1,
-	RooAbsReal& _mean2,
-	RooAbsReal& _sigma2,
-	RooAbsReal& _sigma3,        
-	RooAbsReal& _i2,
-        RooAbsReal& _i3) :
-	RooAbsPdf(name, title),
-	x("x", "Observable", this, _x),
-	mean1("mean1", "Mean1", this, _mean1),
-	sigma1("sigma1", "Width1", this, _sigma1),
-	mean2("mean2", "Mean2", this, _mean2),
-	sigma2("sigma2", "Width2", this, _sigma2),
-	sigma3("sigma3", "Width3", this, _sigma3),
-	i2("i2", "I2", this, _i2),
-	i3("i3", "I3", this, _i3)
+    RooAbsReal& _x,
+    RooAbsReal& _mean1,
+    RooAbsReal& _sigma1,
+    RooAbsReal& _mean2,
+    RooAbsReal& _sigma2,
+    RooAbsReal& _sigma3,        
+    RooAbsReal& _i2,
+    RooAbsReal& _i3) :
+    RooAbsPdf(name, title),
+    x("x", "Observable", this, _x),
+    mean1("mean1", "Mean1", this, _mean1),
+    sigma1("sigma1", "Width1", this, _sigma1),
+    mean2("mean2", "Mean2", this, _mean2),
+    sigma2("sigma2", "Width2", this, _sigma2),
+    sigma3("sigma3", "Width3", this, _sigma3),
+    i2("i2", "I2", this, _i2),
+    i3("i3", "I3", this, _i3)
 {
 }
 
@@ -41,17 +41,51 @@ sigma2("sigma2", this, other.sigma2), sigma3("sigma3", this, other.sigma3), i2("
 {
 }
 
-Double_t ThreeGaussian::evaluate() const
-{
-	Double_t pi = 3.14159;
+//Double_t ThreeGaussian::evaluate() const
+//{
+//	Double_t arg1 = x - mean1;
+//	Double_t ret1 = exp(-0.5*arg1*arg1 / (sigma1*sigma1)) / sigma1 / sqrt(2 * TMath::Pi());
+//
+//	Double_t arg2 = x - mean2;
+//	Double_t ret2 = exp(-0.5*arg2*arg2 / (sigma2*sigma2)) / sigma2 / sqrt(2 * TMath::Pi());
+//
+//	Double_t ret3 = exp(-0.5*arg1*arg1 / (sigma3*sigma3)) / sigma3 / sqrt(2 * TMath::Pi());        
+//        
+//	return (1.-i2-i3)*ret1 + i2*ret2 + i3*ret3;
+//}
 
-	Double_t arg1 = x - mean1;
-	Double_t ret1 = exp(-0.5*arg1*arg1 / (sigma1*sigma1)) / sigma1 / sqrt(2 * pi);
+Double_t ThreeGaussian::evaluate() const {
+    Double_t arg1 = x - mean1;
+    Double_t arg2 = x - mean2;
 
-	Double_t arg2 = x - mean2;
-	Double_t ret2 = exp(-0.5*arg2*arg2 / (sigma2*sigma2)) / sigma2 / sqrt(2 * pi);
+    Double_t ret1 = exp(-0.5*arg1*arg1 / (sigma1*sigma1));
+    Double_t ret2 = exp(-0.5*arg2*arg2 / (sigma2*sigma2));
+    Double_t ret3 = exp(-0.5*arg1*arg1 / (sigma3*sigma3));     
 
-	Double_t ret3 = exp(-0.5*arg1*arg1 / (sigma3*sigma3)) / sigma3 / sqrt(2 * pi);        
-        
-	return (1.-i2-i3)*ret1 + i2*ret2 + i3*ret3;
+    return (1.-i2-i3)*ret1 + i2*ret2 + i3*ret3;
+}
+
+
+Int_t ThreeGaussian::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName) const {
+    return 1;
+}
+
+Double_t ThreeGaussian::indefiniteIntegral(Double_t y) const {
+    Double_t sqrtPiOver2 = TMath::Sqrt(TMath::PiOver2());
+    Double_t s1Sqrt2 = sigma1*TMath::Sqrt2();
+    Double_t s2Sqrt2 = sigma2*TMath::Sqrt2();
+    Double_t s3Sqrt2 = sigma3*TMath::Sqrt2();
+    
+    Double_t ret = (1.-i2-i3)*sqrtPiOver2*sigma1*RooMath::erf(y-mean1/s1Sqrt2)
+                 + i2*sqrtPiOver2*sigma2*RooMath::erf(y-mean2/s2Sqrt2)
+                 + i3*sqrtPiOver2*sigma3*RooMath::erf(y-mean1/s3Sqrt2);
+    return ret;
+}
+
+Double_t ThreeGaussian::analyticalIntegral(Int_t code, const char* rangeName) const {
+    Double_t x1 = x.min(rangeName);
+    Double_t x2 = x.max(rangeName);
+    
+    Double_t ret = indefiniteIntegral(x2)-indefiniteIntegral(x1);
+    return ret;    
 }
