@@ -21,28 +21,31 @@
 
 class TrapPdf : public RooAbsPdf {
 public:
-	TrapPdf() {};
-	TrapPdf(const char *name, const char *title,
-		RooAbsReal& _t,
-		RooAbsReal& _tauBulk,
-		RooAbsReal& _tauVac,
-		RooAbsReal& _kappaVac
-		);
-	TrapPdf(const TrapPdf& other, const char* name = 0);
-	virtual TObject* clone(const char* newname) const { return new TrapPdf(*this, newname); }
-	inline virtual ~TrapPdf() { }
+    TrapPdf() {};
+    TrapPdf(const char *name, const char *title,
+        RooAbsReal& _t,
+        RooAbsReal& _tauBulk,
+        RooAbsReal& _tauDef,
+        RooAbsReal& _kappaDef
+        );
+    TrapPdf(const TrapPdf& other, const char* name = 0);
+    virtual TObject* clone(const char* newname) const { return new TrapPdf(*this, newname); }
+    inline virtual ~TrapPdf() { }
 
-protected:
-	RooRealProxy t;
-	RooRealProxy tauBulk;
-	RooRealProxy tauVac;
-	RooRealProxy kappaVac;
+    Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const ;
+    Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const ;        
         
-	Double_t evaluate() const;
+protected:
+    RooRealProxy t;
+    RooRealProxy tauBulk;
+    RooRealProxy tauDef;
+    RooRealProxy kappaDef;
 
+    Double_t evaluate() const;
+    Double_t indefiniteIntegral(Double_t y) const;
+    
 private:
-
-	// ClassDef(TrapPdf, 1) // Your description goes here...
+    // ClassDef(TrapPdf, 1) // Your description goes here...
 };
 
-#endif /* MY_EXPPDF */
+#endif /* MY_TRAPPDF */

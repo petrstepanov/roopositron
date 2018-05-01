@@ -28,7 +28,36 @@ tau("tau", this, other.tau){
 }
 
 Double_t ExpPdf::evaluate() const {
-	if (t < 0) return 0.;
-	return exp(-(t / tau)) / tau;
+    if (t < 0) return 0.;
+    return exp(-(t / tau)) / tau;
 }
 
+// Indefinite integral without normalization [0;+infty)
+Double_t ExpPdf::indefiniteIntegral(Double_t y) const {
+    return -exp(-y/tau)*tau;
+}
+
+// Get analytical integral
+Int_t ExpPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName) const {
+   if (matchArgs(allVars,analVars,t)) return 1;
+   return 0;
+}
+
+// Analytical integral
+Double_t ExpPdf::analyticalIntegral(Int_t code, const char* rangeName) const {
+    assert(code == 1);
+    
+    Double_t ret = 0;
+    if (code==1){
+        Double_t x1 = t.min(rangeName);
+        Double_t x2 = t.max(rangeName);
+        if (x2 <= 0) return 0;
+        x1 = TMath::Max(0.,x1);
+
+        ret = indefiniteIntegral(x2)-indefiniteIntegral(x1);
+    }
+    else {
+        std::cout << "Error in RooGaussian::analyticalIntegral" << std::endl;
+    }
+    return ret;    
+}

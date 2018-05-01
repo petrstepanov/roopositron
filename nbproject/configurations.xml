@@ -47,11 +47,13 @@ Contributor(s):
       <itemPath>ConvPdf.h</itemPath>
       <itemPath>ExpPdf.h</itemPath>
       <itemPath>FileUtils.h</itemPath>
+      <itemPath>GrainPdf.h</itemPath>
       <itemPath>MyConvPdf.h</itemPath>
       <itemPath>MyPdf.h</itemPath>
       <itemPath>MyPdfCache.h</itemPath>
       <itemPath>ParamStorage.h</itemPath>
       <itemPath>StructParams.h</itemPath>
+      <itemPath>ThreeExpPdf.h</itemPath>
       <itemPath>ThreeGaussian.h</itemPath>
       <itemPath>TrapPdf.h</itemPath>
       <itemPath>TwoExpPdf.h</itemPath>
@@ -76,11 +78,13 @@ Contributor(s):
       <itemPath>ConvPdf.cpp</itemPath>
       <itemPath>ExpPdf.cpp</itemPath>
       <itemPath>FileUtils.cpp</itemPath>
+      <itemPath>GrainPdf.cpp</itemPath>
       <itemPath>MyConvPdf.cpp</itemPath>
       <itemPath>MyPdf.cpp</itemPath>
       <itemPath>MyPdfCache.cpp</itemPath>
       <itemPath>ParamStorage.cpp</itemPath>
       <itemPath>StructParams.cpp</itemPath>
+      <itemPath>ThreeExpPdf.cpp</itemPath>
       <itemPath>ThreeGaussian.cpp</itemPath>
       <itemPath>TrapPdf.cpp</itemPath>
       <itemPath>TwoExpPdf.cpp</itemPath>
@@ -151,6 +155,7 @@ Contributor(s):
             <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
+            <pElem>.</pElem>
           </linkerDynSerch>
           <linkerDepDynSerchKind>0</linkerDepDynSerchKind>
           <commandlineTool>clang</commandlineTool>
@@ -172,6 +177,10 @@ Contributor(s):
       <item path="FileUtils.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="FileUtils.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="GrainPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="GrainPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="MyConvPdf.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -202,6 +211,10 @@ Contributor(s):
       <item path="StructParams.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="StructParams.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ThreeExpPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ThreeExpPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="ThreeGaussian.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -290,6 +303,7 @@ Contributor(s):
             <pElem>.</pElem>
             <pElem>.</pElem>
             <pElem>.</pElem>
+            <pElem>.</pElem>
           </linkerDynSerch>
           <linkerDepDynSerchKind>0</linkerDepDynSerchKind>
           <commandlineTool>clang</commandlineTool>
@@ -311,6 +325,10 @@ Contributor(s):
       <item path="FileUtils.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="FileUtils.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="GrainPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="GrainPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="MyConvPdf.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -341,6 +359,10 @@ Contributor(s):
       <item path="StructParams.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="StructParams.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ThreeExpPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ThreeExpPdf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="ThreeGaussian.cpp" ex="false" tool="1" flavor2="0">
       </item>

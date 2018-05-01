@@ -39,11 +39,13 @@ OBJECTFILES= \
 	${OBJECTDIR}/ConvPdf.o \
 	${OBJECTDIR}/ExpPdf.o \
 	${OBJECTDIR}/FileUtils.o \
+	${OBJECTDIR}/GrainPdf.o \
 	${OBJECTDIR}/MyConvPdf.o \
 	${OBJECTDIR}/MyPdf.o \
 	${OBJECTDIR}/MyPdfCache.o \
 	${OBJECTDIR}/ParamStorage.o \
 	${OBJECTDIR}/StructParams.o \
+	${OBJECTDIR}/ThreeExpPdf.o \
 	${OBJECTDIR}/ThreeGaussian.o \
 	${OBJECTDIR}/TrapPdf.o \
 	${OBJECTDIR}/TwoExpPdf.o \
@@ -95,6 +97,11 @@ ${OBJECTDIR}/FileUtils.o: FileUtils.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FileUtils.o FileUtils.cpp
 
+${OBJECTDIR}/GrainPdf.o: GrainPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GrainPdf.o GrainPdf.cpp
+
 ${OBJECTDIR}/MyConvPdf.o: MyConvPdf.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
@@ -119,6 +126,11 @@ ${OBJECTDIR}/StructParams.o: StructParams.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/StructParams.o StructParams.cpp
+
+${OBJECTDIR}/ThreeExpPdf.o: ThreeExpPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ThreeExpPdf.o ThreeExpPdf.cpp
 
 ${OBJECTDIR}/ThreeGaussian.o: ThreeGaussian.cpp
 	${MKDIR} -p ${OBJECTDIR}

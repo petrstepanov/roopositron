@@ -1,0 +1,135 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      3639,        127]
+NotebookOptionsPosition[      3174,        106]
+NotebookOutlinePosition[      3521,        121]
+CellTagsIndexPosition[      3478,        118]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"gauss", "[", "x_", "]"}], "=", 
+  RowBox[{"Exp", "[", 
+   RowBox[{
+    RowBox[{"-", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{"x", "-", "\[Mu]"}], ")"}], "^", "2"}]}], "/", 
+    RowBox[{"(", 
+     RowBox[{"2", "*", "\[Sigma]", "*", "\[Sigma]"}], ")"}]}], 
+   "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{"Integrate", "[", 
+  RowBox[{
+   RowBox[{"gauss", "[", "x", "]"}], ",", "x"}], 
+  "]"}], "\[IndentingNewLine]"}], "Input",
+ CellChangeTimes->{{3.734126165171506*^9, 3.734126169218545*^9}, {
+  3.734126445125326*^9, 3.7341265259059715`*^9}, {3.7341269414355817`*^9, 
+  3.7341269436884537`*^9}, {3.734126977219322*^9, 3.7341270238597775`*^9}, {
+  3.7341271221096163`*^9, 3.7341271659531746`*^9}, {3.734127209047926*^9, 
+  3.734127216657054*^9}, {3.734127250999889*^9, 3.7341272557514358`*^9}, {
+  3.7341272873601985`*^9, 3.7341272888595414`*^9}}],
+
+Cell[BoxData[
+ SuperscriptBox["\[ExponentialE]", 
+  RowBox[{"-", 
+   FractionBox[
+    SuperscriptBox[
+     RowBox[{"(", 
+      RowBox[{"x", "-", "\[Mu]"}], ")"}], "2"], 
+    RowBox[{"2", " ", 
+     SuperscriptBox["\[Sigma]", "2"]}]]}]]], "Output",
+ CellChangeTimes->{3.7341272192655935`*^9, 3.7341272579839745`*^9, 
+  3.734127290484029*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  SqrtBox[
+   FractionBox["\[Pi]", "2"]], " ", "\[Sigma]", " ", 
+  RowBox[{"Erf", "[", 
+   FractionBox[
+    RowBox[{"x", "-", "\[Mu]"}], 
+    RowBox[{
+     SqrtBox["2"], " ", "\[Sigma]"}]], "]"}]}]], "Output",
+ CellChangeTimes->{3.7341272192655935`*^9, 3.7341272579839745`*^9, 
+  3.734127290499774*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"gaussnorm", "[", "x_", "]"}], "=", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Exp", "[", 
+     RowBox[{
+      RowBox[{"-", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"x", "-", "\[Mu]"}], ")"}], "^", "2"}]}], "/", 
+      RowBox[{"(", 
+       RowBox[{"2", "*", "\[Sigma]", "*", "\[Sigma]"}], ")"}]}], "]"}], "/", 
+    RowBox[{"Sqrt", "[", 
+     RowBox[{"2", "\[Pi]"}], "]"}]}], "/", "\[Sigma]"}]}]], "Input",
+ CellChangeTimes->{{3.7341399301811438`*^9, 3.734139980941726*^9}, {
+  3.734175994445822*^9, 3.734175997562297*^9}}],
+
+Cell[BoxData[
+ FractionBox[
+  SuperscriptBox["\[ExponentialE]", 
+   RowBox[{"-", 
+    FractionBox[
+     SuperscriptBox[
+      RowBox[{"(", 
+       RowBox[{"x", "-", "\[Mu]"}], ")"}], "2"], 
+     RowBox[{"2", " ", 
+      SuperscriptBox["\[Sigma]", "2"]}]]}]], 
+  RowBox[{
+   SqrtBox[
+    RowBox[{"2", " ", "\[Pi]"}]], " ", "\[Sigma]"}]]], "Output",
+ CellChangeTimes->{3.7341399846496964`*^9, 3.734175999711686*^9}]
+}, Open  ]]
+},
+WindowSize->{759, 813},
+WindowMargins->{{64, Automatic}, {38, Automatic}},
+FrontEndVersion->"11.0 for Microsoft Windows (64-bit) (September 21, 2016)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 888, 21, 69, "Input"],
+Cell[1471, 45, 340, 10, 45, "Output"],
+Cell[1814, 57, 326, 10, 56, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[2177, 72, 565, 16, 30, "Input"],
+Cell[2745, 90, 413, 13, 122, "Output"]
+}, Open  ]]
+}
+]
+*)
+

@@ -30,12 +30,15 @@ public:
 	virtual TObject* clone(const char* newname) const { return new ExpPdf(*this, newname); }
 	inline virtual ~ExpPdf() { }
 
+    Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const ;
+    Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const ;
+ 
 protected:
-	RooRealProxy t;
-	RooRealProxy tau;
+    RooRealProxy t;
+    RooRealProxy tau;
 
-	Double_t evaluate() const;
-
+    Double_t evaluate() const;
+    Double_t indefiniteIntegral(Double_t y) const;
 private:
 
 	// ClassDef(ExpPdf, 1) // Your description goes here...

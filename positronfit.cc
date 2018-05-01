@@ -134,6 +134,10 @@
 #include "TwoExpPdf.h"
 #endif
 
+#ifndef MY_THREEEXPPDF
+#include "ThreeExpPdf.h"
+#endif
+
 #ifndef MY_MYPDF
 #include "MyPdf.h"
 #endif
@@ -257,6 +261,8 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 		std::cout << "  Maximum count is: " << iMaxCount << std::endl;
 		std::cout << "  Minimum count is: " << iMinCount << std::endl;
 
+                std::cout << "  Total number of events:" << fullTH1F[i]->Integral() << std::endl;                
+                
 		// Evaluate counts axis limits (for graphical output)
 		iUpperLimit[i] = 2 * iMaxCount;
 		iLowerLimit[i] = iMinCount / 2;
@@ -283,7 +289,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	RooDataHist** histSpectrum = new RooDataHist*[iNumberOfFiles];
 	TCanvas** histCanvas = new TCanvas*[iNumberOfFiles];
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
-            histSpectrum[i] = new RooDataHist(TString::Format("histSpectrum_%d", i + 1), sFileNames[i].c_str(), RooArgSet(*rChannels), fullTH1F[i]);
+            histSpectrum[i] = new RooDataHist(TString::Format("histSpectrum_%d", i + 1), sFileNames[i].c_str(), RooArgSet(*rChannels), RooFit::Import(*fullTH1F[i]));
 	}
 
 	/*
@@ -359,7 +365,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
             RooFormulaVar* gauss_3_dispersion = new RooFormulaVar("gauss_3_dispersion", "@0*@1/@2", RooArgList(*g3_fwhm, *fwhm2disp, *channelWidth));
 
             // Fraction of the 2nd gauss
-            RooRealVar* gauss_3_fraction_pct = storage->getOrMakeNew("g3_frac", "3rd_gauss_fraction", 0.2, 0, 2, "%");
+            RooRealVar* gauss_3_fraction_pct = storage->getOrMakeNew("g3_frac", "3rd_gauss_fraction", 1, 0, 5, "%");
             RooFormulaVar* gauss_3_fraction = new RooFormulaVar("g3_fraction", "@0/100", *gauss_3_fraction_pct);
         
             for (unsigned i = 0; i<iNumberOfFiles; i++){
@@ -392,12 +398,26 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
         else if(constants->getDecayModel() == "2exp"){
             RooRealVar* tau1 = storage->getOrMakeNew("tau1", "1st_exponent_lifetime", 0.15, 0.1, 0.7, "ns");
             RooFormulaVar* tau1_ch = new RooFormulaVar("tau1_ch", "@0/@1", RooArgList(*tau1, *channelWidth));
-            RooRealVar* tau2 = storage->getOrMakeNew("tau2", "2nd_exponent_lifetime", 0.5, 0.3, 3.0, "ns");
+            RooRealVar* tau2 = storage->getOrMakeNew("tau2", "2nd_exponent_lifetime", 0.5, 0.2, 3.0, "ns");
             RooFormulaVar* tau2_ch = new RooFormulaVar("tau2_ch", "@0/@1", RooArgList(*tau2, *channelWidth));
             RooRealVar* I_tau2 = storage->getOrMakeNew("I_tau2", "2nd_exponent_fraction", 10, 0, 100, "%");
             RooFormulaVar* I_tau2_ = new RooFormulaVar("I_tau2_", "@0/100.", *I_tau2);
             decay_model = new TwoExpPdf("decay_model", "decay_model", *rChannels, *tau1_ch, *tau2_ch, *I_tau2_);        
         }
+        // Two-exponential model
+        else if(constants->getDecayModel() == "3exp"){
+            RooRealVar* tau1 = storage->getOrMakeNew("tau1", "1st_exponent_lifetime", 0.15, 0.1, 0.7, "ns");
+            RooFormulaVar* tau1_ch = new RooFormulaVar("tau1_ch", "@0/@1", RooArgList(*tau1, *channelWidth));
+            RooRealVar* tau2 = storage->getOrMakeNew("tau2", "2nd_exponent_lifetime", 0.5, 0.2, 3.0, "ns");
+            RooFormulaVar* tau2_ch = new RooFormulaVar("tau2_ch", "@0/@1", RooArgList(*tau2, *channelWidth));
+            RooRealVar* tau3 = storage->getOrMakeNew("tau3", "3rd_exponent_lifetime", 1, 0.5, 15, "ns");
+            RooFormulaVar* tau3_ch = new RooFormulaVar("tau3_ch", "@0/@1", RooArgList(*tau3, *channelWidth));
+            RooRealVar* I_tau2 = storage->getOrMakeNew("I_tau2", "2nd_exponent_fraction", 10, 0, 100, "%");
+            RooFormulaVar* I_tau2_ = new RooFormulaVar("I_tau2_", "@0/100.", *I_tau2);
+            RooRealVar* I_tau3 = storage->getOrMakeNew("I_tau3", "3rd_exponent_fraction", 2, 0, 100, "%");
+            RooFormulaVar* I_tau3_ = new RooFormulaVar("I_tau3_", "@0/100.", *I_tau3);
+            decay_model = new ThreeExpPdf("decay_model", "decay_model", *rChannels, *tau1_ch, *tau2_ch, *tau3_ch, *I_tau2_, *I_tau3_);
+        }        
         // Trapping Model
         else if (constants->getDecayModel() == "trapping"){
             RooRealVar* tauBulk = storage->getOrMakeNew("tauBulk", "e+_lifetime_in_source", 0.15, 0.1, 0.3, "ns");
@@ -658,11 +678,14 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 
             histSpectrum[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kBlack), LineWidth(0), MarkerSize(0.2), MarkerColor(kBlack));
 
-            // Draw Resolution Function sumed with Background
-            RooRealVar* bgFractionReal = new RooRealVar(TString::Format("bg_fraction_real_%d", i+1), "", bgFraction[i]);
-            RooAddPdf* resFuncPlusBg = new RooAddPdf(TString::Format("res_funct_with_bg_%d", i+1), TString::Format("res_funct_with_bg_%d", i+1), RooArgList(*bg[i], *res_funct[i]), RooArgList(*bgFractionReal), kTRUE);
-            resFuncPlusBg->plotOn(graphFrame[i], LineStyle(3), LineColor(kGray + 3), LineWidth(1), Name("resolution"));
+            // Draw Resolution Function summed with Background
+//            RooRealVar* bgFractionReal = new RooRealVar(TString::Format("bg_fraction_real_%d", i+1), "", bgFraction[i]);
+//            RooAddPdf* resFuncPlusBg = new RooAddPdf(TString::Format("res_funct_with_bg_%d", i+1), TString::Format("res_funct_with_bg_%d", i+1), RooArgList(*bg[i], *res_funct[i]), RooArgList(*bgFractionReal));// , kTRUE);
+//            resFuncPlusBg->plotOn(graphFrame[i], LineStyle(3), LineColor(kGray + 3), LineWidth(1), Name("resolution"));
 
+            // Draw Resolution Function
+            res_funct[i]->plotOn(graphFrame[i], LineStyle(3), LineColor(kGray + 3), LineWidth(1), Name("resolution"));
+            
             // Draw complete fit
             decay_model_with_source_bg[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kPink - 4), LineWidth(2), Name("fit"));
 //                std::string legendLabel = constants->getDecayModel() + " model parameters";
