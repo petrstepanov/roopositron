@@ -98,7 +98,7 @@ RooRealVar* ParamStorage::getOrMakeNew(const char* name, const char* description
     std::string strDescription(description);  
     std::string strName(name); 
     // If parameter is resolution function related - use default values
-    if (strName.find("zero")*strName.find("g1")*strName.find("g2")*strName.find("g3")==0){
+    if (strName.find("zero")==0 || strName.find("g1")*strName.find("g2")*strName.find("g3")==0){
         var = new RooRealVar(name, description, value, minValue, maxValue, unit);
     }
     // For model parameters - ask to input from keyboard 

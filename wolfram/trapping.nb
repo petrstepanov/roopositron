@@ -112,8 +112,8 @@ Cell[BoxData[
   3.734179576345024*^9, {3.734180234260393*^9, 3.7341802494012485`*^9}}]
 }, Open  ]]
 },
-WindowSize->{838, 958},
-WindowMargins->{{Automatic, -7}, {Automatic, 0}},
+WindowSize->{759, 801},
+WindowMargins->{{Automatic, 92}, {Automatic, 0}},
 Magnification->1.5,
 FrontEndVersion->"11.0 for Microsoft Windows (64-bit) (September 21, 2016)",
 StyleDefinitions->"Default.nb"
@@ -130,7 +130,7 @@ CellTagsIndex->{}
 (*NotebookFileOutline
 Notebook[{
 Cell[CellGroupData[{
-Cell[580, 22, 990, 30, 104, "Input"],
+Cell[580, 22, 990, 30, 133, "Input"],
 Cell[1573, 54, 841, 22, 68, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{

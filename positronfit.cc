@@ -324,12 +324,13 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	RooRealVar** zero_ch = new RooRealVar*[iNumberOfFiles];
 	RooConstVar* minChannel = new RooConstVar("minChannel", "Channel of Left Fitment Interval", MIN_CHANNEL);
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
-		Double_t zeroChannelVal = iTopChannel[i];
-		Double_t zeroChannelDelta = 50;
-		TString name = TString::Format("zero_ch_%d", i + 1);
-		TString description = TString::Format("zero_channel_%d", i + 1);
-		zero_ch[i] = storage->getOrMakeNew(name, description, zeroChannelVal, zeroChannelVal - zeroChannelDelta, zeroChannelVal + zeroChannelDelta, "ch");
-                
+            Double_t zeroChannelVal = iTopChannel[i];
+            Double_t zeroChannelDelta = 50;
+            TString name = TString::Format("zero_ch_%d", i + 1);
+            TString description = TString::Format("zero_channel_%d", i + 1);
+            // Don't store zero_channel in parameters
+//            zero_ch[i] = storage->getOrMakeNew(name, description, zeroChannelVal, zeroChannelVal - zeroChannelDelta, zeroChannelVal + zeroChannelDelta, "ch");
+            zero_ch[i] = new RooRealVar(name, description, zeroChannelVal, zeroChannelVal - zeroChannelDelta, zeroChannelVal + zeroChannelDelta, "ch");
 	}
 
 	// 1st Gauss FWHM
