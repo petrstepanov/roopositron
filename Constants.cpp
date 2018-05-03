@@ -135,7 +135,7 @@ void Constants::writeDefaultConstants(){
     myfile << std::left << std::setw(12) << excludeMinChannel << "# exclude region minimum channel, relative to minimum channel (set 0 if not needed)" << std::endl;
     myfile << std::left << std::setw(12) << excludeMaxChannel << "# exclude region maximum channel, relative to minimum channel" << std::endl;
     myfile << std::left << std::setw(12) << resolutionModel   << "# resolution model - \"2gauss\" or \"3gauss\"" << std::endl;
-    myfile << std::left << std::setw(12) << decayModel        << "# decay model - \"1exp\", \"2exp\", \"trapping\", \"grain\"" << std::endl;
+    myfile << std::left << std::setw(12) << decayModel        << "# decay model - \"1exp\", \"2exp\", \"3exp\", \"trapping\", \"grain\"" << std::endl;
     myfile << std::left << std::setw(12) << sourceModel       << "# source contribution - \"1exp\", \"2exp\" (annihilation in air?)" << std::endl;    
     myfile << std::left << std::setw(12) << imageWidth        << "# image width" << std::endl;   
     myfile << std::left << std::setw(12) << imageHeight       << "# image height" << std::endl;       

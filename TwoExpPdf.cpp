@@ -58,17 +58,17 @@ Int_t TwoExpPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, 
 Double_t TwoExpPdf::analyticalIntegral(Int_t code, const char* rangeName) const {
     assert(code == 1);
     
-    Double_t ret = 0;
     if (code==1){
         Double_t x1 = t.min(rangeName);
         Double_t x2 = t.max(rangeName);
         if (x2 <= 0) return 0;
         x1 = TMath::Max(0.,x1);
 
-        ret = indefiniteIntegral(x2)-indefiniteIntegral(x1);
+        Double_t ret = indefiniteIntegral(x2)-indefiniteIntegral(x1);
+        return ret;
     }
     else {
         std::cout << "Error in RooGaussian::analyticalIntegral" << std::endl;
-    }
-    return ret;    
+    }  
+    return 0;
 }
