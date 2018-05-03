@@ -70,6 +70,7 @@ Double_t TwoGaussian::analyticalIntegral(Int_t code, const char* rangeName) cons
     
     Double_t ret = 0;
     if (code==1){
+        // Range always called symmetrical [-AXIS_HALF_WIDTH-100, AXIS_HALF_WIDTH+100] : (-1100; 1100) if 2000 bins
         Double_t x1 = x.min(rangeName);
         Double_t x2 = x.max(rangeName);
 

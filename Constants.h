@@ -26,27 +26,32 @@ public:
     virtual ~Constants();
     
     int getConvolutionBins();
-    int getNumCPU();
+//    int getNumCPU();
     int getNumberOfChannels();
     double getChannelWidth();
     int getSkipLines();
     int getMinChannel();
     int getMaxChannel();
+    int getExcludeMinChannel();
+    int getExcludeMaxChannel();    
     std::string getResolutionFunctionModel();    
     std::string getDecayModel();
     std::string getSourceContributionModel();
     int getImageWidth();
     int getImageHeight();
     void print();
+    bool isNew();
     
 private:
     int         convolutionBins; // Convolution bins
-    int         numCPU;          // CPU number
+//    int         numCPU;          // CPU number
     int         channels;        // entries in maestro file
     double      channelWidth;    // ns
     int         skipLines;       // spectrum header size
     int         minChannel;      // left channel
     int         maxChannel;      // right channel
+    int         excludeMinChannel;      // left channel
+    int         excludeMaxChannel;      // right channel
     std::string resolutionModel; // resolution function model `2gauss` or `3gauss`
     std::string decayModel;      // decay model `1exp`, `2exp`, `trapping` or `grain`
     std::string sourceModel;     // 1exp, 2exp (annihilation in air?)
@@ -55,6 +60,7 @@ private:
     void init();
     void writeDefaultConstants();
     const std::string filename = "constants.txt";
+    bool        isnew;
 };
 
 #endif /* MY_CONSTANTS */

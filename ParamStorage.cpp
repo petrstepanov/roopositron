@@ -59,10 +59,12 @@ TList* ParamStorage::_getParametersFromFile(const char* filename){
     fgets(buffer, 256, pFile);
     while (fscanf(pFile, "%s %s %lf %lf %lf %lf %s %s", name, description, &val, &min, &max, &error, unit, type) == 8){
         RooRealVar* r = new RooRealVar(name, description, val, min, max, unit);
-        r->setError(error);
         if (strcmp(type, "fixed") == 0){
             r->setConstant(kTRUE);
             std::cout << name << " is constant" << std::endl;
+        }
+        else {
+            r->setError(error);
         }
         params->Add(r);
     }
@@ -122,6 +124,13 @@ RooRealVar* ParamStorage::getOrMakeNew(const char* name, const char* description
         if (isFixed){
             var = new RooRealVar(name, description, inputValue, inputValue, inputValue, unit);     
             var->setConstant(kTRUE);
+            // For correct rounding using autoprecision in legend
+//            if(TString(unit).EqualTo("ns")){
+//                var->setError(0.001);
+//            }
+//            if(TString(unit).EqualTo("%")){
+//                var->setError(0.1);
+//            }            
         }
         else {
             var = new RooRealVar(name, description, inputValue, inputMinValue, inputMaxValue, unit);        

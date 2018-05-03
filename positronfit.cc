@@ -1,163 +1,54 @@
 #ifndef __CINT__
-#include "RooGlobalFunc.h"
+#include <RooGlobalFunc.h>
 #endif
 
-#ifndef ROOT_TBrowser 
-#include "TBrowser.h" 
-#endif
-
-#ifndef ROOT_TRandom
-#include "TRandom.h"
-#endif
-
-#ifndef ROOT_TApplication
-#include "TApplication.h"
-#endif
-
-#ifndef ROO_CONST_VAR
-#include "RooConstVar.h"
-#endif
-
-#ifndef ROO_REAL_VAR
-#include "RooRealVar.h"
-#endif
-
-#ifndef ROO_FORMULA_VAR 
-#include "RooFormulaVar.h"
-#endif
-
-#ifndef ROO_DATA_HIST
-#include "RooDataHist.h"
-#endif
-
-#ifndef ROO_GAUSSIAN
-#include "RooGaussian.h"
-#endif
-
-#ifndef ROO_GAUSS_MODEL
-#include "RooGaussModel.h"
-#endif
-
-#ifndef ROO_ADD_MODEL
-#include "RooAddModel.h"
-#endif
-
-#ifndef ROO_GENERIC_PDF
-#include "RooGenericPdf.h"
-#endif
-
-#ifndef ROO_ADD_PDF
-#include "RooAddPdf.h"
-#endif
-
-#ifndef ROO_MINUIT
-#include "RooMinuit.h"
-#endif
-
-#ifndef ROOFFTCONVPDF
-#include "RooFFTConvPdf.h"
-#endif
-
-#ifndef ROO_SIMULTANEOUS
-#include "RooSimultaneous.h"
-#endif
-
-#ifndef ROO_POLYNOMIAL
-#include "RooPolynomial.h"
-#endif
-
-#ifndef ROO_CATEGORY
-#include "RooCategory.h"
-#endif
-
-#ifndef ROO_CHI2_VAR
-#include "RooChi2Var.h"
-#endif
-
-#ifndef ROO_DECAY
-#include "RooDecay.h"
-#endif
-
-#ifndef ROO_PLOT
-#include "RooPlot.h"
-#endif
-
-#ifndef ROO_HIST
-#include "RooHist.h"
-#endif
-
-#ifndef ROOT_TFile
-#include "TFile.h"
-#endif
-
-#ifndef ROOT_TH1F
-#include "TH1F.h"
-#endif
-
-#ifndef ROOT_TCanvas
-#include "TCanvas.h"
-#endif
-
-#ifndef ROOT_TStyle
-#include "TStyle.h"
-#endif
-
-#ifndef ROOT_TPaveStats
-#include "TPaveStats.h"
-#endif
-
-#ifndef ROOT_TLegend
-#include "TLegend.h"
-#endif
-
-#ifndef MY_MYPDFCACHE
-#include "MyPdfCache.h"
-#endif
-
-#ifndef MY_PARAMSTORAGE
+#include <RooMinimizer.h>
+#include <RooConstVar.h>
+#include <RooRealVar.h>
+#include <RooFormulaVar.h>
+#include <RooDataHist.h>
+#include <RooGaussian.h>
+#include <RooGaussModel.h>
+#include <RooAddModel.h>
+#include <RooGenericPdf.h>
+#include <RooAddPdf.h>
+#include <RooMinuit.h>
+#include <RooFFTConvPdf.h>
+#include <RooNumConvPdf.h>
+#include <RooSimultaneous.h>
+#include <RooPolynomial.h>
+#include <RooCategory.h>
+#include <RooChi2Var.h>
+#include <RooDecay.h>
+#include <RooPlot.h>
+#include <RooHist.h>
+#include <TBrowser.h>
+#include <TRandom.h>
+#include <TApplication.h>
+#include <TFile.h>
+#include <TH1F.h>
+#include <TCanvas.h>
+#include <TStyle.h>
+#include <TPaveStats.h>
+#include <TLegend.h>
+#include <TUnixSystem.h>
 #include "ParamStorage.h"
-#endif
-
-#ifndef MY_TWOGAUSSIAN
 #include "TwoGaussian.h"
-#endif
-
-#ifndef MY_THREEGAUSSIAN
 #include "ThreeGaussian.h"
-#endif
-
-#ifndef MY_EXPPDF
 #include "ExpPdf.h"
-#endif
-
-#ifndef MY_TWOEXPPDF
 #include "TwoExpPdf.h"
-#endif
-
-#ifndef MY_THREEEXPPDF
 #include "ThreeExpPdf.h"
-#endif
-
-#ifndef MY_MYPDF
-#include "MyPdf.h"
-#endif
-
-#ifndef MY_TRAPPDF
 #include "TrapPdf.h"
-#endif
-
-#ifndef MY_FILEUTILS
+#include "GrainPdf.h"
 #include "FileUtils.h"
-#endif
-
-#ifndef MY_CONSTANTS
 #include "Constants.h"
+//#include "MyPdfCache.h"
+//#include "MyPdf.h"
 #include "ConvPdf.h"
-#endif
-
-//#ifndef _UNISTD_H_
+#include "ChannelConvolutionPdf.h"
 //#include <unistd.h>
-//#endif
+#include <iostream>
+#include <sstream>
 
 using namespace RooFit;
 using namespace TMath;
@@ -182,25 +73,45 @@ Double_t getConstBackgroundFraction(TH1F* hist){
     return bgInt / fullInt;
 }
 
-int run(TApplication* theApp, Bool_t isRoot = kFALSE){
-        // Output current time
+TSystem* tSystem = NULL;
+Int_t getNumCpu(){
+    // Get number of CPUs
+    if (tSystem == NULL) tSystem = new TUnixSystem();
+    SysInfo_t sysInfo;
+    tSystem->GetSysInfo(&sysInfo);
+    std::cout << "NumCpu: " << sysInfo.fCpus << std::endl;
+    return (sysInfo.fCpus >= 0) ? sysInfo.fCpus : 1;
+}
+
+// ASCII font generator is here: http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Resolution%0AFunction
+int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
+    // Output current time
 	// std::cout << "Current date and time is " << getCurrentTime() << std::endl;
 
         TStopwatch watch;
         watch.Start();    
     
 	// Print command line arguments
-	int argc = theApp->Argc();
-	char **argv = theApp->Argv();
 	std::cout << "Command line arguments (" << argc << "):" << std::endl;
 	for (unsigned i = 0; i < argc; i++){
             std::cout << "argument " << i << ": " << argv[i] << std::endl;
         }
 
         // Input and output paths are either current directory or program arguments
-        std::string sInputPath = (isRoot || argc < 2) ? "" : argv[1];
-        std::string sOutputPath = (isRoot || argc < 2) ? "" : argv[2];
+//        std::string sInputPath = (isRoot || argc < 2) ? "" : argv[1];
+//        std::string sOutputPath = (isRoot || argc < 2) ? "" : argv[2];
 
+        std::string sInputPath = "";
+        std::string sOutputPath = "";
+        
+        // Dirty fix for the Ghost peak
+        std::string sGhostPeakCenter = (isRoot || argc == 1) ? "" : argv[1];
+        int iGhostPeakCenter = 0;
+        if(sGhostPeakCenter.length()>0){
+            std::stringstream geek(sGhostPeakCenter);
+            geek >> iGhostPeakCenter;      
+            std::cout << "Ghost peak center: " << iGhostPeakCenter << std:: endl;
+        }
 	// If ROOT session or directory not specified then set default input folder (./ - current directory)
 	// otherwise use command line parameter (if provided)
         std::cout << "Input path is: \"" << sInputPath << "\"" << std::endl;
@@ -214,7 +125,10 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	std::cout << "Found " << iNumberOfFiles << " files.\n" << std::endl;
 
         // Exit if no spectra found
-        if (iNumberOfFiles < 1) return 0;
+        if (iNumberOfFiles < 1) {
+            std::cout << "No Maestro `.Spe` files found in current directory. Press CTRL+C." << std::endl;
+            return 0;
+        }
         
 	// Convert list to array of strings
 	const char** array = new const char*[fileNamesMap.size()];
@@ -237,6 +151,12 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 
         // Constants object reads values from "constants.txt" file
         Constants* constants = new Constants();
+        
+        if (constants->isNew()){
+            std::cout << "Constants file `constants.txt` created. Make sure values are ok. Press CTRL+C." << std::endl;
+            return 0;            
+        }
+        
         Int_t MIN_CHANNEL = constants->getMinChannel();
         Int_t MAX_CHANNEL = constants->getMaxChannel();
         Int_t CHANNELS = constants->getNumberOfChannels();
@@ -269,60 +189,58 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	}
 
 	/*
-	_____         .__           _________       __
-	/  _  \ ___  __|__| ______  /   _____/ _____/  |_ __ ________
-	/  /_\  \\  \/  /  |/  ___/  \_____  \_/ __ \   __\  |  \____ \
-	/    |    \>    <|  |\___ \   /        \  ___/|  | |  |  /  |_> >
-	\____|__  /__/\_ \__/____  > /_______  /\___  >__| |____/|   __/
-	\/      \/       \/          \/     \/           |__|
-	*/
+           _____         .__           _________       __                
+          /  _  \ ___  __|__| ______  /   _____/ _____/  |_ __ ________  
+         /  /_\  \\  \/  /  |/  ___/  \_____  \_/ __ \   __\  |  \____ \ 
+        /    |    \>    <|  |\___ \   /        \  ___/|  | |  |  /  |_> >
+        \____|__  /__/\_ \__/____  > /_______  /\___  >__| |____/|   __/ 
+                \/      \/       \/          \/     \/           |__|    
+          
+        */
 
 	// Define Channels Axis
 
 	RooRealVar* rChannels = new RooRealVar("rChannels", "Channels axis", 0, MAX_CHANNEL-MIN_CHANNEL+1, "ch");
 	rChannels->setBins(MAX_CHANNEL - MIN_CHANNEL + 1);
-
+        
 	// Conversion variables
-	RooConstVar* channelWidth = new RooConstVar("channelWidth", "Channel width, ns", CHANNEL_WIDTH);
-
+	RooConstVar* channelWidth = new RooConstVar("channelWidth", "Bin channel width, ns", CHANNEL_WIDTH);
+        
 	// Convert TH1F spectra to RooDataHist
 	RooDataHist** histSpectrum = new RooDataHist*[iNumberOfFiles];
-	TCanvas** histCanvas = new TCanvas*[iNumberOfFiles];
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
             histSpectrum[i] = new RooDataHist(TString::Format("histSpectrum_%d", i + 1), sFileNames[i].c_str(), RooArgSet(*rChannels), RooFit::Import(*fullTH1F[i]));
 	}
 
 	/*
-	__________                    .__          __  .__
-	\______   \ ____   __________ |  |  __ ___/  |_|__| ____   ____
-	|       _// __ \ /  ___/  _ \|  | |  |  \   __\  |/  _ \ /    \
-	|    |   \  ___/ \___ (  <_> )  |_|  |  /|  | |  (  <_> )   |  \
-	|____|_  /\___  >____  >____/|____/____/ |__| |__|\____/|___|  /
-	\/     \/     \/                                      \/
-	___________                   __  .__
-	\_   _____/_ __  ____   _____/  |_|__| ____   ____
-	|    __)|  |  \/    \_/ ___\   __\  |/  _ \ /    \
-	|     \ |  |  /   |  \  \___|  | |  (  <_> )   |  \
-	\___  / |____/|___|  /\___  >__| |__|\____/|___|  /
-	\/             \/     \/                    \/
-	*/
+        __________                    .__          __  .__               
+        \______   \ ____   __________ |  |  __ ___/  |_|__| ____   ____  
+         |       _// __ \ /  ___/  _ \|  | |  |  \   __\  |/  _ \ /    \ 
+         |    |   \  ___/ \___ (  <_> )  |_|  |  /|  | |  (  <_> )   |  \
+         |____|_  /\___  >____  >____/|____/____/ |__| |__|\____/|___|  /
+                \/     \/     \/                                      \/ 
+        ___________                   __  .__                            
+        \_   _____/_ __  ____   _____/  |_|__| ____   ____               
+         |    __)|  |  \/    \_/ ___\   __\  |/  _ \ /    \              
+         |     \ |  |  /   |  \  \___|  | |  (  <_> )   |  \             
+         \___  / |____/|___|  /\___  >__| |__|\____/|___|  /             
+             \/             \/     \/                    \/       
+          
+        */
 
 
 	// CREATE RESOLUTION FUNCTIONS
 	// by  the way, FWHM = 2 sqrt(2 ln 2) * dispersion
-	//              FWHM = 2.3548 * dispersion
-	//     0.4247 * FWHM = dispersion
 
 	// Read resolution function parameters from file
         // parameters filename is "parameters_XXX.txt", where XXX is model name (1exp, 2exp etc)
         std::string suffix = constants->getDecayModel() + "_" + constants->getResolutionFunctionModel();
 	ParamStorage* storage = new ParamStorage(suffix);
         
-	RooConstVar* fwhm2disp = new RooConstVar("fwhm2disp", "Coefficient to convert fwhm to dispersion", 0.42466);  //1.0/(2.0*Sqrt(2.0*Log(2.0)))
+	RooConstVar* fwhm2disp = new RooConstVar("fwhm2disp", "Coefficient to convert fwhm to dispersion", 1./(2.*sqrt(2.*log(2.))));
 
 	// Zero channel value is relative to the MIN_CHANNEL value
 	RooRealVar** zero_ch = new RooRealVar*[iNumberOfFiles];
-	RooConstVar* minChannel = new RooConstVar("minChannel", "Channel of Left Fitment Interval", MIN_CHANNEL);
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
             Double_t zeroChannelVal = iTopChannel[i];
             Double_t zeroChannelDelta = 50;
@@ -334,43 +252,45 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	}
 
 	// 1st Gauss FWHM
-	RooRealVar* g1_fwhm = storage->getOrMakeNew("g1_fwhm", "1st_gauss_fwhm", 0.30, 0.1, 0.450, "ns");
+	RooRealVar* g1_fwhm = storage->getOrMakeNew("g1_fwhm", "1st_gauss_fwhm", 0.3, 0.1, 1.0, "ns");
 	RooFormulaVar* gauss_1_dispersion = new RooFormulaVar("gauss_1_dispersion", "@0*@1/@2", RooArgList(*g1_fwhm, *fwhm2disp, *channelWidth));
 
-	// 2nd gauss dispertion
-	RooRealVar* g2_fwhm = storage->getOrMakeNew("g2_fwhm", "2nd_gauss_fwhm", 0.7, 0.3, 1.2, "ns");
+	// 2nd gauss FWHM
+	RooRealVar* g2_fwhm = storage->getOrMakeNew("g2_fwhm", "2nd_gauss_fwhm", 0.7, 0.1, 1.5, "ns");
 	RooFormulaVar* gauss_2_dispersion = new RooFormulaVar("gauss_2_dispersion", "@0*@1/@2", RooArgList(*g2_fwhm, *fwhm2disp, *channelWidth));
 
        	// Fraction of the 2nd gauss
-	RooRealVar* gauss_2_fraction_pct = storage->getOrMakeNew("g2_frac", "2nd_gauss_fraction", 5, 0, 25, "%");
+	RooRealVar* gauss_2_fraction_pct = storage->getOrMakeNew("g2_frac", "2nd_gauss_fraction", 10, 0, 100, "%");
 	RooFormulaVar* gauss_2_fraction = new RooFormulaVar("g2_fraction", "@0/100", *gauss_2_fraction_pct);
 
 	// 2nd Gauss shift
-	RooRealVar** g2_shift = new RooRealVar*[iNumberOfFiles];
-	RooFormulaVar** zero_ch_relative_2 = new RooFormulaVar*[iNumberOfFiles];
-	for (unsigned i = 0; i < iNumberOfFiles; i++) {
-		g2_shift[i] = storage->getOrMakeNew(TString::Format("g2_shift_%d", i + 1), TString::Format("2nd_gauss_shift_%d", i + 1), 0, -70, 50, "ch");
-		zero_ch_relative_2[i] = new RooFormulaVar(TString::Format("zero_ch_relative_2_%d", i + 1), "@0+@1", RooArgList(*zero_ch[i], *g2_shift[i]));
-	}
+//	RooRealVar** g2_shift = new RooRealVar*[iNumberOfFiles];
+//	RooFormulaVar** zero_ch_relative_2 = new RooFormulaVar*[iNumberOfFiles];
+//	for (unsigned i = 0; i < iNumberOfFiles; i++) {
+//		g2_shift[i] = storage->getOrMakeNew(TString::Format("g2_shift_%d", i + 1), TString::Format("2nd_gauss_shift_%d", i + 1), 0, -10, 10, "ch");
+//		zero_ch_relative_2[i] = new RooFormulaVar(TString::Format("zero_ch_relative_2_%d", i + 1), "@0+@1", RooArgList(*zero_ch[i], *g2_shift[i]));
+//	}
 
 	// Two-Gauss PDF
 	RooAbsPdf** res_funct = new RooAbsPdf*[iNumberOfFiles];
         
         if (constants->getResolutionFunctionModel() == "2gauss"){
             for (unsigned i = 0; i<iNumberOfFiles; i++){
-                res_funct[i] = new TwoGaussian(TString::Format("res_funct_%d", i + 1), "Resolution Function for Convolution (2 Gauss)", *rChannels, *zero_ch[i], *gauss_1_dispersion, *zero_ch_relative_2[i], *gauss_2_dispersion, *gauss_2_fraction);
-            }            
+//                res_funct[i] = new TwoGaussian(TString::Format("res_funct_%d", i + 1), "Resolution Function for Convolution (2 Gauss)", *rChannels, *zero_ch[i], *gauss_1_dispersion, *zero_ch_relative_2[i], *gauss_2_dispersion, *gauss_2_fraction);
+                res_funct[i] = new TwoGaussian(TString::Format("res_funct_%d", i + 1), "Resolution Function for Convolution (2 Gauss)", *rChannels, *zero_ch[i], *gauss_1_dispersion, *zero_ch[i], *gauss_2_dispersion, *gauss_2_fraction);
+            }
         } else {
             // 3rd gauss dispertion
-            RooRealVar* g3_fwhm = storage->getOrMakeNew("g3_fwhm", "3rd_gauss_fwhm", 1.5, 1, 2, "ns");
+            RooRealVar* g3_fwhm = storage->getOrMakeNew("g3_fwhm", "3rd_gauss_fwhm", 1.5, 1, 3, "ns");
             RooFormulaVar* gauss_3_dispersion = new RooFormulaVar("gauss_3_dispersion", "@0*@1/@2", RooArgList(*g3_fwhm, *fwhm2disp, *channelWidth));
 
             // Fraction of the 2nd gauss
-            RooRealVar* gauss_3_fraction_pct = storage->getOrMakeNew("g3_frac", "3rd_gauss_fraction", 1, 0, 5, "%");
+            RooRealVar* gauss_3_fraction_pct = storage->getOrMakeNew("g3_frac", "3rd_gauss_fraction", 1, 0, 10, "%");
             RooFormulaVar* gauss_3_fraction = new RooFormulaVar("g3_fraction", "@0/100", *gauss_3_fraction_pct);
         
             for (unsigned i = 0; i<iNumberOfFiles; i++){
-                res_funct[i] = new ThreeGaussian(TString::Format("res_funct_%d", i + 1), "Resolution Function for Convolution (3 Gauss)", *rChannels, *zero_ch[i], *gauss_1_dispersion, *zero_ch_relative_2[i], *gauss_2_dispersion, *gauss_3_dispersion, *gauss_2_fraction, *gauss_3_fraction);
+//                res_funct[i] = new ThreeGaussian(TString::Format("res_funct_%d", i + 1), "Resolution Function for Convolution (3 Gauss)", *rChannels, *zero_ch[i], *gauss_1_dispersion, *zero_ch_relative_2[i], *gauss_2_dispersion, *gauss_3_dispersion, *gauss_2_fraction, *gauss_3_fraction);
+                res_funct[i] = new ThreeGaussian(TString::Format("res_funct_%d", i + 1), "Resolution Function for Convolution (3 Gauss)", *rChannels, *zero_ch[i], *gauss_1_dispersion, *zero_ch[i], *gauss_2_dispersion, *gauss_3_dispersion, *gauss_2_fraction, *gauss_3_fraction);
             }            
         }
 
@@ -379,13 +299,13 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 
 
 	/*
-	________                                  _____             .___     .__
-	\______ \   ____   ____ _____  ___.__.   /     \   ____   __| _/____ |  |
-	|    |  \_/ __ \_/ ___\\__  \<   |  |  /  \ /  \ /  _ \ / __ |/ __ \|  |
-	|    `   \  ___/\  \___ / __ \\___  | /    Y    (  <_> ) /_/ \  ___/|  |__
-	/_______  /\___  >\___  >____  / ____| \____|__  /\____/\____ |\___  >____/
-	\/     \/     \/     \/\/              \/            \/    \/
-
+        ________                                  _____             .___     .__   
+        \______ \   ____   ____ _____  ___.__.   /     \   ____   __| _/____ |  |  
+         |    |  \_/ __ \_/ ___\\__  \<   |  |  /  \ /  \ /  _ \ / __ |/ __ \|  |  
+         |    `   \  ___/\  \___ / __ \\___  | /    Y    (  <_> ) /_/ \  ___/|  |__
+        /_______  /\___  >\___  >____  / ____| \____|__  /\____/\____ |\___  >____/
+                \/     \/     \/     \/\/              \/            \/    \/      
+        
 	*/
 
         RooAbsPdf* decay_model; // Polymorphism lol
@@ -450,35 +370,36 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
             RooFormulaVar* lambdaJ_ch = new RooFormulaVar("lambdaJ_ch", "@0*@1", RooArgList(*lambdaJ, *channelWidth));
 
             // Initialize cache
-            MyPdfCache* myPdfCache = new MyPdfCache(100, MIN_CHANNEL, MAX_CHANNEL);
-            MyPdf::myPdfCache = myPdfCache;
+//            MyPdfCache* myPdfCache = new MyPdfCache(100, MIN_CHANNEL, MAX_CHANNEL);
+//            MyPdf::myPdfCache = myPdfCache;
 
-            decay_model = new MyPdf("decay_model", "decay_model", *rChannels, *lambdaJ_ch, *lambdaBulk_ch, *lambdaGrain_ch, *lambdaVac_ch, *kappaVac_ch);
-            // add cache to model - counts 10x faster            
+//            decay_model = new MyPdf("decay_model", "decay_model", *rChannels, *lambdaJ_ch, *lambdaBulk_ch, *lambdaGrain_ch, *lambdaVac_ch, *kappaVac_ch);
+            // add cache to model - counts 10x faster
+            
+            decay_model = new GrainPdf("decay_model", "decay_model", *rChannels, *lambdaJ_ch, *lambdaBulk_ch, *lambdaGrain_ch, *lambdaVac_ch, *kappaVac_ch);            
         }
-
         
 	/*
-	_________
-	/   _____/ ____  __ _________   ____  ____
-	\_____  \ /  _ \|  |  \_  __ \_/ ___\/ __ \
-	/        (  <_> )  |  /|  | \/\  \__\  ___/
-	/________/\____/|____/ |__|    \___  >___  >
-	\/                          \/    \/
-	_________                __         ._____.           __  .__
-	\_   ___ \  ____   _____/  |________|__\_ |__  __ ___/  |_|__| ____   ____
-	/    \  \/ /  _ \ /    \   __\_  __ \  || __ \|  |  \   __\  |/  _ \ /    \
-	\     \___(  <_> )   |  \  |  |  | \/  || \_\ \  |  /|  | |  (  <_> )   |  \
-	\______  /\____/|___|  /__|  |__|  |__||___  /____/ |__| |__|\____/|___|  /
-	\/            \/                    \/                           \/
+          _________                                                                 
+         /   _____/ ____  __ _________   ____  ____                                 
+         \_____  \ /  _ \|  |  \_  __ \_/ ___\/ __ \                                
+         /        (  <_> )  |  /|  | \/\  \__\  ___/                                
+        /_______  /\____/|____/ |__|    \___  >___  >                               
+                \/                          \/    \/                                
+        _________                __         ._____.           __  .__               
+        \_   ___ \  ____   _____/  |________|__\_ |__  __ ___/  |_|__| ____   ____  
+        /    \  \/ /  _ \ /    \   __\_  __ \  || __ \|  |  \   __\  |/  _ \ /    \ 
+        \     \___(  <_> )   |  \  |  |  | \/  || \_\ \  |  /|  | |  (  <_> )   |  \
+         \______  /\____/|___|  /__|  |__|  |__||___  /____/ |__| |__|\____/|___|  /
+                \/            \/                    \/                           \/ 
 
-	*/
+        */
 
 	// Lifetime in source
-	RooRealVar* t_source = storage->getOrMakeNew("t_source", "source_e+_lifetime", 0.38, 0.38, 0.38, "ns"); // Kapton
+	RooRealVar* t_source = storage->getOrMakeNew("t_source", "source_e+_lifetime", 0.385, 0.385, 0.385, "ns"); // Kapton
 	RooFormulaVar* t_source_ch = new RooFormulaVar("t_source_ch", "@0/@1", RooArgList(*t_source, *channelWidth));
         
-	RooRealVar* I_source = storage->getOrMakeNew("I_source", "source_contribution", 12, 8, 16, "%");
+	RooRealVar* I_source = storage->getOrMakeNew("I_source", "source_contribution", 11, 8, 16, "%");
 	RooFormulaVar* I_source_ = new RooFormulaVar("I_source_", "@0/100", *I_source);
 
         RooAbsPdf* decay_source;
@@ -493,29 +414,38 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
             decay_source = new TwoExpPdf("decay_source", "decay_source", *rChannels, *t_source_ch, *t_source_2_ch, *I_source_2_);
         }
         
-	RooAddPdf* decay_model_sum = new RooAddPdf("decay_model_sum", "decay_model_sum", RooArgList(*decay_source, *decay_model), *I_source_);
+        RooAddPdf* decay_model_sum = new RooAddPdf("decay_model_sum", "decay_model_sum", RooArgList(*decay_source, *decay_model), *I_source_, kTRUE);        
 
 	RooFFTConvPdf** decay_model_with_source = new RooFFTConvPdf*[iNumberOfFiles];
-	rChannels->setBins(constants->getConvolutionBins(), "cache");
+//	rChannels->setBins(constants->getConvolutionBins(), "cache");
+        rChannels->setBins(MAX_CHANNEL - MIN_CHANNEL + 1, "cache");
 	for (unsigned i = 0; i<iNumberOfFiles; i++){
-		decay_model_with_source[i] = new RooFFTConvPdf(TString::Format("decay_model_with_source_%d", i + 1), TString::Format("Grain Boundary Model N%d", i + 1), *rChannels, *decay_model_sum, *res_funct[i]);
-		decay_model_with_source[i]->setBufferFraction(0);
+            decay_model_with_source[i] = new RooFFTConvPdf(TString::Format("decay_model_with_source_%d", i + 1), TString::Format("Grain Boundary Model N%d", i + 1), *rChannels, *decay_model_sum, *res_funct[i]);
 	}
 
-//        ConvPdf** decay_model_with_source = new ConvPdf*[iNumberOfFiles];
-//	for (unsigned i = 0; i<iNumberOfFiles; i++){
-//            decay_model_with_source[i] = new ConvPdf(TString::Format("decay_model_with_source_%d", i + 1), TString::Format("Convoluted model N%d", i + 1), *rChannels, *decay_model_sum, *res_funct[i]);
-//            decay_model_with_source[i]->init(MIN_CHANNEL, MAX_CHANNEL);
-//        }        
+//      RooNumConvPdf** decay_model_with_source = new RooNumConvPdf*[iNumberOfFiles];
+//      for (unsigned i = 0; i<iNumberOfFiles; i++){
+//          decay_model_with_source[i] = new RooNumConvPdf(TString::Format("decay_model_with_source_%d", i + 1), TString::Format("Convoluted model N%d", i + 1), *rChannels, *decay_model_sum, *res_funct[i]);
+////        ((RooNumConvPdf*) decay_model_with_source[i])->setConvolutionWindow(*zero_ch[i],*g1_fwhm,2);
+//      }  
+        
+//        rChannels->setBins(constants->getConvolutionBins(), "cache");    
+//        rChannels->setBins(MAX_CHANNEL - MIN_CHANNEL + 1, "cache");        
+//        ChannelConvolutionPdf** decay_model_with_source = new ChannelConvolutionPdf*[iNumberOfFiles];
+//        for (unsigned i = 0; i<iNumberOfFiles; i++){
+//            decay_model_with_source[i] = new ChannelConvolutionPdf(TString::Format("decay_model_with_source_%d", i + 1), TString::Format("Convoluted model N%d", i + 1), *rChannels, *decay_model_sum, *res_funct[i]);
+//            ((ChannelConvolutionPdf*) decay_model_with_source[i])->setConvolutionWindow(*zero_ch[i],*g1_fwhm,2);
+//        }
+
 
 	/*
-	__________                __                                          .___
-	\______   \_____    ____ |  | __  ___________  ____  __ __  ____    __| _/
-	|    |  _/\__  \ _/ ___\|  |/ / / ___\_  __ \/  _ \|  |  \/    \  / __ |
-	|    |   \ / __ \\  \___|    < / /_/  >  | \(  <_> )  |  /   |  \/ /_/ |
-	|______  /(____  /\___  >__|_ \\___  /|__|   \____/|____/|___|  /\____ |
-	\/      \/     \/     \/_____/                         \/      \/
-
+        __________                __                                          .___
+        \______   \_____    ____ |  | __  ___________  ____  __ __  ____    __| _/
+         |    |  _/\__  \ _/ ___\|  |/ / / ___\_  __ \/  _ \|  |  \/    \  / __ | 
+         |    |   \ / __ \\  \___|    < / /_/  >  | \(  <_> )  |  /   |  \/ /_/ | 
+         |______  /(____  /\___  >__|_ \\___  /|__|   \____/|____/|___|  /\____ | 
+                \/      \/     \/     \/_____/                         \/      \/ 
+         
 	*/
 	// Background Model is RooPolynomial: f(x) = sum_i a_i * x^i
 	// as by default a_0=1 and a_i=0, so we get horisontal line
@@ -537,10 +467,32 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 
 	// ADD BACKGROUND PDF
 	RooAddPdf** decay_model_with_source_bg = new RooAddPdf*[iNumberOfFiles];
-	for (unsigned i = 0; i < iNumberOfFiles; i++){
-		decay_model_with_source_bg[i] = new RooAddPdf(TString::Format("Fit_%d", i + 1), "Decay Model with Source Contribution and Background", RooArgList(*bg[i], *decay_model_with_source[i]), *I_bg[i]);
-	}
-
+        for (unsigned i = 0; i < iNumberOfFiles; i++){
+            decay_model_with_source_bg[i] = new RooAddPdf(TString::Format("Fit_%d", i + 1), "Decay Model with Source Contribution and Background", RooArgList(*bg[i], *decay_model_with_source[i]), *I_bg[i]);
+        }
+        // BEGIN ghost peak fix
+//        if (iGhostPeakCenter == 0){
+//            for (unsigned i = 0; i < iNumberOfFiles; i++){
+//                    decay_model_with_source_bg[i] = new RooAddPdf(TString::Format("Fit_%d", i + 1), "Decay Model with Source Contribution and Background", RooArgList(*bg[i], *decay_model_with_source[i]), *I_bg[i]);
+//            }
+//        }
+//        else {
+//            RooAddPdf** decay_model_with_source_bg_temp = new RooAddPdf*[iNumberOfFiles];
+//            std::cout << "Ghost detected!" << std::endl;
+//            RooRealVar* mean = new RooRealVar("mean","mean of the ghost gaussian", iGhostPeakCenter, iGhostPeakCenter-30, iGhostPeakCenter+30, "ch") ;
+//            RooRealVar* sigma = new RooRealVar("sigma","width of the ghost gaussian",75, 20, 150, "ch");
+//
+//            // Build gaussian p.d.f in terms of x,mean and sigma
+//            RooGaussian* ghost = new RooGaussian("ghost","ghost gaussian PDF", *rChannels, *mean, *sigma);
+//            RooRealVar* I_ghost = new RooRealVar("I_ghost", "ghost gaussian intensity", 0.0025, 0.0025 / 10, 0.0025 * 10);
+//            
+//            for (unsigned i = 0; i < iNumberOfFiles; i++){
+//                decay_model_with_source_bg_temp[i] = new RooAddPdf(TString::Format("Fit_%d", i + 1), "Decay Model with Source Contribution and Background", RooArgList(*bg[i], *decay_model_with_source[i]), *I_bg[i]);
+//                decay_model_with_source_bg[i] = new RooAddPdf(TString::Format("Fit_ghost_%d", i + 1), "Decay Model with Source Contribution and Background", RooArgList(*ghost, *decay_model_with_source_bg_temp[i]), *I_ghost);
+//            }
+//        }        
+        // END ghost peak fix            
+        
 	// Output
 	std::cout << "Background OK!" << std::endl;
 
@@ -553,25 +505,24 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 		floatPars[i] = decay_model_with_source_bg[i]->getParameters(histSpectrum[i]);
 		floatPars1[i] = floatPars[i]->selectByAttrib("Constant", kFALSE);
 		np[i] = floatPars1[i]->getSize();
-	}
-       
+	}      
         
 	/*
-	___________.__  __                         __
-	\_   _____/|__|/  |_  _____   ____   _____/  |_
-	|    __)  |  \   __\/     \_/ __ \ /    \   __\
-	|     \   |  ||  | |  Y Y  \  ___/|   |  \  |
-	\___  /   |__||__| |__|_|  /\___  >___|  /__|
-	\/                   \/     \/     \/
-	__________
-	\______   \_______  ____   ____  ____   ____   ______ ______
-	|     ___/\_  __ \/  _ \_/ ___\/ __ \_/ __ \ /  ___//  ___/
-	|    |     |  | \(  <_> )  \__\  ___/\  ___/ \___ \ \___ \
-	|____|     |__|   \____/ \___  >___  >\___  >____  >____  >
-	\/    \/     \/     \/     \/
-
+        ___________.__  __    __  .__                        
+        \_   _____/|__|/  |__/  |_|__| ____    ____          
+         |    __)  |  \   __\   __\  |/    \  / ___\         
+         |     \   |  ||  |  |  | |  |   |  \/ /_/  >        
+         \___  /   |__||__|  |__| |__|___|  /\___  /         
+             \/                           \//_____/          
+        __________                                           
+        \______   \_______  ____   ____  ____   ______ ______
+         |     ___/\_  __ \/  _ \_/ ___\/ __ \ /  ___//  ___/
+         |    |     |  | \(  <_> )  \__\  ___/ \___ \ \___ \ 
+         |____|     |__|   \____/ \___  >___  >____  >____  >
+                                      \/    \/     \/     \/ 
+         
 	*/
-        
+               
 	// Save storage before fitting to create file with parameters 
         // in case   user doesnt want to wait till fitting ends
         storage->save();        
@@ -581,21 +532,21 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	// Create Category Types
 	TString* sTypes = new TString[iNumberOfFiles];
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
-		sTypes[i] = TString::Format("spec%d", i);
+            sTypes[i] = TString::Format("spec%d", i);
 	}
 
 	// Define category with spectra names
 	RooCategory* sample = new RooCategory("sample", "sample");
 	sample->clearTypes();
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
-		sample->defineType(sTypes[i].Data());
+            sample->defineType(sTypes[i].Data());
 	}
 
 	// Use stl::map to keep spectra pointers
 	dhistMap myHistMap;
 	for (unsigned i = 0; i<iNumberOfFiles; i++){
-		std::string type = sTypes[i].Data();
-		myHistMap.insert(dhistPair(type, histSpectrum[i]));
+            std::string type = sTypes[i].Data();
+            myHistMap.insert(dhistPair(type, histSpectrum[i]));
 	}
 
 	// Construct combined dataset in (x,sample)
@@ -605,7 +556,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	// RooDataHist* combData = new RooDataHist("combData", "combined data", *rChannels, *sample, myHistMap);
 
 	// Following code is a workaround
-	RooDataHist* combData = new RooDataHist();
+	RooDataHist* combData; // = new RooDataHist();
 
 	if (iNumberOfFiles == 1)      combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]));
 	else if (iNumberOfFiles == 2) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]));
@@ -615,29 +566,53 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	else if (iNumberOfFiles == 6) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]), Import("spec2", *histSpectrum[2]), Import("spec3", *histSpectrum[3]), Import("spec4", *histSpectrum[4]), Import("spec5", *histSpectrum[5]));
 	else if (iNumberOfFiles == 7) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]), Import("spec2", *histSpectrum[2]), Import("spec3", *histSpectrum[3]), Import("spec4", *histSpectrum[4]), Import("spec5", *histSpectrum[5]), Import("spec6", *histSpectrum[6]));
 	else exit(1);
-
+        
 	combData->Print();
-	RooSimultaneous* simPdf = new RooSimultaneous("simPdf", "Simultaneous PDF", *sample);
-
+	RooSimultaneous* simPdf = new RooSimultaneous("simPdf", "Simultaneous PDF", *sample);   
+        
 	// Associate models and states
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
-		simPdf->addPdf(*decay_model_with_source_bg[i], sTypes[i].Data());
+            simPdf->addPdf(*decay_model_with_source_bg[i], sTypes[i].Data());
 	}
 
         // simPdf->fitTo(*combData) ;
 	// simPdf->fitTo(*combData, NumCPU(NUM_CPU));
 
 	// Use RooMinuit interface to minimize chi^2
-        RooChi2Var* simChi2 = (constants->getNumCPU() < 2) ?
-            new RooChi2Var("simChi2", "chi2", *simPdf, *combData) : // DataError(RooAbsData::None));            
-            new RooChi2Var("simChi2", "chi2", *simPdf, *combData, NumCPU(constants->getNumCPU()));                        
+        RooChi2Var* simChi2;
+//        Int_t EXCLUDE_MIN_CHANNEL = constants->getExcludeMinChannel();
+//        Int_t EXCLUDE_MAX_CHANNEL = constants->getExcludeMaxChannel();
+//        Bool_t doRange = kFALSE;
+//        if (EXCLUDE_MIN_CHANNEL > 1 && EXCLUDE_MIN_CHANNEL < EXCLUDE_MAX_CHANNEL && EXCLUDE_MAX_CHANNEL < MAX_CHANNEL - MIN_CHANNEL){
+//            doRange = kTRUE;
+//        }
+        
+//        if (doRange){
+//            std::cout << "Doing Ranges!" << std::endl;
+//            rChannels->setRange("LEFT", 1, EXCLUDE_MIN_CHANNEL);
+//            rChannels->setRange("RIGHT", EXCLUDE_MAX_CHANNEL, rChannels->getBins());
+//            simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combData, RooFit::Range("LEFT,RIGHT"), NumCPU(getNumCpu()));
+//        }
+//        else {
+            simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combData, NumCPU(getNumCpu()));
+//        }                 
 
-	RooMinuit m(*simChi2);
-        m.optimizeConst(1);
-	m.migrad();
+//	RooMinuit m(*simChi2);
+//        m.optimizeConst(1);
+//	m.migrad();
 //	m.improve();
 //	m.hesse();
 
+        RooMinimizer* m = new RooMinimizer(*simChi2);
+        // m->setStrategy(RooMinimizer::Speed);
+        m->setMinimizerType("Minuit");
+        Int_t resultMigrad = m->migrad();
+        Int_t resultHesse = m->hesse();
+        std::cout << "RooMinimizer: migrad=" << resultMigrad << ", hesse=" << resultHesse << std::endl;
+
+        RooFitResult* fitResult = m->save();
+        
+        
 	// m.save();
 	// m.fit("r");
 
@@ -659,13 +634,13 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 	}
 
 	/*
-	________                    .__    .__
-	/  _____/___________  ______ |  |__ |__| ____   ______
-	/   \  __\_  __ \__  \ \____ \|  |  \|  |/ ___\ /  ___/
-	\    \_\  \  | \// __ \|  |_> >   Y  \  \  \___ \___ \
-	\______  /__|  (____  /   __/|___|  /__|\___  >____  >
-	\/           \/|__|        \/        \/     \/
-
+          ________                    .__    .__               
+         /  _____/___________  ______ |  |__ |__| ____   ______
+        /   \  __\_  __ \__  \ \____ \|  |  \|  |/ ___\ /  ___/
+        \    \_\  \  | \// __ \|  |_> >   Y  \  \  \___ \___ \ 
+         \______  /__|  (____  /   __/|___|  /__|\___  >____  >
+                \/           \/|__|        \/        \/     \/ 
+         
 	*/
 	// Define frame for data points and fit
 	RooPlot** graphFrame = new RooPlot*[iNumberOfFiles];
@@ -690,7 +665,7 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
             // Draw complete fit
             decay_model_with_source_bg[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kPink - 4), LineWidth(2), Name("fit"));
 //                std::string legendLabel = constants->getDecayModel() + " model parameters";
-            decay_model_with_source_bg[i]->paramOn(graphFrame[i], Layout(0.78, 0.97, 0.9), Format("NEU", AutoPrecision(1)), ShowConstants(kTRUE));// , Label(legendLabel.c_str()) Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);
+            decay_model_with_source_bg[i]->paramOn(graphFrame[i], Layout(0.78, 0.97, 0.9), Format("NEU", AutoPrecision(3)), ShowConstants(kTRUE));// , Label(legendLabel.c_str()) Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);
 	}
 	std::cout << "Plot Frames Created OK!" << std::endl;
 
@@ -773,19 +748,19 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 
         
         /*
-            __________                                     __                       
-            \______   \_____ ____________    _____   _____/  |_  ___________  ______
-             |     ___/\__  \\_  __ \__  \  /     \_/ __ \   __\/ __ \_  __ \/  ___/
-             |    |     / __ \|  | \// __ \|  Y Y  \  ___/|  | \  ___/|  | \/\___ \ 
-             |____|    (____  /__|  (____  /__|_|  /\___  >__|  \___  >__|  /____  >
-                            \/           \/      \/     \/          \/           \/ 
-                           ________          __                 __   
-                           \_____  \  __ ___/  |_______  __ ___/  |_ 
-                            /   |   \|  |  \   __\____ \|  |  \   __\
-                           /    |    \  |  /|  | |  |_> >  |  /|  |  
-                           \_______  /____/ |__| |   __/|____/ |__|  
-                                   \/            |__|                
-
+        ________          __                 __                                 
+        \_____  \  __ ___/  |_______  __ ___/  |_                               
+         /   |   \|  |  \   __\____ \|  |  \   __\                              
+        /    |    \  |  /|  | |  |_> >  |  /|  |                                
+        \_______  /____/ |__| |   __/|____/ |__|                                
+                \/            |__|                                              
+        __________                                     __                       
+        \______   \_____ ____________    _____ _____ _/  |_  ___________  ______
+         |     ___/\__  \\_  __ \__  \  /     \\__  \\   __\/ __ \_  __ \/  ___/
+         |    |     / __ \|  | \// __ \|  Y Y  \/ __ \|  | \  ___/|  | \/\___ \ 
+         |____|    (____  /__|  (____  /__|_|  (____  /__|  \___  >__|  /____  >
+                        \/           \/      \/     \/          \/           \/ 
+         
         */
     for (unsigned i = 0; i<iNumberOfFiles; i++){
         std::ofstream outputFile;
@@ -832,7 +807,6 @@ int run(TApplication* theApp, Bool_t isRoot = kFALSE){
 
     watch.Stop();
     watch.Print();
-
     return 1;
 }
 
@@ -841,15 +815,18 @@ int main(int argc, char* argv[]){
 //    If need to use gdb - use this timeout and -O2 compiler flag
 //    int seconds = 3;
 //    usleep(seconds*1E6);
-    // If we run compiled executable we need to instantinate TApplication manually
-    TApplication* theApp = new TApplication("Positron Fit", &argc, argv);
-    run(theApp);
-    // Otherwise it crashes
-    theApp->Run();            
-    return 1;
+
+    // Create ROOT application 
+    // https://github.com/root-project/root/blob/master/tutorials/gui/mditest.C#L409
+    TApplication* app = new TApplication("Positron Fit", &argc, argv);
+    
+    run(argc, argv);
+           
+    app->Run();
+    return 0;
 }
 
 void positronfit(){
     // If running app like `root -l positronfit.c` the instance of gApplication is created
-    run(gApplication, kTRUE);
+    run(gApplication->Argc(), gApplication->Argv(), kTRUE);
 }

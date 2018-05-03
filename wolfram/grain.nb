@@ -1,0 +1,965 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     37551,        957]
+NotebookOptionsPosition[     36975,        932]
+NotebookOutlinePosition[     37343,        948]
+CellTagsIndexPosition[     37300,        945]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[{
+ RowBox[{"iter", ":=", "5"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"nb", "[", "t_", "]"}], ":=", 
+  RowBox[{"6", "*", 
+   RowBox[{
+    RowBox[{"Exp", "[", 
+     RowBox[{
+      RowBox[{"-", 
+       RowBox[{"(", 
+        RowBox[{"\[Lambda]b", "+", "\[Kappa]"}], ")"}]}], "*", "t"}], "]"}], 
+    "/", 
+    RowBox[{"(", 
+     RowBox[{"\[Pi]", "*", "\[Pi]"}], ")"}]}], "*", 
+   RowBox[{"Sum", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Exp", "[", 
+       RowBox[{
+        RowBox[{"-", "\[Lambda]J"}], "*", "n", "*", "n", "*", "t"}], "]"}], 
+      "/", 
+      RowBox[{"(", 
+       RowBox[{"n", "*", "n"}], ")"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{"n", ",", "1", ",", "iter"}], "}"}]}], 
+    "]"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"nv", "[", "t_", "]"}], ":=", 
+  RowBox[{"6", 
+   RowBox[{"\[Kappa]", "/", 
+    RowBox[{"(", 
+     RowBox[{"\[Pi]", "*", "\[Pi]"}], ")"}]}], "*", 
+   RowBox[{"Sum", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"Exp", "[", 
+         RowBox[{
+          RowBox[{"-", "\[Lambda]v"}], "*", "t"}], "]"}], "-", 
+        RowBox[{"Exp", "[", 
+         RowBox[{
+          RowBox[{"-", 
+           RowBox[{"(", 
+            RowBox[{"\[Lambda]b", "+", "\[Kappa]", "+", 
+             RowBox[{"\[Lambda]J", "*", "n", "*", "n"}]}], ")"}]}], "*", 
+          "t"}], "]"}]}], ")"}], "/", 
+      RowBox[{"(", 
+       RowBox[{"n", "*", "n", "*", 
+        RowBox[{"(", 
+         RowBox[{"\[Lambda]b", "+", "\[Kappa]", "+", 
+          RowBox[{"\[Lambda]J", "*", "n", "*", "n"}], "-", "\[Lambda]v"}], 
+         ")"}]}], ")"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{"n", ",", "1", ",", "iter"}], "}"}]}], 
+    "]"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"ng", "[", "t_", "]"}], ":=", 
+  RowBox[{"6", "*", 
+   RowBox[{"\[Lambda]J", "/", 
+    RowBox[{"(", 
+     RowBox[{"\[Pi]", "*", "\[Pi]"}], ")"}]}], "*", 
+   RowBox[{"Sum", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"Exp", "[", 
+         RowBox[{
+          RowBox[{"-", "\[Lambda]g"}], "*", "t"}], "]"}], "-", 
+        RowBox[{"Exp", "[", 
+         RowBox[{
+          RowBox[{"-", 
+           RowBox[{"(", 
+            RowBox[{"\[Lambda]b", "+", "\[Kappa]", "+", 
+             RowBox[{"\[Lambda]J", "*", "n", "*", "n"}]}], ")"}]}], "*", 
+          "t"}], "]"}]}], ")"}], "/", 
+      RowBox[{"(", 
+       RowBox[{"\[Lambda]b", "+", "\[Kappa]", "+", 
+        RowBox[{"\[Lambda]J", "*", "n", "*", "n"}], "-", "\[Lambda]g"}], 
+       ")"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{"n", ",", "1", ",", "iter"}], "}"}]}], 
+    "]"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"func", "[", "t_", "]"}], "=", 
+  RowBox[{
+   RowBox[{"\[Lambda]b", "*", 
+    RowBox[{"nb", "[", "t", "]"}]}], "+", 
+   RowBox[{"\[Lambda]v", "*", 
+    RowBox[{"nv", "[", "t", "]"}]}], "+", 
+   RowBox[{"\[Lambda]g", "*", 
+    RowBox[{"ng", "[", "t", "]"}]}]}]}]}], "Input",
+ CellChangeTimes->{{3.7342168032344646`*^9, 3.734217336624998*^9}, {
+  3.73421737495254*^9, 3.734217523266031*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  FractionBox[
+   RowBox[{"6", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{"t", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"-", "\[Kappa]"}], "-", "\[Lambda]b"}], ")"}]}]], " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{
+       FractionBox["1", "25"], " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", "25"}], " ", "t", " ", "\[Lambda]J"}]]}], "+", 
+      RowBox[{
+       FractionBox["1", "16"], " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", "16"}], " ", "t", " ", "\[Lambda]J"}]]}], "+", 
+      RowBox[{
+       FractionBox["1", "9"], " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", "9"}], " ", "t", " ", "\[Lambda]J"}]]}], "+", 
+      RowBox[{
+       FractionBox["1", "4"], " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", "4"}], " ", "t", " ", "\[Lambda]J"}]]}], "+", 
+      SuperscriptBox["\[ExponentialE]", 
+       RowBox[{
+        RowBox[{"-", "t"}], " ", "\[Lambda]J"}]]}], ")"}], " ", 
+    "\[Lambda]b"}], 
+   SuperscriptBox["\[Pi]", "2"]], "+", 
+  FractionBox[
+   RowBox[{"6", " ", "\[Lambda]g", " ", "\[Lambda]J", " ", 
+    RowBox[{"(", 
+     RowBox[{
+      FractionBox[
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "t"}], " ", "\[Lambda]g"}]], "-", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"t", " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", "\[Kappa]"}], "-", "\[Lambda]b", "-", "\[Lambda]J"}],
+            ")"}]}]]}], 
+       RowBox[{
+       "\[Kappa]", "+", "\[Lambda]b", "-", "\[Lambda]g", "+", "\[Lambda]J"}]],
+       "+", 
+      FractionBox[
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "t"}], " ", "\[Lambda]g"}]], "-", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"t", " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", "\[Kappa]"}], "-", "\[Lambda]b", "-", 
+            RowBox[{"4", " ", "\[Lambda]J"}]}], ")"}]}]]}], 
+       RowBox[{"\[Kappa]", "+", "\[Lambda]b", "-", "\[Lambda]g", "+", 
+        RowBox[{"4", " ", "\[Lambda]J"}]}]], "+", 
+      FractionBox[
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "t"}], " ", "\[Lambda]g"}]], "-", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"t", " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", "\[Kappa]"}], "-", "\[Lambda]b", "-", 
+            RowBox[{"9", " ", "\[Lambda]J"}]}], ")"}]}]]}], 
+       RowBox[{"\[Kappa]", "+", "\[Lambda]b", "-", "\[Lambda]g", "+", 
+        RowBox[{"9", " ", "\[Lambda]J"}]}]], "+", 
+      FractionBox[
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "t"}], " ", "\[Lambda]g"}]], "-", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"t", " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", "\[Kappa]"}], "-", "\[Lambda]b", "-", 
+            RowBox[{"16", " ", "\[Lambda]J"}]}], ")"}]}]]}], 
+       RowBox[{"\[Kappa]", "+", "\[Lambda]b", "-", "\[Lambda]g", "+", 
+        RowBox[{"16", " ", "\[Lambda]J"}]}]], "+", 
+      FractionBox[
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "t"}], " ", "\[Lambda]g"}]], "-", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"t", " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", "\[Kappa]"}], "-", "\[Lambda]b", "-", 
+            RowBox[{"25", " ", "\[Lambda]J"}]}], ")"}]}]]}], 
+       RowBox[{"\[Kappa]", "+", "\[Lambda]b", "-", "\[Lambda]g", "+", 
+        RowBox[{"25", " ", "\[Lambda]J"}]}]]}], ")"}]}], 
+   SuperscriptBox["\[Pi]", "2"]], "+", 
+  FractionBox[
+   RowBox[{"6", " ", "\[Kappa]", " ", 
+    RowBox[{"(", 
+     RowBox[{
+      FractionBox[
+       RowBox[{
+        RowBox[{"-", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"t", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", "\[Kappa]"}], "-", "\[Lambda]b", "-", 
+             "\[Lambda]J"}], ")"}]}]]}], "+", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "t"}], " ", "\[Lambda]v"}]]}], 
+       RowBox[{
+       "\[Kappa]", "+", "\[Lambda]b", "+", "\[Lambda]J", "-", "\[Lambda]v"}]],
+       "+", 
+      FractionBox[
+       RowBox[{
+        RowBox[{"-", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"t", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", "\[Kappa]"}], "-", "\[Lambda]b", "-", 
+             RowBox[{"4", " ", "\[Lambda]J"}]}], ")"}]}]]}], "+", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "t"}], " ", "\[Lambda]v"}]]}], 
+       RowBox[{"4", " ", 
+        RowBox[{"(", 
+         RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+          RowBox[{"4", " ", "\[Lambda]J"}], "-", "\[Lambda]v"}], ")"}]}]], 
+      "+", 
+      FractionBox[
+       RowBox[{
+        RowBox[{"-", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"t", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", "\[Kappa]"}], "-", "\[Lambda]b", "-", 
+             RowBox[{"9", " ", "\[Lambda]J"}]}], ")"}]}]]}], "+", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "t"}], " ", "\[Lambda]v"}]]}], 
+       RowBox[{"9", " ", 
+        RowBox[{"(", 
+         RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+          RowBox[{"9", " ", "\[Lambda]J"}], "-", "\[Lambda]v"}], ")"}]}]], 
+      "+", 
+      FractionBox[
+       RowBox[{
+        RowBox[{"-", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"t", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", "\[Kappa]"}], "-", "\[Lambda]b", "-", 
+             RowBox[{"16", " ", "\[Lambda]J"}]}], ")"}]}]]}], "+", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "t"}], " ", "\[Lambda]v"}]]}], 
+       RowBox[{"16", " ", 
+        RowBox[{"(", 
+         RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+          RowBox[{"16", " ", "\[Lambda]J"}], "-", "\[Lambda]v"}], ")"}]}]], 
+      "+", 
+      FractionBox[
+       RowBox[{
+        RowBox[{"-", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"t", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", "\[Kappa]"}], "-", "\[Lambda]b", "-", 
+             RowBox[{"25", " ", "\[Lambda]J"}]}], ")"}]}]]}], "+", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "t"}], " ", "\[Lambda]v"}]]}], 
+       RowBox[{"25", " ", 
+        RowBox[{"(", 
+         RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+          RowBox[{"25", " ", "\[Lambda]J"}], "-", "\[Lambda]v"}], ")"}]}]]}], 
+     ")"}], " ", "\[Lambda]v"}], 
+   SuperscriptBox["\[Pi]", "2"]]}]], "Output",
+ CellChangeTimes->{{3.734217500170957*^9, 3.7342175172389975`*^9}, 
+   3.734217555077449*^9, 3.734220056625228*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Integrate", "[", 
+  RowBox[{
+   RowBox[{"func", "[", "t", "]"}], ",", "t"}], "]"}]], "Input",
+ CellChangeTimes->{{3.734217548343178*^9, 3.7342175509834566`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  FractionBox[
+   RowBox[{"6", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "t"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", "\[Lambda]J"}], ")"}]}]], 
+    " ", "\[Lambda]g", " ", "\[Lambda]J"}], 
+   RowBox[{
+    SuperscriptBox["\[Pi]", "2"], " ", 
+    RowBox[{"(", 
+     RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", "\[Lambda]J"}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{
+     "\[Kappa]", "+", "\[Lambda]b", "-", "\[Lambda]g", "+", "\[Lambda]J"}], 
+     ")"}]}]], "+", 
+  FractionBox[
+   RowBox[{"6", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "t"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+        RowBox[{"4", " ", "\[Lambda]J"}]}], ")"}]}]], " ", "\[Lambda]g", " ", 
+    "\[Lambda]J"}], 
+   RowBox[{
+    SuperscriptBox["\[Pi]", "2"], " ", 
+    RowBox[{"(", 
+     RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+      RowBox[{"4", " ", "\[Lambda]J"}]}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"\[Kappa]", "+", "\[Lambda]b", "-", "\[Lambda]g", "+", 
+      RowBox[{"4", " ", "\[Lambda]J"}]}], ")"}]}]], "+", 
+  FractionBox[
+   RowBox[{"6", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "t"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+        RowBox[{"9", " ", "\[Lambda]J"}]}], ")"}]}]], " ", "\[Lambda]g", " ", 
+    "\[Lambda]J"}], 
+   RowBox[{
+    SuperscriptBox["\[Pi]", "2"], " ", 
+    RowBox[{"(", 
+     RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+      RowBox[{"9", " ", "\[Lambda]J"}]}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"\[Kappa]", "+", "\[Lambda]b", "-", "\[Lambda]g", "+", 
+      RowBox[{"9", " ", "\[Lambda]J"}]}], ")"}]}]], "+", 
+  FractionBox[
+   RowBox[{"6", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "t"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+        RowBox[{"16", " ", "\[Lambda]J"}]}], ")"}]}]], " ", "\[Lambda]g", " ",
+     "\[Lambda]J"}], 
+   RowBox[{
+    SuperscriptBox["\[Pi]", "2"], " ", 
+    RowBox[{"(", 
+     RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+      RowBox[{"16", " ", "\[Lambda]J"}]}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"\[Kappa]", "+", "\[Lambda]b", "-", "\[Lambda]g", "+", 
+      RowBox[{"16", " ", "\[Lambda]J"}]}], ")"}]}]], "+", 
+  FractionBox[
+   RowBox[{"6", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "t"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+        RowBox[{"25", " ", "\[Lambda]J"}]}], ")"}]}]], " ", "\[Lambda]g", " ",
+     "\[Lambda]J"}], 
+   RowBox[{
+    SuperscriptBox["\[Pi]", "2"], " ", 
+    RowBox[{"(", 
+     RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+      RowBox[{"25", " ", "\[Lambda]J"}]}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"\[Kappa]", "+", "\[Lambda]b", "-", "\[Lambda]g", "+", 
+      RowBox[{"25", " ", "\[Lambda]J"}]}], ")"}]}]], "+", 
+  RowBox[{
+   RowBox[{"(", 
+    RowBox[{"6", " ", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       RowBox[{"-", "t"}], " ", "\[Lambda]g"}]], " ", "\[Lambda]J", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"5", " ", 
+        SuperscriptBox["\[Kappa]", "4"]}], "+", 
+       RowBox[{"20", " ", 
+        SuperscriptBox["\[Kappa]", "3"], " ", "\[Lambda]b"}], "+", 
+       RowBox[{"30", " ", 
+        SuperscriptBox["\[Kappa]", "2"], " ", 
+        SuperscriptBox["\[Lambda]b", "2"]}], "+", 
+       RowBox[{"20", " ", "\[Kappa]", " ", 
+        SuperscriptBox["\[Lambda]b", "3"]}], "+", 
+       RowBox[{"5", " ", 
+        SuperscriptBox["\[Lambda]b", "4"]}], "-", 
+       RowBox[{"20", " ", 
+        SuperscriptBox["\[Kappa]", "3"], " ", "\[Lambda]g"}], "-", 
+       RowBox[{"60", " ", 
+        SuperscriptBox["\[Kappa]", "2"], " ", "\[Lambda]b", " ", 
+        "\[Lambda]g"}], "-", 
+       RowBox[{"60", " ", "\[Kappa]", " ", 
+        SuperscriptBox["\[Lambda]b", "2"], " ", "\[Lambda]g"}], "-", 
+       RowBox[{"20", " ", 
+        SuperscriptBox["\[Lambda]b", "3"], " ", "\[Lambda]g"}], "+", 
+       RowBox[{"30", " ", 
+        SuperscriptBox["\[Kappa]", "2"], " ", 
+        SuperscriptBox["\[Lambda]g", "2"]}], "+", 
+       RowBox[{"60", " ", "\[Kappa]", " ", "\[Lambda]b", " ", 
+        SuperscriptBox["\[Lambda]g", "2"]}], "+", 
+       RowBox[{"30", " ", 
+        SuperscriptBox["\[Lambda]b", "2"], " ", 
+        SuperscriptBox["\[Lambda]g", "2"]}], "-", 
+       RowBox[{"20", " ", "\[Kappa]", " ", 
+        SuperscriptBox["\[Lambda]g", "3"]}], "-", 
+       RowBox[{"20", " ", "\[Lambda]b", " ", 
+        SuperscriptBox["\[Lambda]g", "3"]}], "+", 
+       RowBox[{"5", " ", 
+        SuperscriptBox["\[Lambda]g", "4"]}], "+", 
+       RowBox[{"220", " ", 
+        SuperscriptBox["\[Kappa]", "3"], " ", "\[Lambda]J"}], "+", 
+       RowBox[{"660", " ", 
+        SuperscriptBox["\[Kappa]", "2"], " ", "\[Lambda]b", " ", 
+        "\[Lambda]J"}], "+", 
+       RowBox[{"660", " ", "\[Kappa]", " ", 
+        SuperscriptBox["\[Lambda]b", "2"], " ", "\[Lambda]J"}], "+", 
+       RowBox[{"220", " ", 
+        SuperscriptBox["\[Lambda]b", "3"], " ", "\[Lambda]J"}], "-", 
+       RowBox[{"660", " ", 
+        SuperscriptBox["\[Kappa]", "2"], " ", "\[Lambda]g", " ", 
+        "\[Lambda]J"}], "-", 
+       RowBox[{
+       "1320", " ", "\[Kappa]", " ", "\[Lambda]b", " ", "\[Lambda]g", " ", 
+        "\[Lambda]J"}], "-", 
+       RowBox[{"660", " ", 
+        SuperscriptBox["\[Lambda]b", "2"], " ", "\[Lambda]g", " ", 
+        "\[Lambda]J"}], "+", 
+       RowBox[{"660", " ", "\[Kappa]", " ", 
+        SuperscriptBox["\[Lambda]g", "2"], " ", "\[Lambda]J"}], "+", 
+       RowBox[{"660", " ", "\[Lambda]b", " ", 
+        SuperscriptBox["\[Lambda]g", "2"], " ", "\[Lambda]J"}], "-", 
+       RowBox[{"220", " ", 
+        SuperscriptBox["\[Lambda]g", "3"], " ", "\[Lambda]J"}], "+", 
+       RowBox[{"3069", " ", 
+        SuperscriptBox["\[Kappa]", "2"], " ", 
+        SuperscriptBox["\[Lambda]J", "2"]}], "+", 
+       RowBox[{"6138", " ", "\[Kappa]", " ", "\[Lambda]b", " ", 
+        SuperscriptBox["\[Lambda]J", "2"]}], "+", 
+       RowBox[{"3069", " ", 
+        SuperscriptBox["\[Lambda]b", "2"], " ", 
+        SuperscriptBox["\[Lambda]J", "2"]}], "-", 
+       RowBox[{"6138", " ", "\[Kappa]", " ", "\[Lambda]g", " ", 
+        SuperscriptBox["\[Lambda]J", "2"]}], "-", 
+       RowBox[{"6138", " ", "\[Lambda]b", " ", "\[Lambda]g", " ", 
+        SuperscriptBox["\[Lambda]J", "2"]}], "+", 
+       RowBox[{"3069", " ", 
+        SuperscriptBox["\[Lambda]g", "2"], " ", 
+        SuperscriptBox["\[Lambda]J", "2"]}], "+", 
+       RowBox[{"15290", " ", "\[Kappa]", " ", 
+        SuperscriptBox["\[Lambda]J", "3"]}], "+", 
+       RowBox[{"15290", " ", "\[Lambda]b", " ", 
+        SuperscriptBox["\[Lambda]J", "3"]}], "-", 
+       RowBox[{"15290", " ", "\[Lambda]g", " ", 
+        SuperscriptBox["\[Lambda]J", "3"]}], "+", 
+       RowBox[{"21076", " ", 
+        SuperscriptBox["\[Lambda]J", "4"]}]}], ")"}]}], ")"}], "/", 
+   RowBox[{"(", 
+    RowBox[{
+     SuperscriptBox["\[Pi]", "2"], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", "\[Kappa]"}], "-", "\[Lambda]b", "+", "\[Lambda]g", "-", 
+       RowBox[{"25", " ", "\[Lambda]J"}]}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", "\[Kappa]"}], "-", "\[Lambda]b", "+", "\[Lambda]g", "-", 
+       RowBox[{"16", " ", "\[Lambda]J"}]}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", "\[Kappa]"}], "-", "\[Lambda]b", "+", "\[Lambda]g", "-", 
+       RowBox[{"9", " ", "\[Lambda]J"}]}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", "\[Kappa]"}], "-", "\[Lambda]b", "+", "\[Lambda]g", "-", 
+       RowBox[{"4", " ", "\[Lambda]J"}]}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", "\[Kappa]"}], "-", "\[Lambda]b", "+", "\[Lambda]g", "-", 
+       "\[Lambda]J"}], ")"}]}], ")"}]}], "+", 
+  FractionBox[
+   RowBox[{"6", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"25", " ", "t", " ", "\[Lambda]J"}], "-", 
+      RowBox[{"t", " ", 
+       RowBox[{"(", 
+        RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+         RowBox[{"25", " ", "\[Lambda]J"}]}], ")"}]}]}]], " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{
+       FractionBox["1", "25"], " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", "25"}], " ", "t", " ", "\[Lambda]J"}]]}], "+", 
+      RowBox[{
+       FractionBox["1", "16"], " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", "16"}], " ", "t", " ", "\[Lambda]J"}]]}], "+", 
+      RowBox[{
+       FractionBox["1", "9"], " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", "9"}], " ", "t", " ", "\[Lambda]J"}]]}], "+", 
+      RowBox[{
+       FractionBox["1", "4"], " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", "4"}], " ", "t", " ", "\[Lambda]J"}]]}], "+", 
+      SuperscriptBox["\[ExponentialE]", 
+       RowBox[{
+        RowBox[{"-", "t"}], " ", "\[Lambda]J"}]]}], ")"}], " ", "\[Lambda]b", 
+    " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{"-", 
+       FractionBox[
+        RowBox[{"3600", " ", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"24", " ", "t", " ", "\[Lambda]J"}]]}], 
+        RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", "\[Lambda]J"}]]}], "-", 
+      FractionBox[
+       RowBox[{"900", " ", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"21", " ", "t", " ", "\[Lambda]J"}]]}], 
+       RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+        RowBox[{"4", " ", "\[Lambda]J"}]}]], "-", 
+      FractionBox[
+       RowBox[{"400", " ", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"16", " ", "t", " ", "\[Lambda]J"}]]}], 
+       RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+        RowBox[{"9", " ", "\[Lambda]J"}]}]], "-", 
+      FractionBox[
+       RowBox[{"225", " ", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"9", " ", "t", " ", "\[Lambda]J"}]]}], 
+       RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+        RowBox[{"16", " ", "\[Lambda]J"}]}]], "-", 
+      FractionBox["144", 
+       RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+        RowBox[{"25", " ", "\[Lambda]J"}]}]]}], ")"}]}], 
+   RowBox[{
+    RowBox[{"(", 
+     RowBox[{"144", "+", 
+      RowBox[{"225", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{"9", " ", "t", " ", "\[Lambda]J"}]]}], "+", 
+      RowBox[{"400", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{"16", " ", "t", " ", "\[Lambda]J"}]]}], "+", 
+      RowBox[{"900", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{"21", " ", "t", " ", "\[Lambda]J"}]]}], "+", 
+      RowBox[{"3600", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{"24", " ", "t", " ", "\[Lambda]J"}]]}]}], ")"}], " ", 
+    SuperscriptBox["\[Pi]", "2"]}]], "+", 
+  FractionBox[
+   RowBox[{"6", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "t"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", "\[Lambda]J"}], ")"}]}]], 
+    " ", "\[Kappa]", " ", "\[Lambda]v"}], 
+   RowBox[{
+    SuperscriptBox["\[Pi]", "2"], " ", 
+    RowBox[{"(", 
+     RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", "\[Lambda]J"}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{
+     "\[Kappa]", "+", "\[Lambda]b", "+", "\[Lambda]J", "-", "\[Lambda]v"}], 
+     ")"}]}]], "+", 
+  FractionBox[
+   RowBox[{"3", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "t"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+        RowBox[{"4", " ", "\[Lambda]J"}]}], ")"}]}]], " ", "\[Kappa]", " ", 
+    "\[Lambda]v"}], 
+   RowBox[{"2", " ", 
+    SuperscriptBox["\[Pi]", "2"], " ", 
+    RowBox[{"(", 
+     RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+      RowBox[{"4", " ", "\[Lambda]J"}]}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+      RowBox[{"4", " ", "\[Lambda]J"}], "-", "\[Lambda]v"}], ")"}]}]], "+", 
+  FractionBox[
+   RowBox[{"2", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "t"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+        RowBox[{"9", " ", "\[Lambda]J"}]}], ")"}]}]], " ", "\[Kappa]", " ", 
+    "\[Lambda]v"}], 
+   RowBox[{"3", " ", 
+    SuperscriptBox["\[Pi]", "2"], " ", 
+    RowBox[{"(", 
+     RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+      RowBox[{"9", " ", "\[Lambda]J"}]}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+      RowBox[{"9", " ", "\[Lambda]J"}], "-", "\[Lambda]v"}], ")"}]}]], "+", 
+  FractionBox[
+   RowBox[{"3", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "t"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+        RowBox[{"16", " ", "\[Lambda]J"}]}], ")"}]}]], " ", "\[Kappa]", " ", 
+    "\[Lambda]v"}], 
+   RowBox[{"8", " ", 
+    SuperscriptBox["\[Pi]", "2"], " ", 
+    RowBox[{"(", 
+     RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+      RowBox[{"16", " ", "\[Lambda]J"}]}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+      RowBox[{"16", " ", "\[Lambda]J"}], "-", "\[Lambda]v"}], ")"}]}]], "+", 
+  FractionBox[
+   RowBox[{"6", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "t"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+        RowBox[{"25", " ", "\[Lambda]J"}]}], ")"}]}]], " ", "\[Kappa]", " ", 
+    "\[Lambda]v"}], 
+   RowBox[{"25", " ", 
+    SuperscriptBox["\[Pi]", "2"], " ", 
+    RowBox[{"(", 
+     RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+      RowBox[{"25", " ", "\[Lambda]J"}]}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+      RowBox[{"25", " ", "\[Lambda]J"}], "-", "\[Lambda]v"}], ")"}]}]], "+", 
+  RowBox[{
+   RowBox[{"(", 
+    RowBox[{
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       RowBox[{"-", "t"}], " ", "\[Lambda]v"}]], " ", "\[Kappa]", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "5269"}], " ", 
+        SuperscriptBox["\[Kappa]", "4"]}], "-", 
+       RowBox[{"21076", " ", 
+        SuperscriptBox["\[Kappa]", "3"], " ", "\[Lambda]b"}], "-", 
+       RowBox[{"31614", " ", 
+        SuperscriptBox["\[Kappa]", "2"], " ", 
+        SuperscriptBox["\[Lambda]b", "2"]}], "-", 
+       RowBox[{"21076", " ", "\[Kappa]", " ", 
+        SuperscriptBox["\[Lambda]b", "3"]}], "-", 
+       RowBox[{"5269", " ", 
+        SuperscriptBox["\[Lambda]b", "4"]}], "-", 
+       RowBox[{"271795", " ", 
+        SuperscriptBox["\[Kappa]", "3"], " ", "\[Lambda]J"}], "-", 
+       RowBox[{"815385", " ", 
+        SuperscriptBox["\[Kappa]", "2"], " ", "\[Lambda]b", " ", 
+        "\[Lambda]J"}], "-", 
+       RowBox[{"815385", " ", "\[Kappa]", " ", 
+        SuperscriptBox["\[Lambda]b", "2"], " ", "\[Lambda]J"}], "-", 
+       RowBox[{"271795", " ", 
+        SuperscriptBox["\[Lambda]b", "3"], " ", "\[Lambda]J"}], "-", 
+       RowBox[{"4598187", " ", 
+        SuperscriptBox["\[Kappa]", "2"], " ", 
+        SuperscriptBox["\[Lambda]J", "2"]}], "-", 
+       RowBox[{"9196374", " ", "\[Kappa]", " ", "\[Lambda]b", " ", 
+        SuperscriptBox["\[Lambda]J", "2"]}], "-", 
+       RowBox[{"4598187", " ", 
+        SuperscriptBox["\[Lambda]b", "2"], " ", 
+        SuperscriptBox["\[Lambda]J", "2"]}], "-", 
+       RowBox[{"29233105", " ", "\[Kappa]", " ", 
+        SuperscriptBox["\[Lambda]J", "3"]}], "-", 
+       RowBox[{"29233105", " ", "\[Lambda]b", " ", 
+        SuperscriptBox["\[Lambda]J", "3"]}], "-", 
+       RowBox[{"56005444", " ", 
+        SuperscriptBox["\[Lambda]J", "4"]}], "+", 
+       RowBox[{"21076", " ", 
+        SuperscriptBox["\[Kappa]", "3"], " ", "\[Lambda]v"}], "+", 
+       RowBox[{"63228", " ", 
+        SuperscriptBox["\[Kappa]", "2"], " ", "\[Lambda]b", " ", 
+        "\[Lambda]v"}], "+", 
+       RowBox[{"63228", " ", "\[Kappa]", " ", 
+        SuperscriptBox["\[Lambda]b", "2"], " ", "\[Lambda]v"}], "+", 
+       RowBox[{"21076", " ", 
+        SuperscriptBox["\[Lambda]b", "3"], " ", "\[Lambda]v"}], "+", 
+       RowBox[{"815385", " ", 
+        SuperscriptBox["\[Kappa]", "2"], " ", "\[Lambda]J", " ", 
+        "\[Lambda]v"}], "+", 
+       RowBox[{
+       "1630770", " ", "\[Kappa]", " ", "\[Lambda]b", " ", "\[Lambda]J", " ", 
+        "\[Lambda]v"}], "+", 
+       RowBox[{"815385", " ", 
+        SuperscriptBox["\[Lambda]b", "2"], " ", "\[Lambda]J", " ", 
+        "\[Lambda]v"}], "+", 
+       RowBox[{"9196374", " ", "\[Kappa]", " ", 
+        SuperscriptBox["\[Lambda]J", "2"], " ", "\[Lambda]v"}], "+", 
+       RowBox[{"9196374", " ", "\[Lambda]b", " ", 
+        SuperscriptBox["\[Lambda]J", "2"], " ", "\[Lambda]v"}], "+", 
+       RowBox[{"29233105", " ", 
+        SuperscriptBox["\[Lambda]J", "3"], " ", "\[Lambda]v"}], "-", 
+       RowBox[{"31614", " ", 
+        SuperscriptBox["\[Kappa]", "2"], " ", 
+        SuperscriptBox["\[Lambda]v", "2"]}], "-", 
+       RowBox[{"63228", " ", "\[Kappa]", " ", "\[Lambda]b", " ", 
+        SuperscriptBox["\[Lambda]v", "2"]}], "-", 
+       RowBox[{"31614", " ", 
+        SuperscriptBox["\[Lambda]b", "2"], " ", 
+        SuperscriptBox["\[Lambda]v", "2"]}], "-", 
+       RowBox[{"815385", " ", "\[Kappa]", " ", "\[Lambda]J", " ", 
+        SuperscriptBox["\[Lambda]v", "2"]}], "-", 
+       RowBox[{"815385", " ", "\[Lambda]b", " ", "\[Lambda]J", " ", 
+        SuperscriptBox["\[Lambda]v", "2"]}], "-", 
+       RowBox[{"4598187", " ", 
+        SuperscriptBox["\[Lambda]J", "2"], " ", 
+        SuperscriptBox["\[Lambda]v", "2"]}], "+", 
+       RowBox[{"21076", " ", "\[Kappa]", " ", 
+        SuperscriptBox["\[Lambda]v", "3"]}], "+", 
+       RowBox[{"21076", " ", "\[Lambda]b", " ", 
+        SuperscriptBox["\[Lambda]v", "3"]}], "+", 
+       RowBox[{"271795", " ", "\[Lambda]J", " ", 
+        SuperscriptBox["\[Lambda]v", "3"]}], "-", 
+       RowBox[{"5269", " ", 
+        SuperscriptBox["\[Lambda]v", "4"]}]}], ")"}]}], ")"}], "/", 
+   RowBox[{"(", 
+    RowBox[{"600", " ", 
+     SuperscriptBox["\[Pi]", "2"], " ", 
+     RowBox[{"(", 
+      RowBox[{
+      "\[Kappa]", "+", "\[Lambda]b", "+", "\[Lambda]J", "-", "\[Lambda]v"}], 
+      ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+       RowBox[{"4", " ", "\[Lambda]J"}], "-", "\[Lambda]v"}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+       RowBox[{"9", " ", "\[Lambda]J"}], "-", "\[Lambda]v"}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+       RowBox[{"16", " ", "\[Lambda]J"}], "-", "\[Lambda]v"}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{"\[Kappa]", "+", "\[Lambda]b", "+", 
+       RowBox[{"25", " ", "\[Lambda]J"}], "-", "\[Lambda]v"}], ")"}]}], 
+    ")"}]}]}]], "Output",
+ CellChangeTimes->{3.7342175634214444`*^9, 3.734220065307996*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"CForm", "[", "%", "]"}]], "Input",
+ CellChangeTimes->{{3.7342193257935867`*^9, 3.7342193283212066`*^9}, {
+  3.7342200741416492`*^9, 3.734220089031348*^9}}],
+
+Cell["\<\
+(6*\[Lambda]g*\[Lambda]J)/(Power(E,t*(\[Kappa] + \[Lambda]b + \
+\[Lambda]J))*Power(Pi,2)*(\[Kappa] + \[Lambda]b + \[Lambda]J)*
+      (\[Kappa] + \[Lambda]b - \[Lambda]g + \[Lambda]J)) + (6*\[Lambda]g*\
+\[Lambda]J)/
+    (Power(E,t*(\[Kappa] + \[Lambda]b + 4*\[Lambda]J))*Power(Pi,2)*(\[Kappa] \
++ \[Lambda]b + 4*\[Lambda]J)*(\[Kappa] + \[Lambda]b - \[Lambda]g + \
+4*\[Lambda]J))\\
+    + (6*\[Lambda]g*\[Lambda]J)/(Power(E,t*(\[Kappa] + \[Lambda]b + 9*\
+\[Lambda]J))*Power(Pi,2)*(\[Kappa] + \[Lambda]b + 9*\[Lambda]J)*
+      (\[Kappa] + \[Lambda]b - \[Lambda]g + 9*\[Lambda]J)) + (6*\[Lambda]g*\
+\[Lambda]J)/
+    (Power(E,t*(\[Kappa] + \[Lambda]b + 16*\[Lambda]J))*Power(Pi,2)*(\[Kappa] \
++ \[Lambda]b + 16*\[Lambda]J)*
+      (\[Kappa] + \[Lambda]b - \[Lambda]g + 16*\[Lambda]J)) + (6*\[Lambda]g*\
+\[Lambda]J)/
+    (Power(E,t*(\[Kappa] + \[Lambda]b + 25*\[Lambda]J))*Power(Pi,2)*(\[Kappa] \
++ \[Lambda]b + 25*\[Lambda]J)*
+      (\[Kappa] + \[Lambda]b - \[Lambda]g + 25*\[Lambda]J)) + (6*\[Lambda]J*
+      (5*Power(\[Kappa],4) + 20*Power(\[Kappa],3)*\[Lambda]b + 30*Power(\
+\[Kappa],2)*Power(\[Lambda]b,2) + 
+        20*\[Kappa]*Power(\[Lambda]b,3) + 5*Power(\[Lambda]b,4) - 20*Power(\
+\[Kappa],3)*\[Lambda]g - 
+        60*Power(\[Kappa],2)*\[Lambda]b*\[Lambda]g - 60*\[Kappa]*Power(\
+\[Lambda]b,2)*\[Lambda]g - 20*Power(\[Lambda]b,3)*\[Lambda]g + 
+        30*Power(\[Kappa],2)*Power(\[Lambda]g,2) + \
+60*\[Kappa]*\[Lambda]b*Power(\[Lambda]g,2) + 
+        30*Power(\[Lambda]b,2)*Power(\[Lambda]g,2) - 20*\[Kappa]*Power(\
+\[Lambda]g,3) - 20*\[Lambda]b*Power(\[Lambda]g,3) + 
+        5*Power(\[Lambda]g,4) + 220*Power(\[Kappa],3)*\[Lambda]J + 660*Power(\
+\[Kappa],2)*\[Lambda]b*\[Lambda]J + 
+        660*\[Kappa]*Power(\[Lambda]b,2)*\[Lambda]J + \
+220*Power(\[Lambda]b,3)*\[Lambda]J - 660*Power(\[Kappa],2)*\[Lambda]g*\
+\[Lambda]J - 
+        1320*\[Kappa]*\[Lambda]b*\[Lambda]g*\[Lambda]J - \
+660*Power(\[Lambda]b,2)*\[Lambda]g*\[Lambda]J + \
+660*\[Kappa]*Power(\[Lambda]g,2)*\[Lambda]J + 
+        660*\[Lambda]b*Power(\[Lambda]g,2)*\[Lambda]J - \
+220*Power(\[Lambda]g,3)*\[Lambda]J + \
+3069*Power(\[Kappa],2)*Power(\[Lambda]J,2) + 
+        6138*\[Kappa]*\[Lambda]b*Power(\[Lambda]J,2) + \
+3069*Power(\[Lambda]b,2)*Power(\[Lambda]J,2) - 
+        6138*\[Kappa]*\[Lambda]g*Power(\[Lambda]J,2) - 6138*\[Lambda]b*\
+\[Lambda]g*Power(\[Lambda]J,2) + 
+        3069*Power(\[Lambda]g,2)*Power(\[Lambda]J,2) + 15290*\[Kappa]*Power(\
+\[Lambda]J,3) + 
+        15290*\[Lambda]b*Power(\[Lambda]J,3) - 15290*\[Lambda]g*Power(\
+\[Lambda]J,3) + 21076*Power(\[Lambda]J,4)))/
+    (Power(E,t*\[Lambda]g)*Power(Pi,2)*(-\[Kappa] - \[Lambda]b + \[Lambda]g - \
+25*\[Lambda]J)*(-\[Kappa] - \[Lambda]b + \[Lambda]g - 16*\[Lambda]J)*
+      (-\[Kappa] - \[Lambda]b + \[Lambda]g - 9*\[Lambda]J)*(-\[Kappa] - \
+\[Lambda]b + \[Lambda]g - 4*\[Lambda]J)*(-\[Kappa] - \[Lambda]b + \[Lambda]g \
+- \[Lambda]J)) + 
+   (6*Power(E,25*t*\[Lambda]J - t*(\[Kappa] + \[Lambda]b + 25*\[Lambda]J))*
+      (1/(25.*Power(E,25*t*\[Lambda]J)) + 1/(16.*Power(E,16*t*\[Lambda]J)) + 
+        1/(9.*Power(E,9*t*\[Lambda]J)) + 1/(4.*Power(E,4*t*\[Lambda]J)) + \
+Power(E,-(t*\[Lambda]J)))*\[Lambda]b*
+      ((-3600*Power(E,24*t*\[Lambda]J))/(\[Kappa] + \[Lambda]b + \[Lambda]J) - 
+        (900*Power(E,21*t*\[Lambda]J))/(\[Kappa] + \[Lambda]b + 4*\[Lambda]J) \
+- 
+        (400*Power(E,16*t*\[Lambda]J))/(\[Kappa] + \[Lambda]b + 9*\[Lambda]J) \
+- 
+        (225*Power(E,9*t*\[Lambda]J))/(\[Kappa] + \[Lambda]b + 16*\[Lambda]J) \
+- 144/(\[Kappa] + \[Lambda]b + 25*\[Lambda]J)))/
+    ((144 + 225*Power(E,9*t*\[Lambda]J) + 400*Power(E,16*t*\[Lambda]J) + \
+900*Power(E,21*t*\[Lambda]J) + 
+        3600*Power(E,24*t*\[Lambda]J))*Power(Pi,2)) + 
+   (6*\[Kappa]*\[Lambda]v)/(Power(E,t*(\[Kappa] + \[Lambda]b + \
+\[Lambda]J))*Power(Pi,2)*(\[Kappa] + \[Lambda]b + \[Lambda]J)*
+      (\[Kappa] + \[Lambda]b + \[Lambda]J - \[Lambda]v)) + (3*\[Kappa]*\
+\[Lambda]v)/
+    (2.*Power(E,t*(\[Kappa] + \[Lambda]b + 4*\[Lambda]J))*Power(Pi,2)*(\
+\[Kappa] + \[Lambda]b + 4*\[Lambda]J)*
+      (\[Kappa] + \[Lambda]b + 4*\[Lambda]J - \[Lambda]v)) + (2*\[Kappa]*\
+\[Lambda]v)/
+    (3.*Power(E,t*(\[Kappa] + \[Lambda]b + 9*\[Lambda]J))*Power(Pi,2)*(\
+\[Kappa] + \[Lambda]b + 9*\[Lambda]J)*
+      (\[Kappa] + \[Lambda]b + 9*\[Lambda]J - \[Lambda]v)) + (3*\[Kappa]*\
+\[Lambda]v)/
+    (8.*Power(E,t*(\[Kappa] + \[Lambda]b + 16*\[Lambda]J))*Power(Pi,2)*(\
+\[Kappa] + \[Lambda]b + 16*\[Lambda]J)*
+      (\[Kappa] + \[Lambda]b + 16*\[Lambda]J - \[Lambda]v)) + (6*\[Kappa]*\
+\[Lambda]v)/
+    (25.*Power(E,t*(\[Kappa] + \[Lambda]b + 25*\[Lambda]J))*Power(Pi,2)*(\
+\[Kappa] + \[Lambda]b + 25*\[Lambda]J)*
+      (\[Kappa] + \[Lambda]b + 25*\[Lambda]J - \[Lambda]v)) + (\[Kappa]*
+      (-5269*Power(\[Kappa],4) - 21076*Power(\[Kappa],3)*\[Lambda]b - \
+31614*Power(\[Kappa],2)*Power(\[Lambda]b,2) - 
+        21076*\[Kappa]*Power(\[Lambda]b,3) - 5269*Power(\[Lambda]b,4) - \
+271795*Power(\[Kappa],3)*\[Lambda]J - 
+        815385*Power(\[Kappa],2)*\[Lambda]b*\[Lambda]J - \
+815385*\[Kappa]*Power(\[Lambda]b,2)*\[Lambda]J - 
+        271795*Power(\[Lambda]b,3)*\[Lambda]J - \
+4598187*Power(\[Kappa],2)*Power(\[Lambda]J,2) - 
+        9196374*\[Kappa]*\[Lambda]b*Power(\[Lambda]J,2) - 4598187*Power(\
+\[Lambda]b,2)*Power(\[Lambda]J,2) - 
+        29233105*\[Kappa]*Power(\[Lambda]J,3) - 29233105*\[Lambda]b*Power(\
+\[Lambda]J,3) - 56005444*Power(\[Lambda]J,4) + 
+        21076*Power(\[Kappa],3)*\[Lambda]v + \
+63228*Power(\[Kappa],2)*\[Lambda]b*\[Lambda]v + \
+63228*\[Kappa]*Power(\[Lambda]b,2)*\[Lambda]v + 
+        21076*Power(\[Lambda]b,3)*\[Lambda]v + 815385*Power(\[Kappa],2)*\
+\[Lambda]J*\[Lambda]v + 1630770*\[Kappa]*\[Lambda]b*\[Lambda]J*\[Lambda]v + 
+        815385*Power(\[Lambda]b,2)*\[Lambda]J*\[Lambda]v + \
+9196374*\[Kappa]*Power(\[Lambda]J,2)*\[Lambda]v + 
+        9196374*\[Lambda]b*Power(\[Lambda]J,2)*\[Lambda]v + 29233105*Power(\
+\[Lambda]J,3)*\[Lambda]v - 
+        31614*Power(\[Kappa],2)*Power(\[Lambda]v,2) - \
+63228*\[Kappa]*\[Lambda]b*Power(\[Lambda]v,2) - 
+        31614*Power(\[Lambda]b,2)*Power(\[Lambda]v,2) - 815385*\[Kappa]*\
+\[Lambda]J*Power(\[Lambda]v,2) - 
+        815385*\[Lambda]b*\[Lambda]J*Power(\[Lambda]v,2) - 4598187*Power(\
+\[Lambda]J,2)*Power(\[Lambda]v,2) + 
+        21076*\[Kappa]*Power(\[Lambda]v,3) + \
+21076*\[Lambda]b*Power(\[Lambda]v,3) + 271795*\[Lambda]J*Power(\[Lambda]v,3) - 
+        5269*Power(\[Lambda]v,4)))/
+    (600.*Power(E,t*\[Lambda]v)*Power(Pi,2)*(\[Kappa] + \[Lambda]b + \
+\[Lambda]J - \[Lambda]v)*(\[Kappa] + \[Lambda]b + 4*\[Lambda]J - \[Lambda]v)*
+      (\[Kappa] + \[Lambda]b + 9*\[Lambda]J - \[Lambda]v)*(\[Kappa] + \
+\[Lambda]b + 16*\[Lambda]J - \[Lambda]v)*(\[Kappa] + \[Lambda]b + \
+25*\[Lambda]J - \[Lambda]v))\
+\>", "Output",
+ CellChangeTimes->{3.7342200919374833`*^9}]
+}, Open  ]]
+},
+WindowSize->{1550, 808},
+WindowMargins->{{44, Automatic}, {Automatic, 18}},
+Magnification->1.5,
+FrontEndVersion->"11.0 for Microsoft Windows (64-bit) (September 21, 2016)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 3065, 94, 162, "Input"],
+Cell[3648, 118, 7115, 196, 223, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[10800, 319, 185, 4, 45, "Input"],
+Cell[10988, 325, 19005, 472, 880, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[30030, 802, 179, 3, 45, "Input"],
+Cell[30212, 807, 6747, 122, 1510, "Output"]
+}, Open  ]]
+}
+]
+*)
+

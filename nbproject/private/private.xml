@@ -7,8 +7,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/Users/petrstepanov/Development/positronfit/Spectrum_000.Spe</file>
+            <file>file:/Users/petrstepanov/Development/positronfit/Constants.cpp</file>
+            <file>file:/Users/petrstepanov/Development/positronfit/ExpPdf.cpp</file>
             <file>file:/Users/petrstepanov/Development/positronfit/positronfit.cc</file>
+            <file>file:/Users/petrstepanov/Development/positronfit/ParamStorage.cpp</file>
+            <file>file:/Users/petrstepanov/Development/positronfit/GrainPdf.cpp</file>
+            <file>file:/Users/petrstepanov/Development/positronfit/ExpPdf.h</file>
+            <file>file:/Users/petrstepanov/Development/positronfit/TwoExpPdf.cpp</file>
         </group>
     </open-files>
 </project-private>

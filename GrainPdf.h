@@ -36,6 +36,9 @@ public:
     GrainPdf(const GrainPdf& other, const char* name = 0);
     virtual TObject* clone(const char* newname) const { return new GrainPdf(*this, newname); }
     inline virtual ~GrainPdf() { }     
+
+    Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const ;
+    Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const ;
     
 protected:
     RooRealProxy t;
@@ -46,6 +49,9 @@ protected:
     RooRealProxy kappaVac;
 
     Double_t evaluate() const;
+    Double_t sum(Double_t a) const;     
+    Double_t Power(Double_t a, Double_t b) const;
+    Double_t indefiniteIntegral(Double_t y) const; 
     
 private:
     // ClassDef(GrainPdf, 1) // Your description goes here...

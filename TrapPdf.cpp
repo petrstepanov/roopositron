@@ -35,13 +35,13 @@ kappaDef("kappaDef", this, other.kappaDef){
 
 Double_t TrapPdf::evaluate() const {
     if (t < 0) return 0.;
-    Double_t lambdaBulk = 1/tauBulk;
-    Double_t lambdaDefect = 1/tauDef;
+    Double_t lambdaB = 1/tauBulk;
+    Double_t lambdaD = 1/tauDef;
 
-    Double_t I_1 = (lambdaBulk-lambdaDefect)/(lambdaBulk+kappaDef-lambdaDefect);
-    Double_t I_2 = kappaDef/(lambdaBulk+kappaDef-lambdaDefect);
+    Double_t I_1 = (lambdaB-lambdaD)/(lambdaB+kappaDef-lambdaD);
+    Double_t I_2 = kappaDef/(lambdaB+kappaDef-lambdaD);
 
-    return I_1*(lambdaBulk+kappaDef)*exp(-(lambdaBulk+kappaDef)*t) + I_2*lambdaDefect*exp(-lambdaDefect*t);
+    return I_1*(lambdaB+kappaDef)*exp(-(lambdaB+kappaDef)*t) + I_2*lambdaD*exp(-lambdaD*t);
 }
 
 Double_t TrapPdf::indefiniteIntegral(Double_t y) const {

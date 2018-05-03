@@ -33,24 +33,36 @@ void FileUtils::importTH1F(TH1F* fullTH1F, std::string& filename, int channels, 
 
 	// Skip spectrum header
 	std::string sLine = filename;
-	for (unsigned j = 0; j <= skipLines; j++){
+	for (unsigned j = 0; j < skipLines; j++){
 		getline(inFile, sLine);
 //                std::cout << sLine << std::endl;
 	}
 	// Now `sLine` contains first line with data. Read spectrum data
-	Int_t iChannel = 1;
-	while (iChannel <= channels) {
-		Double_t dCount, dError;
-		std::istringstream streamLine(sLine);
-		streamLine >> dCount;
-		if (iChannel >= minChannel && iChannel <= maxChannel){
-			fullTH1F->SetBinContent(iChannel - minChannel + 1, dCount + 1); // The RooFit chi2 fit does not work when the bins have zero entries.
-			fullTH1F->SetBinError(iChannel - minChannel + 1, sqrt(dCount));
-		}
+        // Skip minChannel - 1 lines;
+	for (unsigned j = 0; j < minChannel - 1; j++){
 		getline(inFile, sLine);
-//                std::cout << sLine << std::endl;
-		iChannel++;
 	}
+        // Fill in histogram
+	for (unsigned j = 1; j <= maxChannel-minChannel+1; j++){
+            getline(inFile, sLine);
+            std::istringstream streamLine(sLine);
+            Double_t dCount;
+            streamLine >> dCount;
+            fullTH1F->SetBinContent(j, dCount + 1); // The RooFit chi2 fit does not work when the bins have zero entries.
+            fullTH1F->SetBinError(j, sqrt(dCount+1));
+	}        
+//	while (iChannel <= channels) {
+//		Double_t dCount, dError;
+//		std::istringstream streamLine(sLine);
+//		streamLine >> dCount;
+//		if (iChannel >= minChannel && iChannel <= maxChannel){
+//			fullTH1F->SetBinContent(iChannel - minChannel + 1, dCount + 1); // The RooFit chi2 fit does not work when the bins have zero entries.
+//			fullTH1F->SetBinError(iChannel - minChannel + 1, sqrt(dCount+1));
+//		}
+//		getline(inFile, sLine);
+////                std::cout << sLine << std::endl;
+//		iChannel++;
+//	}
 	inFile.close();
 	fullTH1F->Print();
 }

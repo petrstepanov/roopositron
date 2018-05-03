@@ -35,6 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/ChannelConvolutionPdf.o \
 	${OBJECTDIR}/Constants.o \
 	${OBJECTDIR}/ConvPdf.o \
 	${OBJECTDIR}/ExpPdf.o \
@@ -76,6 +77,11 @@ LDLIBSOPTIONS=-L/Users/petrstepanov/root_v6.11.02/lib
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/positronfit: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	clang -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/positronfit ${OBJECTFILES} ${LDLIBSOPTIONS} -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -lpthread -stdlib=libc++ -lm -ldl -lRooFit -lRooFitCore -lc++
+
+${OBJECTDIR}/ChannelConvolutionPdf.o: ChannelConvolutionPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -I/Users/petrstepanov/root_v6.11.02/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ChannelConvolutionPdf.o ChannelConvolutionPdf.cpp
 
 ${OBJECTDIR}/Constants.o: Constants.cpp
 	${MKDIR} -p ${OBJECTDIR}
