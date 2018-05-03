@@ -414,14 +414,17 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             decay_source = new TwoExpPdf("decay_source", "decay_source", *rChannels, *t_source_ch, *t_source_2_ch, *I_source_2_);
         }
         
-        RooAddPdf* decay_model_sum = new RooAddPdf("decay_model_sum", "decay_model_sum", RooArgList(*decay_source, *decay_model), *I_source_, kTRUE);        
+        RooAddPdf* decay_model_sum = new RooAddPdf("decay_model_sum", "decay_model_sum", RooArgList(*decay_source, *decay_model), *I_source_);
 
-//	RooFFTConvPdf** decay_model_with_source = new RooFFTConvPdf*[iNumberOfFiles];
-//	rChannels->setBins(constants->getConvolutionBins(), "cache");
+	RooFFTConvPdf** decay_model_with_source = new RooFFTConvPdf*[iNumberOfFiles];
+	rChannels->setBins(constants->getConvolutionBins(), "cache");
 //        rChannels->setBins(MAX_CHANNEL - MIN_CHANNEL + 1, "cache");
-//	for (unsigned i = 0; i<iNumberOfFiles; i++){
-//            decay_model_with_source[i] = new RooFFTConvPdf(TString::Format("decay_model_with_source_%d", i + 1), TString::Format("Grain Boundary Model N%d", i + 1), *rChannels, *decay_model_sum, *res_funct[i]);
-//	}
+	for (unsigned i = 0; i<iNumberOfFiles; i++){
+            decay_model_with_source[i] = new RooFFTConvPdf(TString::Format("decay_model_with_source_%d", i + 1), TString::Format("Grain Boundary Model N%d", i + 1), *rChannels, *decay_model_sum, *res_funct[i]);
+//            decay_model_with_source[i] -> setBufferStrategy(RooFFTConvPdf::Flat); // Extend (default), Flat, Mirror (dont work really well)
+            decay_model_with_source[i] -> setCacheObservables(*rChannels);
+            decay_model_with_source[i] -> setBufferFraction(1.0);
+	}
 
 //      RooNumConvPdf** decay_model_with_source = new RooNumConvPdf*[iNumberOfFiles];
 //      for (unsigned i = 0; i<iNumberOfFiles; i++){
@@ -430,12 +433,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 //      }  
         
 //        rChannels->setBins(MAX_CHANNEL - MIN_CHANNEL + 1, "cache");        
-        rChannels->setBins(500, "cache");        
-        ChannelConvolutionPdf** decay_model_with_source = new ChannelConvolutionPdf*[iNumberOfFiles];
-        for (unsigned i = 0; i<iNumberOfFiles; i++){
-            decay_model_with_source[i] = new ChannelConvolutionPdf(TString::Format("decay_model_with_source_%d", i + 1), TString::Format("Convoluted model N%d", i + 1), *rChannels, *decay_model_sum, *res_funct[i]);
-            ((ChannelConvolutionPdf*) decay_model_with_source[i])->setConvolutionWindow(*zero_ch[i],*g1_fwhm,2);
-        }
+//        rChannels->setBins(500, "cache");        
+//        ChannelConvolutionPdf** decay_model_with_source = new ChannelConvolutionPdf*[iNumberOfFiles];
+//        for (unsigned i = 0; i<iNumberOfFiles; i++){
+//            decay_model_with_source[i] = new ChannelConvolutionPdf(TString::Format("decay_model_with_source_%d", i + 1), TString::Format("Convoluted model N%d", i + 1), *rChannels, *decay_model_sum, *res_funct[i]);
+//            ((ChannelConvolutionPdf*) decay_model_with_source[i])->setConvolutionWindow(*zero_ch[i],*g1_fwhm,2);
+//        }
 
 
 	/*
@@ -527,59 +530,45 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
         // in case   user doesnt want to wait till fitting ends
         storage->save();        
         
-	// CASE: FIT SPECTRUMS SEPARATELY WITH ROOMINUIT
+        // Make array of spectrum names
+        TString* types = new TString[iNumberOfFiles];
+        for (unsigned i = 0; i<iNumberOfFiles; i++) types[i] = TString::Format("spectrum_%d", i);
 
-	// Create Category Types
-	TString* sTypes = new TString[iNumberOfFiles];
-	for (unsigned i = 0; i < iNumberOfFiles; i++){
-            sTypes[i] = TString::Format("spec%d", i);
-	}
-
-	// Define category with spectra names
-	RooCategory* sample = new RooCategory("sample", "sample");
-	sample->clearTypes();
-	for (unsigned i = 0; i < iNumberOfFiles; i++){
-            sample->defineType(sTypes[i].Data());
-	}
-
-	// Use stl::map to keep spectra pointers
-	dhistMap myHistMap;
+	// Define category and map with spectra
+	RooCategory* category = new RooCategory("category", "sample");
+	std::map<std::string, RooDataHist*> histogramsMap;
 	for (unsigned i = 0; i<iNumberOfFiles; i++){
-            std::string type = sTypes[i].Data();
-            myHistMap.insert(dhistPair(type, histSpectrum[i]));
+            std::string type = types[i].Data();
+            category->defineType(type.c_str());
+            histogramsMap.insert(dhistPair(type, histSpectrum[i]));
 	}
 
-	// Construct combined dataset in (x,sample)
-	std::cout << "Constructing combined dataset" << std::endl;
-
-	// Commented out because of the exception in libRoofitCore.dll in MSVC
-	// RooDataHist* combData = new RooDataHist("combData", "combined data", *rChannels, *sample, myHistMap);
+	// Construct combined dataset
+        RooDataHist* combinedData = new RooDataHist("combData", "combined data", *rChannels, *category, histogramsMap);
 
 	// Following code is a workaround
-	RooDataHist* combData; // = new RooDataHist();
+//	RooDataHist* combData;
+//	if (iNumberOfFiles == 1)      combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]));
+//	else if (iNumberOfFiles == 2) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]));
+//	else if (iNumberOfFiles == 3) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]), Import("spec2", *histSpectrum[2]));
+//	else if (iNumberOfFiles == 4) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]), Import("spec2", *histSpectrum[2]), Import("spec3", *histSpectrum[3]));
+//	else if (iNumberOfFiles == 5) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]), Import("spec2", *histSpectrum[2]), Import("spec3", *histSpectrum[3]), Import("spec4", *histSpectrum[4]));
+//	else if (iNumberOfFiles == 6) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]), Import("spec2", *histSpectrum[2]), Import("spec3", *histSpectrum[3]), Import("spec4", *histSpectrum[4]), Import("spec5", *histSpectrum[5]));
+//	else if (iNumberOfFiles == 7) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]), Import("spec2", *histSpectrum[2]), Import("spec3", *histSpectrum[3]), Import("spec4", *histSpectrum[4]), Import("spec5", *histSpectrum[5]), Import("spec6", *histSpectrum[6]));
+//	else exit(1);       
+//	combinedData->Print();
 
-	if (iNumberOfFiles == 1)      combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]));
-	else if (iNumberOfFiles == 2) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]));
-	else if (iNumberOfFiles == 3) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]), Import("spec2", *histSpectrum[2]));
-	else if (iNumberOfFiles == 4) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]), Import("spec2", *histSpectrum[2]), Import("spec3", *histSpectrum[3]));
-	else if (iNumberOfFiles == 5) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]), Import("spec2", *histSpectrum[2]), Import("spec3", *histSpectrum[3]), Import("spec4", *histSpectrum[4]));
-	else if (iNumberOfFiles == 6) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]), Import("spec2", *histSpectrum[2]), Import("spec3", *histSpectrum[3]), Import("spec4", *histSpectrum[4]), Import("spec5", *histSpectrum[5]));
-	else if (iNumberOfFiles == 7) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]), Import("spec2", *histSpectrum[2]), Import("spec3", *histSpectrum[3]), Import("spec4", *histSpectrum[4]), Import("spec5", *histSpectrum[5]), Import("spec6", *histSpectrum[6]));
-	else exit(1);
-        
-	combData->Print();
-	RooSimultaneous* simPdf = new RooSimultaneous("simPdf", "Simultaneous PDF", *sample);   
-        
-	// Associate models and states
+        // Construct combined model and add 
+	RooSimultaneous* simPdf = new RooSimultaneous("simPdf", "Simultaneous PDF", *category);   
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
-            simPdf->addPdf(*decay_model_with_source_bg[i], sTypes[i].Data());
+            simPdf->addPdf(*decay_model_with_source_bg[i], types[i].Data());
 	}
 
         // simPdf->fitTo(*combData) ;
 	// simPdf->fitTo(*combData, NumCPU(NUM_CPU));
 
 	// Use RooMinuit interface to minimize chi^2
-        RooChi2Var* simChi2;
+
 //        Int_t EXCLUDE_MIN_CHANNEL = constants->getExcludeMinChannel();
 //        Int_t EXCLUDE_MAX_CHANNEL = constants->getExcludeMaxChannel();
 //        Bool_t doRange = kFALSE;
@@ -594,29 +583,24 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 //            simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combData, RooFit::Range("LEFT,RIGHT"), NumCPU(getNumCpu()));
 //        }
 //        else {
-            simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combData, NumCPU(getNumCpu()));
+                 
 //        }                 
 
-//	RooMinuit m(*simChi2);
-//        m.optimizeConst(1);
-//	m.migrad();
-//	m.improve();
-//	m.hesse();
+        RooChi2Var* simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, NumCPU(getNumCpu()));
 
         RooMinimizer* m = new RooMinimizer(*simChi2);
-        // m->setStrategy(RooMinimizer::Speed);
+        m->setStrategy(RooMinimizer::Speed); // Speed (default), Balance, Robustness
         m->setMinimizerType("Minuit");
         Int_t resultMigrad = m->migrad();
         Int_t resultHesse = m->hesse();
         std::cout << "RooMinimizer: migrad=" << resultMigrad << ", hesse=" << resultHesse << std::endl;
 
-        RooFitResult* fitResult = m->save();
-        
+//        RooFitResult* fitResult = m->save();      
         
 	// m.save();
 	// m.fit("r");
 
-	RooArgSet* simFloatPars = simPdf->getParameters(*combData);
+	RooArgSet* simFloatPars = simPdf->getParameters(*combinedData);
 	RooAbsCollection* simFloatPars1 = simFloatPars->selectByAttrib("Constant", kFALSE);
 	Int_t simNp = simFloatPars1->getSize();
 

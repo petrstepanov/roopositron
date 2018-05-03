@@ -25,8 +25,7 @@ ChannelConvolutionPdf::ChannelConvolutionPdf() :
     _clonePdf(0),
     _cloneModel(0),        
     _useWindow(kFALSE),
-    _windowScale(1),
-    _bins(1000) {
+    _windowScale(1){
 }
 
 ChannelConvolutionPdf::ChannelConvolutionPdf(const char *name, const char *title, RooRealVar& convVar, RooAbsPdf& inPdf, RooAbsPdf& resmodel) : 
@@ -42,8 +41,7 @@ ChannelConvolutionPdf::ChannelConvolutionPdf(const char *name, const char *title
     _cloneModel(0),
     _useWindow(kFALSE),
     _windowScale(1),
-    _windowParam("windowParam","Convolution window parameter",this,kFALSE),
-    _bins(200) {
+    _windowParam("windowParam","Convolution window parameter",this,kFALSE){
     // Constructor of convolution operator PDF
     // convVar  :  convolution variable (on which both pdf and resmodel should depend)
     // pdf      :  input 'physics' pdf
@@ -64,8 +62,7 @@ ChannelConvolutionPdf::ChannelConvolutionPdf(const ChannelConvolutionPdf&  other
     _cloneModel(0),
     _useWindow(kFALSE),
     _windowScale(1),
-    _windowParam("windowParam","Convolution window parameter",this,kFALSE),
-    _bins(1000) {
+    _windowParam("windowParam","Convolution window parameter",this,kFALSE){
     // Make temporary clone of original convolution to preserve configuration information
     // This information will be propagated to a newly create convolution in a subsequent
     // call to initialize() 

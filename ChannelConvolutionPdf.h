@@ -59,7 +59,7 @@ protected:
     Double_t     _windowScale ;     // Scale factor for window parameter
     RooListProxy _windowParam ;     // Holder for optional convolution integration window scaling parameter
     
-    Int_t _bins ;
+//    Int_t _bins ;
     
     RooRealVar& cloneVar()   const { if (!_init) initialize() ; return (RooRealVar&) *_cloneVar ; }
     RooAbsPdf&  clonePdf()   const { if (!_init) initialize() ; return (RooAbsPdf&) *_clonePdf ; }
