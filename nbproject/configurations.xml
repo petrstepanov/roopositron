@@ -258,13 +258,14 @@ Contributor(s):
       <compileType>
         <cTool>
           <developmentMode>5</developmentMode>
+          <commandlineTool>gcc</commandlineTool>
         </cTool>
         <ccTool>
           <developmentMode>5</developmentMode>
           <standard>8</standard>
           <commandlineTool>clang</commandlineTool>
           <incDir>
-            <pElem>/Users/petrstepanov/root_v6.11.02/include</pElem>
+            <pElem>/Applications/root_v6.14.02/include</pElem>
           </incDir>
           <commandLine>-pthread -stdlib=libc++ -std=c++11 -m64</commandLine>
         </ccTool>
@@ -276,7 +277,7 @@ Contributor(s):
         </asmTool>
         <linkerTool>
           <linkerAddLib>
-            <pElem>/Users/petrstepanov/root_v6.11.02/lib</pElem>
+            <pElem>/Applications/root_v6.14.02/lib</pElem>
           </linkerAddLib>
           <linkerDynSerch>
             <pElem>.</pElem>

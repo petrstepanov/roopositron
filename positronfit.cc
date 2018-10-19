@@ -413,19 +413,33 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             RooFormulaVar* I_source_2_ = new RooFormulaVar("I_source_2_", "@0/100.", *I_source_2);
             decay_source = new TwoExpPdf("decay_source", "decay_source", *rChannels, *t_source_ch, *t_source_2_ch, *I_source_2_);
         }
+
         
-        RooAddPdf* decay_model_sum = new RooAddPdf("decay_model_sum", "decay_model_sum", RooArgList(*decay_source, *decay_model), *I_source_);
-
-	RooFFTConvPdf** decay_model_with_source = new RooFFTConvPdf*[iNumberOfFiles];
-	rChannels->setBins(constants->getConvolutionBins(), "cache");
+        // Old convolution begin
+//      RooAddPdf* decay_model_sum = new RooAddPdf("decay_model_sum", "decay_model_sum", RooArgList(*decay_source, *decay_model), *I_source_);
+//	RooFFTConvPdf** decay_model_with_source = new RooFFTConvPdf*[iNumberOfFiles];
+//	rChannels->setBins(constants->getConvolutionBins(), "cache");
 //        rChannels->setBins(MAX_CHANNEL - MIN_CHANNEL + 1, "cache");
-	for (unsigned i = 0; i<iNumberOfFiles; i++){
-            decay_model_with_source[i] = new RooFFTConvPdf(TString::Format("decay_model_with_source_%d", i + 1), TString::Format("Grain Boundary Model N%d", i + 1), *rChannels, *decay_model_sum, *res_funct[i]);
+//	for (unsigned i = 0; i<iNumberOfFiles; i++){
+//            decay_model_with_source[i] = new RooFFTConvPdf(TString::Format("decay_model_with_source_%d", i + 1), TString::Format("Grain Boundary Model N%d", i + 1), *rChannels, *decay_model_sum, *res_funct[i]);
 //            decay_model_with_source[i] -> setBufferStrategy(RooFFTConvPdf::Flat); // Extend (default), Flat, Mirror (dont work really well)
-            decay_model_with_source[i] -> setCacheObservables(*rChannels);
-            decay_model_with_source[i] -> setBufferFraction(1.0);
-	}
+//            decay_model_with_source[i] -> setCacheObservables(*rChannels);
+//            decay_model_with_source[i] -> setBufferFraction(1.0);
+//	}
+        // Old convolution end
 
+        RooFFTConvPdf** model_conv = new RooFFTConvPdf*[iNumberOfFiles];
+        RooFFTConvPdf** source_conv = new RooFFTConvPdf*[iNumberOfFiles];
+        RooAddPdf** decay_model_with_source = new RooAddPdf*[iNumberOfFiles];        
+        
+        // New convolution begin (fix)
+	for (unsigned i = 0; i<iNumberOfFiles; i++){
+            model_conv[i] = new RooFFTConvPdf(TString::Format("model_conv_%d", i + 1), TString::Format("Model Conv N%d", i + 1), *rChannels, *decay_model, *res_funct[i]);
+            source_conv[i] = new RooFFTConvPdf(TString::Format("source_conv_%d", i + 1), TString::Format("Source Conv N%d", i + 1), *rChannels, *decay_source, *res_funct[i]);
+            decay_model_with_source[i] = new RooAddPdf(TString::Format("decay_model_with_source_%d", i + 1), "decay_model_with_source", RooArgList(*source_conv[i], *model_conv[i]), *I_source_);
+	}        
+        // New convolution end (fix)        
+        
 //      RooNumConvPdf** decay_model_with_source = new RooNumConvPdf*[iNumberOfFiles];
 //      for (unsigned i = 0; i<iNumberOfFiles; i++){
 //          decay_model_with_source[i] = new RooNumConvPdf(TString::Format("decay_model_with_source_%d", i + 1), TString::Format("Convoluted model N%d", i + 1), *rChannels, *decay_model_sum, *res_funct[i]);
