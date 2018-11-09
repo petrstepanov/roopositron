@@ -431,7 +431,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
         RooFFTConvPdf** model_conv = new RooFFTConvPdf*[iNumberOfFiles];
         RooFFTConvPdf** source_conv = new RooFFTConvPdf*[iNumberOfFiles];
         RooAddPdf** decay_model_with_source = new RooAddPdf*[iNumberOfFiles];        
-        
+        rChannels->setBins(MAX_CHANNEL - MIN_CHANNEL + 1,"cache") ; 
+//        rChannels->setBins(2048,"cache") ; 
         // New convolution begin (fix)
 	for (unsigned i = 0; i<iNumberOfFiles; i++){
             model_conv[i] = new RooFFTConvPdf(TString::Format("model_conv_%d", i + 1), TString::Format("Model Conv N%d", i + 1), *rChannels, *decay_model, *res_funct[i]);
