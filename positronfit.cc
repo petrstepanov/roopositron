@@ -234,7 +234,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 
 	// Read resolution function parameters from file
         // parameters filename is "parameters_XXX.txt", where XXX is model name (1exp, 2exp etc)
-        std::string suffix = constants->getDecayModel() + "_" + constants->getResolutionFunctionModel();
+        std::string suffix = constants->getDecayModel() + "-" + constants->getResolutionFunctionModel();
 	ParamStorage* storage = new ParamStorage(suffix);
         
 	RooConstVar* fwhm2disp = new RooConstVar("fwhm2disp", "Coefficient to convert fwhm to dispersion", 1./(2.*sqrt(2.*log(2.))));
@@ -738,8 +738,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 //              gSystem->ProcessEvents();
 //            }
 
-            TString imageFilename = TString::Format("%sfit-%s-%s-%d.png", 
-                    sOutputPath.c_str(), 
+            TString imageFilename = TString::Format("./%s-%s/fit-%s-%s-%d.png", 
+                    (constants->getDecayModel()).c_str(), 
+                    (constants->getResolutionFunctionModel()).c_str(),
                     (constants->getDecayModel()).c_str(), 
                     (constants->getResolutionFunctionModel()).c_str(), i+1);
             fileUtils->saveImage(canvas[i], imageFilename.Data());
@@ -763,8 +764,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
         */
     for (unsigned i = 0; i<iNumberOfFiles; i++){
         std::ofstream outputFile;
-        TString dataFilename = TString::Format("%sdata-%s-%s-%d.txt", 
-                sOutputPath.c_str(), 
+        TString dataFilename = TString::Format("./%s-%s/data-%s-%s-%d.txt", 
+                (constants->getDecayModel()).c_str(), 
+                (constants->getResolutionFunctionModel()).c_str(),
                 (constants->getDecayModel()).c_str(), 
                 (constants->getResolutionFunctionModel()).c_str(), i+1);        
         outputFile.open(dataFilename.Data());

@@ -13,7 +13,7 @@
 
 #include "ParamStorage.h"
 #include "Constants.h"
-
+#include "TSystem.h"
 //ParamStorage::ParamStorage() {
 //}
 //
@@ -29,16 +29,19 @@ ParamStorage::ParamStorage(){
 }
 
 ParamStorage::ParamStorage(std::string postfix){
-    filename = "parameters";
-    filename += (postfix!="")?("_"+postfix):postfix;
+    std::string createDirCommand = "mkdir " + postfix;
+    gSystem->Exec(createDirCommand.c_str());
+    filename = (postfix!="")?("./"+postfix+"/"):"./";
+    filename += "parameters";
+    filename += (postfix!="")?("-"+postfix):postfix;
     filename += ".txt";
     parameters = _getParametersFromFile(filename.c_str());
     if (parameters->GetEntries()>0){
-        std::cout << "ParamStorage: parameters file read successful" << std::endl;            
+        std::cout << "ParamStorage::ParamStorage parameters file read successful" << std::endl;            
         parameters->Print();
     }
     else {
-        std::cout << "ParamStorage: parameters file empty - created new \"" << filename << "\"" << std::endl;            
+        std::cout << "ParamStorage::ParamStorage parameters file empty - created new \"" << filename << "\"" << std::endl;            
     }        
 }
 
@@ -150,7 +153,7 @@ Bool_t ParamStorage::fileExists(std::string filename){
 Bool_t ParamStorage::save(){
     FILE* pFile = fopen(filename.c_str(), "w");
     if (pFile == NULL) {
-        std::cout << "Error writing file" << std::endl;
+        std::cout << "ParamStorage::save Error writing file " << filename << std::endl;
         return kFALSE;
     }
     TIter next(parameters);

@@ -113,5 +113,6 @@ void FileUtils::saveImage(TCanvas* canvas, const char* filename){
     TImage *imgCanvas = TImage::Create();
     imgCanvas->FromPad(canvas);
     imgCanvas->WriteImage(filename);
+    std::cout << "FileUtils::saveImage " << filename << std::endl;
     delete imgCanvas;
 }
