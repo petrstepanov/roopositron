@@ -265,7 +265,7 @@ Contributor(s):
           <standard>8</standard>
           <commandlineTool>clang</commandlineTool>
           <incDir>
-            <pElem>/Applications/root_v6.14.02/include</pElem>
+            <pElem>/Applications/root_v6.14.06/include</pElem>
           </incDir>
           <commandLine>-pthread -stdlib=libc++ -std=c++11 -m64</commandLine>
         </ccTool>
@@ -277,7 +277,7 @@ Contributor(s):
         </asmTool>
         <linkerTool>
           <linkerAddLib>
-            <pElem>/Applications/root_v6.14.02/lib</pElem>
+            <pElem>/Applications/root_v6.14.06/lib</pElem>
           </linkerAddLib>
           <linkerDynSerch>
             <pElem>.</pElem>

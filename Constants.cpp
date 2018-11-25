@@ -29,15 +29,15 @@ void Constants::init(){
     isnew = true;    
     
     // Default values
-    convolutionBins = 1000;
+//    convolutionBins = 1000;
 //    numCPU          = 1;
     channels        = 8192;        // entries in maestro file
-    channelWidth    = 0.0061741;   // ns
+    channelWidth    = 0.006186;   // ns
     skipLines       = 12;          // spectrum header size
     minChannel      = 100;         // left channel
     maxChannel      = 8000;        // right channel   
-    excludeMinChannel = 0;         // left exclude channel
-    excludeMaxChannel = 0;         // right exclude channel
+//    excludeMinChannel = 0;         // left exclude channel
+//    excludeMaxChannel = 0;         // right exclude channel
     resolutionModel = "2gauss";
     decayModel      = "1exp";
     sourceModel     = "1exp";
@@ -53,8 +53,8 @@ void Constants::init(){
         return;
     }
 
-    constantsFile >> convolutionBins;
-    std::getline(constantsFile, line);    
+//    constantsFile >> convolutionBins;
+//    std::getline(constantsFile, line);    
     
 //    constantsFile >> numCPU;
 //    std::getline(constantsFile, line);
@@ -74,12 +74,12 @@ void Constants::init(){
     constantsFile >> maxChannel;
     std::getline(constantsFile, line);
 
-    constantsFile >> excludeMinChannel;
-    std::getline(constantsFile, line);
-
-    constantsFile >> excludeMaxChannel;
-    std::getline(constantsFile, line);
-    
+//    constantsFile >> excludeMinChannel;
+//    std::getline(constantsFile, line);
+//
+//    constantsFile >> excludeMaxChannel;
+//    std::getline(constantsFile, line);
+//    
     constantsFile >> resolutionModel;
     std::getline(constantsFile, line);
 
@@ -106,15 +106,15 @@ bool Constants::isNew() {
 }
 
 void Constants::print(){
-    std::cout << "convolutionBins:    " << convolutionBins << std::endl;
+//    std::cout << "convolutionBins:    " << convolutionBins << std::endl;
 //    std::cout << "numCPU:             " << numCPU << std::endl;
     std::cout << "channels:           " << channels << std::endl;
     std::cout << "channel width:      " << channelWidth << std::endl;
     std::cout << "skip lines:         " << skipLines << std::endl;
     std::cout << "minChannel:         " << minChannel << std::endl;
     std::cout << "maxChannel:         " << maxChannel << std::endl;
-    std::cout << "excludeMinChannel:  " << excludeMinChannel << std::endl;
-    std::cout << "excludeMaxChannel:  " << excludeMaxChannel << std::endl;
+//    std::cout << "excludeMinChannel:  " << excludeMinChannel << std::endl;
+//    std::cout << "excludeMaxChannel:  " << excludeMaxChannel << std::endl;
     std::cout << "resolutionModel:    " << resolutionModel << std::endl;
     std::cout << "decayModel:         " << decayModel << std::endl;
     std::cout << "sourceModel:        " << sourceModel << std::endl;    
@@ -125,26 +125,27 @@ void Constants::print(){
 void Constants::writeDefaultConstants(){
     std::ofstream myfile;
     myfile.open (filename.c_str());
-    myfile << std::left << std::setw(12) << convolutionBins   << "# number of bins for convolution" << std::endl;
+//    myfile << std::left << std::setw(12) << convolutionBins   << "# number of bins for convolution" << std::endl;
 //    myfile << std::left << std::setw(12) << numCPU            << "# number of CPU cores" << std::endl;
     myfile << std::left << std::setw(12) << channels          << "# number of channels in Maestro .Spe file" << std::endl;
     myfile << std::left << std::setw(12) << channelWidth      << "# channel width, ns" << std::endl;
     myfile << std::left << std::setw(12) << skipLines         << "# Maestro header size" << std::endl;
     myfile << std::left << std::setw(12) << minChannel        << "# minimum channel (>= 1), included in plot" << std::endl;
     myfile << std::left << std::setw(12) << maxChannel        << "# maximum channel, included in plot" << std::endl;
-    myfile << std::left << std::setw(12) << excludeMinChannel << "# exclude region minimum channel, relative to minimum channel (set 0 if not needed)" << std::endl;
-    myfile << std::left << std::setw(12) << excludeMaxChannel << "# exclude region maximum channel, relative to minimum channel" << std::endl;
+//    myfile << std::left << std::setw(12) << excludeMinChannel << "# exclude region minimum channel, relative to minimum channel (set 0 if not needed)" << std::endl;
+//    myfile << std::left << std::setw(12) << excludeMaxChannel << "# exclude region maximum channel, relative to minimum channel" << std::endl;
     myfile << std::left << std::setw(12) << resolutionModel   << "# resolution model - \"2gauss\" or \"3gauss\"" << std::endl;
     myfile << std::left << std::setw(12) << decayModel        << "# decay model - \"1exp\", \"2exp\", \"3exp\", \"trapping\", \"grain\"" << std::endl;
+//    myfile << std::left << std::setw(12) << decayModel        << "# decay type - \"common\", \"free\"" << std::endl;
     myfile << std::left << std::setw(12) << sourceModel       << "# source contribution - \"1exp\", \"2exp\" (annihilation in air?)" << std::endl;    
     myfile << std::left << std::setw(12) << imageWidth        << "# image width" << std::endl;   
     myfile << std::left << std::setw(12) << imageHeight       << "# image height" << std::endl;       
     myfile.close();  
 }
 
-int Constants::getConvolutionBins(){
-    return convolutionBins;
-}
+//int Constants::getConvolutionBins(){
+//    return convolutionBins;
+//}
 
 //int Constants::getNumCPU(){
 //    return numCPU;
@@ -169,14 +170,14 @@ int Constants::getMinChannel(){
 int Constants::getMaxChannel(){
     return maxChannel;
 }
-
-int Constants::getExcludeMinChannel() {
-    return excludeMinChannel;
-}
-
-int Constants::getExcludeMaxChannel() {
-    return excludeMaxChannel;
-}
+//
+//int Constants::getExcludeMinChannel() {
+//    return excludeMinChannel;
+//}
+//
+//int Constants::getExcludeMaxChannel() {
+//    return excludeMaxChannel;
+//}
 
 std::string Constants::getResolutionFunctionModel(){
     return resolutionModel;

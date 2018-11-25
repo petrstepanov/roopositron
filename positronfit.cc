@@ -62,16 +62,16 @@ char* getCurrentTime(){
     return ctime(&now);
 }
 
-Double_t getConstBackgroundFraction(TH1F* hist){
-    Int_t nBins = hist->GetXaxis()->GetNbins();
-    const Int_t wingBins = 20;
-    Double_t fullInt = hist->Integral(1, nBins);
-    Double_t leftWingAverage = (hist->Integral(1, wingBins)) / (Double_t)(wingBins);
-//    Double_t rightWingAverage = (hist->Integral(nBins - wingBins, nBins)) / (Double_t)(wingBins);
-//    Double_t bgInt = nBins * rightWingAverage;
-    Double_t bgInt = nBins * leftWingAverage;
-    return bgInt / fullInt;
-}
+//Double_t getConstBackgroundFraction(TH1F* hist){
+//    Int_t nBins = hist->GetXaxis()->GetNbins();
+//    const Int_t wingBins = 20;
+//    Double_t fullInt = hist->Integral(1, nBins);
+//    Double_t leftWingAverage = (hist->Integral(1, wingBins)) / (Double_t)(wingBins);
+////    Double_t rightWingAverage = (hist->Integral(nBins - wingBins, nBins)) / (Double_t)(wingBins);
+////    Double_t bgInt = nBins * rightWingAverage;
+//    Double_t bgInt = nBins * leftWingAverage;
+//    return bgInt / fullInt;
+//}
 
 TSystem* tSystem = NULL;
 Int_t getNumCpu(){
@@ -252,15 +252,15 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	}
 
 	// 1st Gauss FWHM
-	RooRealVar* g1_fwhm = storage->getOrMakeNew("g1_fwhm", "1st_gauss_fwhm", 0.3, 0.1, 1.0, "ns");
+	RooRealVar* g1_fwhm = storage->getOrMakeNew("g1_fwhm", "1st_gauss_fwhm", 0.3, 0.1, 5.0, "ns");
 	RooFormulaVar* gauss_1_dispersion = new RooFormulaVar("gauss_1_dispersion", "@0*@1/@2", RooArgList(*g1_fwhm, *fwhm2disp, *channelWidth));
 
 	// 2nd gauss FWHM
-	RooRealVar* g2_fwhm = storage->getOrMakeNew("g2_fwhm", "2nd_gauss_fwhm", 0.7, 0.1, 1.5, "ns");
+	RooRealVar* g2_fwhm = storage->getOrMakeNew("g2_fwhm", "2nd_gauss_fwhm", 0.7, 0.5, 1.5, "ns");
 	RooFormulaVar* gauss_2_dispersion = new RooFormulaVar("gauss_2_dispersion", "@0*@1/@2", RooArgList(*g2_fwhm, *fwhm2disp, *channelWidth));
 
        	// Fraction of the 2nd gauss
-	RooRealVar* gauss_2_fraction_pct = storage->getOrMakeNew("g2_frac", "2nd_gauss_fraction", 10, 0, 100, "%");
+	RooRealVar* gauss_2_fraction_pct = storage->getOrMakeNew("g2_frac", "2nd_gauss_fraction", 1, 0, 10, "%");
 	RooFormulaVar* gauss_2_fraction = new RooFormulaVar("g2_fraction", "@0/100", *gauss_2_fraction_pct);
 
 	// 2nd Gauss shift
@@ -471,16 +471,38 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	// new RooPolynomial("constBg", "y=1", *x, RooArgSet(RooConst(1)));
 	RooPolynomial** bg = new RooPolynomial*[iNumberOfFiles];
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
-		bg[i] = new RooPolynomial(TString::Format("bg_%d", i + 1), "y=1", *rChannels, RooArgSet());
-		// bg[i] = new RooPolynomial(TString::Format("bg_%d", i + 1), "Background Polynom", *rChannels);
+		bg[i] = new RooPolynomial(TString::Format("bg_func_%d", i + 1), "y=1", *rChannels, RooArgSet());
+//		 bg[i] = new RooPolynomial(TString::Format("bg_func_%d", i + 1), "Background Polynom", *rChannels);
 	}
 
 	// Background fractions array
-	RooConstVar** I_bg = new RooConstVar*[iNumberOfFiles];
-        Double_t* bgFraction = new Double_t[iNumberOfFiles];
+//	RooConstVar** I_bg = new RooConstVar*[iNumberOfFiles];
+//	RooRealVar** bg = new RooRealVar*[iNumberOfFiles];
+	RooFormulaVar** I_bg = new RooFormulaVar*[iNumberOfFiles];
+
+//        Double_t* bgFraction = new Double_t[iNumberOfFiles];
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
-		bgFraction[i] = getConstBackgroundFraction(fullTH1F[i]);
-		I_bg[i] = new RooConstVar(TString::Format("I_bg_%d", i + 1), "background_fraction", bgFraction[i]); //, bgFraction[i]/2, bgFraction[i]*2);
+//		bgFraction[i] = getConstBackgroundFraction(fullTH1F[i]);
+//		I_bg[i] = new RooConstVar(TString::Format("I_bg_%d", i + 1), "background_fraction", bgFraction[i]); //, bgFraction[i]/2, bgFraction[i]*2);
+//              Double_t rightWingAverage = (hist->Integral(nBins - wingBins, nBins)) / (Double_t)(wingBins);
+//              Double_t bgInt = nBins * rightWingAverage;
+//		I_bg[i] = new RooRealVar(TString::Format("I_bg_%d", i + 1), "background_fraction", bgFraction[i],bgFraction[i]/2, bgFraction[i]*2); //, bgFraction[i]/2, bgFraction[i]*2);
+
+            // Get average background
+            Int_t wingBins = 20;
+            Int_t bins = fullTH1F[i]->GetXaxis()->GetNbins();
+            Double_t wingIntegral = fullTH1F[i]->Integral(bins-20, bins);
+            std::cout << "wingIntegral: " << wingIntegral << std::endl;
+            Double_t averageBg = wingIntegral / wingBins;
+            std::cout << "averageBg: " << averageBg << std::endl;
+            RooRealVar* bg = new RooRealVar(TString::Format("bg_%d", i + 1), TString::Format("Background %d", i + 1), averageBg, averageBg/2, averageBg*2);
+            bg->Print();
+            RooConstVar* nBins = new RooConstVar(TString::Format("nBins_%d", i + 1), TString::Format("Number of bins %d", i + 1), bins);
+            nBins->Print();
+            RooConstVar* fullIntegral = new RooConstVar(TString::Format("fullInt_%d", i + 1), TString::Format("Full integral %d", i + 1), fullTH1F[i]->Integral(1, bins));
+            fullIntegral->Print();
+            I_bg[i] = new RooFormulaVar(TString::Format("I_bg_%d", i + 1), "@0*@1/@2", RooArgList(*bg, *nBins, *fullIntegral));
+            I_bg[i]->Print();
 	}
 
 	// ADD BACKGROUND PDF
