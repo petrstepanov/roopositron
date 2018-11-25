@@ -73,6 +73,18 @@ char* getCurrentTime(){
 //    return bgInt / fullInt;
 //}
 
+void drawRegion(RooPlot* frame, Int_t xMin, Int_t xMax){
+    Double_t yMin = frame->GetMinimum(); // frame->GetYaxis()->GetXmin();
+    Double_t yMax = frame->GetMaximum(); // frame->GetYaxis()->GetXmax();
+    TBox* sBox = new TBox(xMin, yMin, xMax, yMax);            
+    sBox->SetLineWidth(0);
+    sBox->SetFillColorAlpha(2, 0.2);
+    frame->addObject(sBox); 
+
+    std::cout << "xMin: " << xMin << ", xMax: " << xMax << std::endl; 
+    std::cout << "yMin: " << yMin << ", yMax: " << yMax<< std::endl; 
+}
+
 TSystem* tSystem = NULL;
 Int_t getNumCpu(){
     // Get number of CPUs
@@ -567,7 +579,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
         // in case   user doesnt want to wait till fitting ends
         storage->save();        
         
-        // Make array of spectrum names
+        // Make array of category names
         TString* types = new TString[iNumberOfFiles];
         for (unsigned i = 0; i<iNumberOfFiles; i++) types[i] = TString::Format("spectrum_%d", i);
 
@@ -577,7 +589,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	for (unsigned i = 0; i<iNumberOfFiles; i++){
             std::string type = types[i].Data();
             category->defineType(type.c_str());
-            histogramsMap.insert(dhistPair(type, histSpectrum[i]));
+            histogramsMap.insert(dhistPair(type, histSpectrum[i]));    
 	}
 
 	// Construct combined dataset
@@ -606,37 +618,57 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 
 	// Use RooMinuit interface to minimize chi^2
 
-//        Int_t EXCLUDE_MIN_CHANNEL = constants->getExcludeMinChannel();
-//        Int_t EXCLUDE_MAX_CHANNEL = constants->getExcludeMaxChannel();
-//        Bool_t doRange = kFALSE;
-//        if (EXCLUDE_MIN_CHANNEL > 1 && EXCLUDE_MIN_CHANNEL < EXCLUDE_MAX_CHANNEL && EXCLUDE_MAX_CHANNEL < MAX_CHANNEL - MIN_CHANNEL){
-//            doRange = kTRUE;
-//        }
+        Int_t EXCLUDE_MIN_CHANNEL = constants->getExcludeMinChannel();
+        Int_t EXCLUDE_MAX_CHANNEL = constants->getExcludeMaxChannel();
+        Bool_t doRange = kFALSE;
+        if (EXCLUDE_MIN_CHANNEL > 1 && EXCLUDE_MIN_CHANNEL < EXCLUDE_MAX_CHANNEL && EXCLUDE_MAX_CHANNEL < MAX_CHANNEL - MIN_CHANNEL){
+            doRange = kTRUE;
+        }
         
-//        if (doRange){
-//            std::cout << "Doing Ranges!" << std::endl;
-//            rChannels->setRange("LEFT", 1, EXCLUDE_MIN_CHANNEL);
-//            rChannels->setRange("RIGHT", EXCLUDE_MAX_CHANNEL, rChannels->getBins());
-//            simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combData, RooFit::Range("LEFT,RIGHT"), NumCPU(getNumCpu()));
-//        }
-//        else {
-                 
-//        }                 
+        RooChi2Var* simChi2;
+        if (doRange){
+            std::cout << "Doing Ranges!" << std::endl;
+//            for (unsigned i = 0; i<iNumberOfFiles; i++){
+//                TString rangeType = std::string type = types[i].Data();
+//                category->defineType(type.c_str());
+//                histogramsMap.insert(dhistPair(type, histSpectrum[i]));    
+//            }
+            // Define ranges for every spectrum
+            // https://root-forum.cern.ch/t/trying-a-simultaneous-fit-in-roofit/3168
+            for (unsigned i = 0; i < iNumberOfFiles; i++){
+                TString rangeName = "LEFT";
+                rangeName += '_';
+                rangeName += types[i];
+                rChannels->setRange(rangeName.Data(),1, EXCLUDE_MIN_CHANNEL) ;
 
-        RooChi2Var* simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, NumCPU(getNumCpu()));
+                rangeName = "RIGHT";
+                rangeName += '_';
+                rangeName += types[i];
+                rChannels->setRange(rangeName.Data(),EXCLUDE_MAX_CHANNEL, rChannels->getBins()) ;                
+            }
+//            rChannels->setRange("left", 1, EXCLUDE_MIN_CHANNEL);
+//            rChannels->setRange("right", EXCLUDE_MAX_CHANNEL, rChannels->getBins()-1);
+//            rChannels->setRange("middle", EXCLUDE_MIN_CHANNEL, EXCLUDE_MAX_CHANNEL);            
 
+//             simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, kFALSE, "middle", 0, getNumCpu());
+             simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::Range("LEFT,RIGHT"), RooFit::SplitRange(kTRUE));
+
+             // Ranges only work with fitTo (not combined ranges)!
+            // TODO: Try SplitRange() https://root-forum.cern.ch/t/trying-a-simultaneous-fit-in-roofit/3168
+//            simPdf->fitTo(*combinedData, RooFit::Range("LEFT,RIGHT"), RooFit::SplitRange(kTRUE)) ;
+        }
+        else {
+            simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::NumCPU(getNumCpu()));
+        }                        
+
+        RooMinimizer:
         RooMinimizer* m = new RooMinimizer(*simChi2);
         m->setStrategy(RooMinimizer::Speed); // Speed (default), Balance, Robustness
         m->setMinimizerType("Minuit");
         Int_t resultMigrad = m->migrad();
         Int_t resultHesse = m->hesse();
         std::cout << "RooMinimizer: migrad=" << resultMigrad << ", hesse=" << resultHesse << std::endl;
-
-//        RooFitResult* fitResult = m->save();      
         
-	// m.save();
-	// m.fit("r");
-
 	RooArgSet* simFloatPars = simPdf->getParameters(*combinedData);
 	RooAbsCollection* simFloatPars1 = simFloatPars->selectByAttrib("Constant", kFALSE);
 	Int_t simNp = simFloatPars1->getSize();
@@ -685,7 +717,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             
             // Draw complete fit
             decay_model_with_source_bg[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kPink - 4), LineWidth(2), Name("fit"));
-//                std::string legendLabel = constants->getDecayModel() + " model parameters";
+
+//            if (doRange){
+//                drawRegion(graphFrame[i], EXCLUDE_MIN_CHANNEL, EXCLUDE_MAX_CHANNEL); 
+//            }
+            
+            //                std::string legendLabel = constants->getDecayModel() + " model parameters";
             decay_model_with_source_bg[i]->paramOn(graphFrame[i], Layout(0.78, 0.97, 0.9), Format("NEU", AutoPrecision(3)), ShowConstants(kTRUE));// , Label(legendLabel.c_str()) Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);
 	}
 	std::cout << "Plot Frames Created OK!" << std::endl;
@@ -711,11 +748,11 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 		chiFrame[i]->GetXaxis()->SetRangeUser(0, MAX_CHANNEL-MIN_CHANNEL+1);
 
                 // Write RooDataHist statistics on chi frame (to create TPaveStats object)
-		// histSpectrum[i]->statOn(chiFrame[i]);                
+		// histSpectrum[i]->statOn(chiFrame[i]);        
 	}
 	std::cout << "Chi2 Frames Created OK!" << std::endl;
 
-
+       
 	// POPUP CANVAS WITH BOTH FRAMES
 	TCanvas** canvas = new TCanvas*[iNumberOfFiles];
 	for (unsigned i = 0; i<iNumberOfFiles; i++){
@@ -732,8 +769,13 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             graphFrame[i]->GetYaxis()->SetRangeUser(1, iUpperLimit[i]);
             graphFrame[i]->GetYaxis()->SetTitleSize(fontSize);             
             graphFrame[i]->GetYaxis()->SetTitleOffset(0.5);  
-            graphFrame[i]->Draw();
 
+            if (doRange){
+                drawRegion(graphFrame[i], EXCLUDE_MIN_CHANNEL, EXCLUDE_MAX_CHANNEL);
+            }
+            
+            graphFrame[i]->Draw(); // Draw frame on current canvas (pad)
+                      
 //            canvas[i]->cd(2)->SetPad(0, 0, 1, 0.4);
             canvas[i]->cd(2)->SetMargin(0.08, 0.03, 0.3, 0.05); // left right bottom top - margin for bottom title space
 
@@ -744,6 +786,10 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             chiFrame[i]->GetXaxis()->SetTitleSize(fontSize); 
             chiFrame[i]->GetXaxis()->SetTitleOffset(2); 
 
+            if (doRange){
+                drawRegion(chiFrame[i], EXCLUDE_MIN_CHANNEL, EXCLUDE_MAX_CHANNEL);     
+            }
+            
             chiFrame[i]->Draw();
             
             TLegend* leg = new TLegend(0.78,0.8,0.97-0.01,0.95-0.01);  // x1 y1 x2 y2
@@ -751,7 +797,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             leg->SetTextSize(0.05);
             leg->SetLineWidth(0);
             leg->Draw();
-            
+        
             //            ps->SetName("mystats");
             
 //            if (!isRoot){
@@ -759,7 +805,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
                 canvas[i]->Update();                
 //              gSystem->ProcessEvents();
 //            }
-
+                
+                
             TString imageFilename = TString::Format("./%s-%s/fit-%s-%s-%d.png", 
                     (constants->getDecayModel()).c_str(), 
                     (constants->getResolutionFunctionModel()).c_str(),

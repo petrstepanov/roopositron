@@ -36,13 +36,13 @@ void Constants::init(){
     skipLines       = 12;          // spectrum header size
     minChannel      = 100;         // left channel
     maxChannel      = 8000;        // right channel   
-//    excludeMinChannel = 0;         // left exclude channel
-//    excludeMaxChannel = 0;         // right exclude channel
+    excludeMinChannel = 0;         // left exclude channel
+    excludeMaxChannel = 0;         // right exclude channel
     resolutionModel = "2gauss";
     decayModel      = "1exp";
     sourceModel     = "1exp";
-    imageWidth      = 1024;
-    imageHeight     = 500;
+    imageWidth      = 1280;
+    imageHeight     = 700;
     
     // Read from file
     std::string line;
@@ -74,12 +74,12 @@ void Constants::init(){
     constantsFile >> maxChannel;
     std::getline(constantsFile, line);
 
-//    constantsFile >> excludeMinChannel;
-//    std::getline(constantsFile, line);
-//
-//    constantsFile >> excludeMaxChannel;
-//    std::getline(constantsFile, line);
-//    
+    constantsFile >> excludeMinChannel;
+    std::getline(constantsFile, line);
+
+    constantsFile >> excludeMaxChannel;
+    std::getline(constantsFile, line);
+    
     constantsFile >> resolutionModel;
     std::getline(constantsFile, line);
 
@@ -113,8 +113,8 @@ void Constants::print(){
     std::cout << "skip lines:         " << skipLines << std::endl;
     std::cout << "minChannel:         " << minChannel << std::endl;
     std::cout << "maxChannel:         " << maxChannel << std::endl;
-//    std::cout << "excludeMinChannel:  " << excludeMinChannel << std::endl;
-//    std::cout << "excludeMaxChannel:  " << excludeMaxChannel << std::endl;
+    std::cout << "excludeMinChannel:  " << excludeMinChannel << std::endl;
+    std::cout << "excludeMaxChannel:  " << excludeMaxChannel << std::endl;
     std::cout << "resolutionModel:    " << resolutionModel << std::endl;
     std::cout << "decayModel:         " << decayModel << std::endl;
     std::cout << "sourceModel:        " << sourceModel << std::endl;    
@@ -132,11 +132,10 @@ void Constants::writeDefaultConstants(){
     myfile << std::left << std::setw(12) << skipLines         << "# Maestro header size" << std::endl;
     myfile << std::left << std::setw(12) << minChannel        << "# minimum channel (>= 1), included in plot" << std::endl;
     myfile << std::left << std::setw(12) << maxChannel        << "# maximum channel, included in plot" << std::endl;
-//    myfile << std::left << std::setw(12) << excludeMinChannel << "# exclude region minimum channel, relative to minimum channel (set 0 if not needed)" << std::endl;
-//    myfile << std::left << std::setw(12) << excludeMaxChannel << "# exclude region maximum channel, relative to minimum channel" << std::endl;
+    myfile << std::left << std::setw(12) << excludeMinChannel << "# exclude region minimum channel, relative to minimum channel (set 0 if not needed)" << std::endl;
+    myfile << std::left << std::setw(12) << excludeMaxChannel << "# exclude region maximum channel, relative to minimum channel" << std::endl;
     myfile << std::left << std::setw(12) << resolutionModel   << "# resolution model - \"2gauss\" or \"3gauss\"" << std::endl;
     myfile << std::left << std::setw(12) << decayModel        << "# decay model - \"1exp\", \"2exp\", \"3exp\", \"trapping\", \"grain\"" << std::endl;
-//    myfile << std::left << std::setw(12) << decayModel        << "# decay type - \"common\", \"free\"" << std::endl;
     myfile << std::left << std::setw(12) << sourceModel       << "# source contribution - \"1exp\", \"2exp\" (annihilation in air?)" << std::endl;    
     myfile << std::left << std::setw(12) << imageWidth        << "# image width" << std::endl;   
     myfile << std::left << std::setw(12) << imageHeight       << "# image height" << std::endl;       
@@ -170,14 +169,14 @@ int Constants::getMinChannel(){
 int Constants::getMaxChannel(){
     return maxChannel;
 }
-//
-//int Constants::getExcludeMinChannel() {
-//    return excludeMinChannel;
-//}
-//
-//int Constants::getExcludeMaxChannel() {
-//    return excludeMaxChannel;
-//}
+
+int Constants::getExcludeMinChannel() {
+    return excludeMinChannel;
+}
+
+int Constants::getExcludeMaxChannel() {
+    return excludeMaxChannel;
+}
 
 std::string Constants::getResolutionFunctionModel(){
     return resolutionModel;
