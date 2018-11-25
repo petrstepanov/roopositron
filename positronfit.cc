@@ -628,12 +628,10 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
         RooChi2Var* simChi2;
         if (doRange){
             std::cout << "Doing Ranges!" << std::endl;
-//            for (unsigned i = 0; i<iNumberOfFiles; i++){
-//                TString rangeType = std::string type = types[i].Data();
-//                category->defineType(type.c_str());
-//                histogramsMap.insert(dhistPair(type, histSpectrum[i]));    
-//            }
-            // Define ranges for every spectrum
+            rChannels->setRange("LEFT",1, EXCLUDE_MIN_CHANNEL);
+            rChannels->setRange("RIGHT",EXCLUDE_MAX_CHANNEL, rChannels->getBins());       
+            
+            // Define ranges for every spectrum, then use SplitRange... (not worked)
             // https://root-forum.cern.ch/t/trying-a-simultaneous-fit-in-roofit/3168
             for (unsigned i = 0; i < iNumberOfFiles; i++){
                 TString rangeName = "LEFT";
@@ -651,11 +649,15 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 //            rChannels->setRange("middle", EXCLUDE_MIN_CHANNEL, EXCLUDE_MAX_CHANNEL);            
 
 //             simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, kFALSE, "middle", 0, getNumCpu());
-             simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::Range("LEFT,RIGHT"), RooFit::SplitRange(kTRUE));
+//             simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::Range("LEFT,RIGHT"), RooFit::SplitRange(kTRUE));
+             simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::Range("LEFT,RIGHT"));
 
-             // Ranges only work with fitTo (not combined ranges)!
+            // Ranges only work with fitTo (not combined ranges)!
             // TODO: Try SplitRange() https://root-forum.cern.ch/t/trying-a-simultaneous-fit-in-roofit/3168
 //            simPdf->fitTo(*combinedData, RooFit::Range("LEFT,RIGHT"), RooFit::SplitRange(kTRUE)) ;
+//            simPdf->fitTo(*combinedData, RooFit::Range("LEFT,RIGHT")) ;
+//            RooFitResult* r_sb12 = simPdf->fitTo(*combinedData,Range("LEFT,RIGHT",kFALSE),Save()) ;
+
         }
         else {
             simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::NumCPU(getNumCpu()));
@@ -705,7 +707,13 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 
             graphFrame[i]->GetXaxis()->SetRangeUser(0, MAX_CHANNEL-MIN_CHANNEL + 1);
 
+//            if (doRange){
+//                histSpectrum[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kBlack), LineWidth(0), MarkerSize(0.2), MarkerColor(kBlack), Range("LEFT,RIGHT"));
+//            } else {
+//                histSpectrum[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kBlack), LineWidth(0), MarkerSize(0.2), MarkerColor(kBlack));
+//            }
             histSpectrum[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kBlack), LineWidth(0), MarkerSize(0.2), MarkerColor(kBlack));
+
 
             // Draw Resolution Function summed with Background
 //            RooRealVar* bgFractionReal = new RooRealVar(TString::Format("bg_fraction_real_%d", i+1), "", bgFraction[i]);
@@ -716,12 +724,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             res_funct[i]->plotOn(graphFrame[i], LineStyle(3), LineColor(kGray + 3), LineWidth(1), Name("resolution"));
             
             // Draw complete fit
-            decay_model_with_source_bg[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kPink - 4), LineWidth(2), Name("fit"));
-
-//            if (doRange){
-//                drawRegion(graphFrame[i], EXCLUDE_MIN_CHANNEL, EXCLUDE_MAX_CHANNEL); 
-//            }
-            
+            if (doRange){
+                decay_model_with_source_bg[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kPink - 4), LineWidth(2), Name("fit"), Range("LEFT,RIGHT"));
+            } else {
+                decay_model_with_source_bg[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kPink - 4), LineWidth(2), Name("fit"));
+            }            
+           
             //                std::string legendLabel = constants->getDecayModel() + " model parameters";
             decay_model_with_source_bg[i]->paramOn(graphFrame[i], Layout(0.78, 0.97, 0.9), Format("NEU", AutoPrecision(3)), ShowConstants(kTRUE));// , Label(legendLabel.c_str()) Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);
 	}
