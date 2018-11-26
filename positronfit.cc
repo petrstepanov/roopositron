@@ -78,8 +78,8 @@ void drawRegion(RooPlot* frame, Int_t xMin, Int_t xMax){
     Double_t yMax = frame->GetMaximum(); // frame->GetYaxis()->GetXmax();
     TBox* sBox = new TBox(xMin, yMin, xMax, yMax);            
     sBox->SetLineWidth(0);
-    sBox->SetFillColorAlpha(2, 0.2);
-    frame->addObject(sBox); 
+    sBox->SetFillColorAlpha(15, 0.2);
+    frame->addObject(sBox);
 
     std::cout << "xMin: " << xMin << ", xMax: " << xMax << std::endl; 
     std::cout << "yMin: " << yMin << ", yMax: " << yMax<< std::endl; 
@@ -630,27 +630,23 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             std::cout << "Doing Ranges!" << std::endl;
             rChannels->setRange("LEFT",1, EXCLUDE_MIN_CHANNEL);
             rChannels->setRange("RIGHT",EXCLUDE_MAX_CHANNEL, rChannels->getBins());       
+            simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::Range("LEFT,RIGHT"), RooFit::NumCPU(getNumCpu()));
+
             
             // Define ranges for every spectrum, then use SplitRange... (not worked)
             // https://root-forum.cern.ch/t/trying-a-simultaneous-fit-in-roofit/3168
-            for (unsigned i = 0; i < iNumberOfFiles; i++){
-                TString rangeName = "LEFT";
-                rangeName += '_';
-                rangeName += types[i];
-                rChannels->setRange(rangeName.Data(),1, EXCLUDE_MIN_CHANNEL) ;
-
-                rangeName = "RIGHT";
-                rangeName += '_';
-                rangeName += types[i];
-                rChannels->setRange(rangeName.Data(),EXCLUDE_MAX_CHANNEL, rChannels->getBins()) ;                
-            }
-//            rChannels->setRange("left", 1, EXCLUDE_MIN_CHANNEL);
-//            rChannels->setRange("right", EXCLUDE_MAX_CHANNEL, rChannels->getBins()-1);
-//            rChannels->setRange("middle", EXCLUDE_MIN_CHANNEL, EXCLUDE_MAX_CHANNEL);            
-
-//             simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, kFALSE, "middle", 0, getNumCpu());
+//            for (unsigned i = 0; i < iNumberOfFiles; i++){
+//                TString rangeName = "LEFT";
+//                rangeName += '_';
+//                rangeName += types[i];
+//                rChannels->setRange(rangeName.Data(),1, EXCLUDE_MIN_CHANNEL) ;
+//
+//                rangeName = "RIGHT";
+//                rangeName += '_';
+//                rangeName += types[i];
+//                rChannels->setRange(rangeName.Data(),EXCLUDE_MAX_CHANNEL, rChannels->getBins()) ;                
+//            }
 //             simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::Range("LEFT,RIGHT"), RooFit::SplitRange(kTRUE));
-             simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::Range("LEFT,RIGHT"));
 
             // Ranges only work with fitTo (not combined ranges)!
             // TODO: Try SplitRange() https://root-forum.cern.ch/t/trying-a-simultaneous-fit-in-roofit/3168
@@ -665,7 +661,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 
         RooMinimizer:
         RooMinimizer* m = new RooMinimizer(*simChi2);
-        m->setStrategy(RooMinimizer::Speed); // Speed (default), Balance, Robustness
+//        m->setStrategy(); // RooMinimizer::Speed (default), RooMinimizer::Balance, RooMinimizer::Robustness
         m->setMinimizerType("Minuit");
         Int_t resultMigrad = m->migrad();
         Int_t resultHesse = m->hesse();
@@ -712,7 +708,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 //            } else {
 //                histSpectrum[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kBlack), LineWidth(0), MarkerSize(0.2), MarkerColor(kBlack));
 //            }
-            histSpectrum[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kBlack), LineWidth(0), MarkerSize(0.2), MarkerColor(kBlack));
+            histSpectrum[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kBlack), LineWidth(0), MarkerSize(0.2), MarkerColor(kBlack), Name("data"));
 
 
             // Draw Resolution Function summed with Background
@@ -723,7 +719,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             // Draw Resolution Function
             res_funct[i]->plotOn(graphFrame[i], LineStyle(3), LineColor(kGray + 3), LineWidth(1), Name("resolution"));
             
-            // Draw complete fit
+            // Draw complete fit, dont't forget the ranges option
+            // https://root-forum.cern.ch/t/excluding-regions-in-a-fit/9109
             if (doRange){
                 decay_model_with_source_bg[i]->plotOn(graphFrame[i], LineStyle(kSolid), LineColor(kPink - 4), LineWidth(2), Name("fit"), Range("LEFT,RIGHT"));
             } else {
@@ -732,7 +729,10 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
            
             //                std::string legendLabel = constants->getDecayModel() + " model parameters";
             decay_model_with_source_bg[i]->paramOn(graphFrame[i], Layout(0.78, 0.97, 0.9), Format("NEU", AutoPrecision(3)), ShowConstants(kTRUE));// , Label(legendLabel.c_str()) Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);
+            
+            graphFrame[i]->Print("V");
 	}
+
 	std::cout << "Plot Frames Created OK!" << std::endl;
 
 
@@ -747,13 +747,31 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 		// std::cout << "simNp: " << simNp << std::endl;
 		// chi2Value[i] = (simChi2->getVal()) / n_Degree[i];  // multiply on number of files
 		chi2Value[i] = chi2[i]->getVal() / n_Degree[i];  // multiply on number of files
-		hresid[i] = graphFrame[i]->pullHist();
-                hresid[i]->SetLineWidth(0);
-                hresid[i]->SetMarkerSize(0.2);
-		chiFrame[i] = rChannels->frame(Title(" ")); //Title(TString::Format("Goodness of fit: chi^2 = %.1f / %d = %.3f", chi2[i]->getVal(), n_Degree[i], chi2Value[i])));
+
+                chiFrame[i] = rChannels->frame(Title(" ")); //Title(TString::Format("Goodness of fit: chi^2 = %.1f / %d = %.3f", chi2[i]->getVal(), n_Degree[i], chi2Value[i])));
+                // If doing ranges we have to manually construct chi frames from the curves
+                // https://root-forum.cern.ch/t/pull-histogram-with-multiple-ranges/20935
+                if (doRange){
+                    RooHist* dataHist  = (RooHist*) graphFrame[i]->getHist("data"); 
+                    auto curve1 = (RooCurve*) graphFrame[i]->getObject(2);  // 2 is index in the list of RooPlot items (see printout from graphFrame[i]->Print("V")  
+                    auto curve2 = (RooCurve*) graphFrame[i]->getObject(3);
+                    auto hresid1 = dataHist->makePullHist(*curve1,true);
+                    auto hresid2 = dataHist->makePullHist(*curve2,true);
+                    hresid1->SetLineWidth(0);
+                    hresid1->SetMarkerSize(0.2);
+                    hresid2->SetLineWidth(0);
+                    hresid2->SetMarkerSize(0.2);
+                    chiFrame[i]->addPlotable(hresid1,"P"); 
+                    chiFrame[i]->addPlotable(hresid2); 
+                }
+                else {
+                    hresid[i] = graphFrame[i]->pullHist();
+                    hresid[i]->SetLineWidth(0);
+                    hresid[i]->SetMarkerSize(0.2);
+                    chiFrame[i]->addPlotable(hresid[i]);                    
+                }
 //                ((RooDataHist*)hresid[i])->plotOn(chiFrame[i],DataError(RooAbsData::None));
-                chiFrame[i]->addPlotable(hresid[i]);
-		chiFrame[i]->GetXaxis()->SetRangeUser(0, MAX_CHANNEL-MIN_CHANNEL+1);
+//		chiFrame[i]->GetXaxis()->SetRangeUser(0, MAX_CHANNEL-MIN_CHANNEL+1);
 
                 // Write RooDataHist statistics on chi frame (to create TPaveStats object)
 		// histSpectrum[i]->statOn(chiFrame[i]);        
@@ -761,14 +779,14 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	std::cout << "Chi2 Frames Created OK!" << std::endl;
 
        
-	// POPUP CANVAS WITH BOTH FRAMES
+	// DRAW CANVAS WITH BOTH FRAMES
 	TCanvas** canvas = new TCanvas*[iNumberOfFiles];
 	for (unsigned i = 0; i<iNumberOfFiles; i++){
             canvas[i] = new TCanvas(TString::Format("canvas-%d", i + 1), TString::Format("Spectrum N%d \"%s\"", i + 1, sFileNames[i].c_str()), constants->getImageWidth(), constants->getImageHeight());
             canvas[i]->SetFillColor(0);
             canvas[i]->Divide(1, 2);
 //            canvas[i]->cd(1)->SetPad(0, 0.4, 1, 1); // xlow ylow xup yup
-            canvas[i]->cd(1)->SetMargin(0.08, 0.03, 0.05, 0.1); // left right bottom top
+            canvas[i]->cd(1)->SetMargin(0.055, 0.01, 0.03, 0.1); // left right bottom top
             canvas[i]->cd(1)->SetLogy();
             Double_t fontSize = 0.06;
             graphFrame[i]->GetXaxis()->SetLabelColor(0);
@@ -785,7 +803,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             graphFrame[i]->Draw(); // Draw frame on current canvas (pad)
                       
 //            canvas[i]->cd(2)->SetPad(0, 0, 1, 0.4);
-            canvas[i]->cd(2)->SetMargin(0.08, 0.03, 0.3, 0.05); // left right bottom top - margin for bottom title space
+            canvas[i]->cd(2)->SetMargin(0.055, 0.01, 0.25, 0.05); // left right bottom top - margin for bottom title space
 
             chiFrame[i]->GetXaxis()->SetLabelSize(fontSize - 0.01);
             chiFrame[i]->GetYaxis()->SetLabelSize(fontSize - 0.01);            
@@ -797,6 +815,13 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             if (doRange){
                 drawRegion(chiFrame[i], EXCLUDE_MIN_CHANNEL, EXCLUDE_MAX_CHANNEL);     
             }
+            
+            // Draw horizontal line along residuals
+            TLine* hr = new TLine(1, 0, rChannels->getBins(), 0);            
+            hr->SetLineStyle(7);
+            hr->SetLineWidth(1);
+//            sBox->SetFillColorAlpha(2, 0.2);
+            chiFrame[i]->addObject(hr); 
             
             chiFrame[i]->Draw();
             
@@ -865,7 +890,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             Double_t resolution = graphFrame[i]->getCurve("resolution")->Eval(j-MIN_CHANNEL+0.5);            
             Double_t fit = graphFrame[i]->getCurve("fit")->Eval(j-MIN_CHANNEL+0.5);
             Double_t channel, chi;
-            hresid[i]->GetPoint(j-MIN_CHANNEL+1, channel, chi);
+            if (!doRange){
+                hresid[i]->GetPoint(j-MIN_CHANNEL+1, channel, chi);
+            }
+            else {
+//                TODO: add code for ranges (two curves)
+            }
 //            
             outputFile << std::left << std::setw(FILE_COLUMN_WIDTH) << j
                        << std::left << std::setw(FILE_COLUMN_WIDTH) << time
