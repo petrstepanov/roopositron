@@ -38,11 +38,11 @@
 
 #include "model/Constants.h"
 #include "model/ParamStorage.h"
-#include "roofit/TwoGaussian.h"
-#include "roofit/ExpPdf.h"
-#include "roofit/TrapPdf.h"
-#include "roofit/GrainPdf.h"
-#include "roofit/ThreeGaussian.h"
+#include "roofit/pdfs/TwoGaussian.h"
+#include "roofit/pdfs/ExpPdf.h"
+#include "roofit/pdfs/TrapPdf.h"
+#include "roofit/pdfs/GrainPdf.h"
+#include "roofit/pdfs/ThreeGaussian.h"
 
 #include "temp/TwoExpPdf.h"
 #include "temp/ThreeExpPdf.h"

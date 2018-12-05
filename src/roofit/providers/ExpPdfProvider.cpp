@@ -12,7 +12,7 @@
  */
 
 #include "ExpPdfProvider.h"
-#include "../ExpPdf.h"
+#include "../pdfs/ExpPdf.h"
 #include "../../util/ObjectNamer.h"
 
 ExpPdfProvider::ExpPdfProvider(RooRealVar* _observable, ParamStorage* _paramStorage) : AbstractProvider(_observable, _paramStorage) {}

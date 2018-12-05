@@ -27,6 +27,9 @@ OBJECTS = $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(OBJECTS_TEMP))
 
 EXECUTABLE=$(BIN_DIR)/$(APP_NAME)
 
+# convenience variable for making directories
+dir_guard=@mkdir -p $(@D)
+
 # Empty target ensures that list of all 'end products' are called
 all: executable
 
@@ -40,6 +43,7 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CXX) -o $@ $(OBJECTS) $(LIBS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(dir_guard)
 	@echo "Compiling "$@
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
@@ -52,11 +56,6 @@ clean:
 directories:
 	mkdir -p $(OBJ_DIR)
 	mkdir -p $(BIN_DIR)
-	mkdir -p $(OBJ_DIR)/model
-	mkdir -p $(OBJ_DIR)/roofit
-	mkdir -p $(OBJ_DIR)/roofit/providers
-	mkdir -p $(OBJ_DIR)/util
-	mkdir -p $(OBJ_DIR)/temp
 
 echo:
 	$(info SOURCES: $(SOURCES))
