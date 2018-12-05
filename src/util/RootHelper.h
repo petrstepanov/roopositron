@@ -14,14 +14,19 @@
 #ifndef ROOTUTILS_H
 #define ROOTUTILS_H
 
-class RootUtils {
+#include <TROOT.h>
+#include <TStopwatch.h>
+
+class RootHelper {
 public:
-    RootUtils();
-    RootUtils(const RootUtils& orig);
-    virtual ~RootUtils();
-
+//    static void deleteObject(const char* name);
+//    static void deleteObject(TObject* obj);
+    static Int_t getNumCpu();
+    static void startTimer(void);
+    static void stopAndPrintTimer();
+    
 private:
-
+    static TStopwatch* watch;
 };
 
 #endif /* ROOTUTILS_H */

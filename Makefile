@@ -54,6 +54,7 @@ directories:
 	mkdir -p $(BIN_DIR)
 	mkdir -p $(OBJ_DIR)/model
 	mkdir -p $(OBJ_DIR)/roofit
+	mkdir -p $(OBJ_DIR)/roofit/providers
 	mkdir -p $(OBJ_DIR)/util
 	mkdir -p $(OBJ_DIR)/temp
 

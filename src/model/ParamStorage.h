@@ -31,7 +31,7 @@ public:
     Bool_t isSet(const char*);
     RooRealVar* get(const char*);
     Bool_t fileExists(std::string);
-    RooRealVar* getOrMakeNew(const char* name, const char* description, Double_t value, Double_t minValue, Double_t maxValue, const char *unit = "");
+    RooRealVar* getOrMakeNew(const char* name, const char* description, Double_t value = 0, Double_t minValue = 0, Double_t maxValue = 0, const char *unit = "");
     Bool_t save();
     Bool_t hasParameters();
 private:

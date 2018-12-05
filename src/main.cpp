@@ -34,7 +34,7 @@
 #include <TUnixSystem.h>
 
 #include "util/FileUtils.h"
-#include "util/RootUtils.h"
+#include "util/RootHelper.h"
 
 #include "model/Constants.h"
 #include "model/ParamStorage.h"
