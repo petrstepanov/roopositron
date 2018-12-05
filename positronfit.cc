@@ -819,7 +819,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             // Draw horizontal line along residuals
             TLine* hr = new TLine(1, 0, rChannels->getBins(), 0);            
             hr->SetLineStyle(7);
-            hr->SetLineWidth(1);
+            hr->SetLineWidth(2);
+            hr->SetLineColor(kPink - 4);
 //            sBox->SetFillColorAlpha(2, 0.2);
             chiFrame[i]->addObject(hr); 
             

@@ -45,6 +45,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/MyPdf.o \
 	${OBJECTDIR}/MyPdfCache.o \
 	${OBJECTDIR}/ParamStorage.o \
+	${OBJECTDIR}/PsThermPdf.o \
+	${OBJECTDIR}/RootUtil.o \
 	${OBJECTDIR}/StructParams.o \
 	${OBJECTDIR}/ThreeExpPdf.o \
 	${OBJECTDIR}/ThreeGaussian.o \
@@ -127,6 +129,16 @@ ${OBJECTDIR}/ParamStorage.o: ParamStorage.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -I/Applications/root_v6.14.06/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ParamStorage.o ParamStorage.cpp
+
+${OBJECTDIR}/PsThermPdf.o: PsThermPdf.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.14.06/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/PsThermPdf.o PsThermPdf.cpp
+
+${OBJECTDIR}/RootUtil.o: RootUtil.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -I/Applications/root_v6.14.06/include -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/RootUtil.o RootUtil.cpp
 
 ${OBJECTDIR}/StructParams.o: StructParams.cpp
 	${MKDIR} -p ${OBJECTDIR}

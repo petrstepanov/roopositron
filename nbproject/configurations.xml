@@ -53,6 +53,8 @@ Contributor(s):
       <itemPath>MyPdf.h</itemPath>
       <itemPath>MyPdfCache.h</itemPath>
       <itemPath>ParamStorage.h</itemPath>
+      <itemPath>PsThermPdf.h</itemPath>
+      <itemPath>RootUtil.h</itemPath>
       <itemPath>StructParams.h</itemPath>
       <itemPath>ThreeExpPdf.h</itemPath>
       <itemPath>ThreeGaussian.h</itemPath>
@@ -85,6 +87,8 @@ Contributor(s):
       <itemPath>MyPdf.cpp</itemPath>
       <itemPath>MyPdfCache.cpp</itemPath>
       <itemPath>ParamStorage.cpp</itemPath>
+      <itemPath>PsThermPdf.cpp</itemPath>
+      <itemPath>RootUtil.cpp</itemPath>
       <itemPath>StructParams.cpp</itemPath>
       <itemPath>ThreeExpPdf.cpp</itemPath>
       <itemPath>ThreeGaussian.cpp</itemPath>
@@ -205,6 +209,14 @@ Contributor(s):
       <item path="ParamStorage.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ParamStorage.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="PsThermPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="PsThermPdf.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="RootUtil.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="RootUtil.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="Spectrum_000.Spe" ex="false" tool="3" flavor2="0">
       </item>
@@ -360,6 +372,14 @@ Contributor(s):
       <item path="ParamStorage.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ParamStorage.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="PsThermPdf.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="PsThermPdf.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="RootUtil.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="RootUtil.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="Spectrum_000.Spe" ex="false" tool="3" flavor2="0">
       </item>
