@@ -1,3 +1,7 @@
+# Minor
+test-spectra/*/*.*
+test-spectra/constants.txt
+
 # Prerequisites
 *.d
 
