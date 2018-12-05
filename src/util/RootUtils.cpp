@@ -4,24 +4,20 @@
  * and open the template in the editor.
  */
 
-/* 
- * File:   RootUtil.h
+/*
+ * File:   RootUtils.cpp
  * Author: petrstepanov
  *
  * Created on December 4, 2018, 2:09 PM
  */
 
-#ifndef ROOTUTIL_H
-#define ROOTUTIL_H
+#include "RootUtils.h"
 
-class RootUtil {
-public:
-    RootUtil();
-    RootUtil(const RootUtil& orig);
-    virtual ~RootUtil();
-private:
+RootUtils::RootUtils() {
+}
 
-};
+RootUtils::RootUtils(const RootUtils& orig) {
+}
 
-#endif /* ROOTUTIL_H */
-
+RootUtils::~RootUtils() {
+}
