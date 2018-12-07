@@ -50,8 +50,6 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 clean:
 	rm -f -r $(OBJ_DIR)
 	rm -f -r $(BIN_DIR)
-	rm -f $(DICTIONARY)
-	rm -f *.pcm
 
 directories:
 	mkdir -p $(OBJ_DIR)

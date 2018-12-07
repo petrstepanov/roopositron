@@ -13,17 +13,10 @@
 
 #include "AbstractProvider.h"
 
-AbstractProvider::AbstractProvider(RooRealVar* _observable, ParamStorage* _paramStorage) {
+AbstractProvider::AbstractProvider(RooRealVar* _observable) {
     observable = _observable;
-    paramStorage = _paramStorage;
     init();
 }
-
-//AbstractProvider::AbstractProvider(const AbstractProvider& orig) {
-//}
-//
-//AbstractProvider::~AbstractProvider() {
-//}
 
 void AbstractProvider::init() {
 //    parameters = initParameters();
@@ -34,6 +27,3 @@ RooAbsPdf* AbstractProvider::getPdf() {
     return pdf;
 }
 
-//RooArgList* AbstractProvider::getParameters() {
-//    return parameters;
-//}

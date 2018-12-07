@@ -18,12 +18,11 @@
 
 class ObjectNamer {
 public:
-    static ObjectNamer* getInstance();
-    const char* getUniqueName(const char* name);
+    ObjectNamer();
+    void fixUniqueName(TNamed* object);
     
 private:
-    ObjectNamer();
-    static ObjectNamer* instance;
+    const char* getPrefixedName(const char* name);
     std::vector<std::string> names;
     Bool_t findName(const char* name);
 };

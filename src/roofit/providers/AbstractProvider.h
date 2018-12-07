@@ -21,19 +21,16 @@
 
 class AbstractProvider {
 public:
-    AbstractProvider(RooRealVar* observable, ParamStorage* paramStorage);
-//    AbstractProvider(const AbstractProvider& orig);
-//    virtual ~AbstractProvider();
-
+    AbstractProvider(RooRealVar* observable);
     RooAbsPdf* getPdf();
-//    RooArgList* getParameters();
+
 private:
     void init();
     virtual RooAbsPdf* initPdf()=0;
 //    virtual RooArgList* initParameters()=0;
 
 protected:
-    ParamStorage* paramStorage;
+//    ParamStorage* paramStorage;
     RooRealVar* observable;
 //    RooArgList* parameters;
     RooAbsPdf* pdf;

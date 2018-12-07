@@ -18,20 +18,23 @@
 
 #include "TCollection.h"
 #include "TObjString.h"
+#include "TNamed.h"
 
-// Private Singleton Members
-ObjectNamer::ObjectNamer(){};
-
-ObjectNamer* ObjectNamer::instance = NULL;
-
-ObjectNamer* ObjectNamer::getInstance(){
-    if (!instance){
-        instance = new ObjectNamer;
-    }
-    return instance;
+ObjectNamer::ObjectNamer() {
 }
 
-const char* ObjectNamer::getUniqueName(const char* name) {
+void ObjectNamer::fixUniqueName(TNamed* object) {
+    const char* currentName = object->GetName();
+    // If name is not unique add prefix to it
+    if (findName(currentName) == kTRUE){
+	const char* newName = getPrefixedName(currentName);
+	object->SetName(newName);
+    }
+    // Remember object's name
+    names.push_back(object->GetName());
+}
+
+const char* ObjectNamer::getPrefixedName(const char* name) {
     if (findName(name) == kFALSE){
         names.push_back(name);
         return name;

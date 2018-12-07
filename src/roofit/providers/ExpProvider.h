@@ -5,28 +5,27 @@
  */
 
 /* 
- * File:   ExpPdfProvider.h
+ * File:   ExpProvider.h
  * Author: petrstepanov
  *
  * Created on December 5, 2018, 8:43 AM
  */
 
-#ifndef EXPPDFPROVIDER_H
-#define EXPPDFPROVIDER_H
+#ifndef EXPPROVIDER_H
+#define EXPPROVIDER_H
 
 #include "AbstractProvider.h"
-#include "RooArgList.h"
 #include "RooRealVar.h"
 
-class ExpPdfProvider : AbstractProvider {
+class ExpProvider : public AbstractProvider {
 public:
-    ExpPdfProvider(RooRealVar* observable, ParamStorage* paramStorage);
-    virtual ~ExpPdfProvider();
+    ExpProvider(RooRealVar* observable);
+    virtual ~ExpProvider();
     
 private:
 //    RooArgList* initParameters() override;
     RooAbsPdf* initPdf() override;
 };
 
-#endif /* EXPPDFPROVIDER_H */
+#endif /* EXPPROVIDER_H */
 

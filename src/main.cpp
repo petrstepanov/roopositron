@@ -37,6 +37,7 @@
 #include "util/RootHelper.h"
 
 #include "model/Constants.h"
+#include "model/RootConstants.h"
 #include "model/ParamStorage.h"
 #include "roofit/pdfs/TwoGaussian.h"
 #include "roofit/pdfs/ExpPdf.h"
@@ -44,8 +45,9 @@
 #include "roofit/pdfs/GrainPdf.h"
 #include "roofit/pdfs/ThreeGaussian.h"
 
-#include "temp/TwoExpPdf.h"
-#include "temp/ThreeExpPdf.h"
+#include "util/GraphicsHelper.h"
+#include "util/StringUtils.h"
+#include "roofit/AdditiveConvolutionPdf.h"
 
 //#include "temp/MyPdfCache.h"
 //#include "temp/MyPdf.h"
@@ -63,10 +65,10 @@ using namespace TMath;
 typedef std::map<std::string, RooDataHist*> dhistMap;
 typedef std::pair<std::string, RooDataHist*> dhistPair;
 
-char* getCurrentTime(){
-    time_t now = time(0);
-    return ctime(&now);
-}
+//char* getCurrentTime(){
+//    time_t now = time(0);
+//    return ctime(&now);
+//}
 
 //Double_t getConstBackgroundFraction(TH1F* hist){
 //    Int_t nBins = hist->GetXaxis()->GetNbins();
@@ -79,35 +81,9 @@ char* getCurrentTime(){
 //    return bgInt / fullInt;
 //}
 
-void drawRegion(RooPlot* frame, Int_t xMin, Int_t xMax){
-    Double_t yMin = frame->GetMinimum(); // frame->GetYaxis()->GetXmin();
-    Double_t yMax = frame->GetMaximum(); // frame->GetYaxis()->GetXmax();
-    TBox* sBox = new TBox(xMin, yMin, xMax, yMax);
-    sBox->SetLineWidth(0);
-    sBox->SetFillColorAlpha(15, 0.2);
-    frame->addObject(sBox);
-
-    std::cout << "xMin: " << xMin << ", xMax: " << xMax << std::endl;
-    std::cout << "yMin: " << yMin << ", yMax: " << yMax<< std::endl;
-}
-
-TSystem* tSystem = NULL;
-Int_t getNumCpu(){
-    // Get number of CPUs
-    if (tSystem == NULL) tSystem = new TUnixSystem();
-    SysInfo_t sysInfo;
-    tSystem->GetSysInfo(&sysInfo);
-    std::cout << "NumCpu: " << sysInfo.fCpus << std::endl;
-    return (sysInfo.fCpus >= 0) ? sysInfo.fCpus : 1;
-}
-
 // ASCII font generator is here: http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Resolution%0AFunction
 int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
-    // Output current time
-	// std::cout << "Current date and time is " << getCurrentTime() << std::endl;
-
-        TStopwatch watch;
-        watch.Start();
+	RootHelper::startTimer();
 
 	// Print command line arguments
 	std::cout << "Command line arguments (" << argc << "):" << std::endl;
@@ -169,17 +145,18 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 
         // Constants object reads values from "constants.txt" file
         Constants* constants = new Constants();
-
-        if (constants->isNew()){
-            std::cout << "Constants file `constants.txt` created. Make sure values are ok. Press CTRL+C." << std::endl;
+        if (!constants->isReadSuccess()){
             return 0;
         }
-
-        Int_t MIN_CHANNEL = constants->getMinChannel();
-        Int_t MAX_CHANNEL = constants->getMaxChannel();
-        Int_t CHANNELS = constants->getNumberOfChannels();
+	
+	// Set channel width in RootConstants (to be used in components instantiation)
+	(RootConstants::getInstance())->channelWidth = new RooConstVar("channelWidth", "Channel width, ns", constants->getChannelWidth());
+	
+        const Int_t MIN_CHANNEL = constants->getMinChannel();
+        const Int_t MAX_CHANNEL = constants->getMaxChannel();
+        const Int_t CHANNELS = constants->getNumberOfChannels();
         Double_t CHANNEL_WIDTH = constants->getChannelWidth();
-        Int_t SKIP_LINES = constants->getSkipLines();
+        const Int_t SKIP_LINES = constants->getSkipLines();
 
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
 		// Import Data
@@ -206,21 +183,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 		iLowerLimit[i] = iMinCount / 2;
 	}
 
-	/*
-           _____         .__           _________       __
-          /  _  \ ___  __|__| ______  /   _____/ _____/  |_ __ ________
-         /  /_\  \\  \/  /  |/  ___/  \_____  \_/ __ \   __\  |  \____ \
-        /    |    \>    <|  |\___ \   /        \  ___/|  | |  |  /  |_> >
-        \____|__  /__/\_ \__/____  > /_______  /\___  >__| |____/|   __/
-                \/      \/       \/          \/     \/           |__|
-
-        */
-
 	// Define Channels Axis
 
 	RooRealVar* rChannels = new RooRealVar("rChannels", "Channels axis", 0, MAX_CHANNEL-MIN_CHANNEL+1, "ch");
 	rChannels->setBins(MAX_CHANNEL - MIN_CHANNEL + 1);
-
+	// Set convolution bins same as 
+	rChannels->setBins(MAX_CHANNEL - MIN_CHANNEL + 1,"cache");
 	// Conversion variables
 	RooConstVar* channelWidth = new RooConstVar("channelWidth", "Bin channel width, ns", CHANNEL_WIDTH);
 
@@ -230,172 +198,29 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             histSpectrum[i] = new RooDataHist(TString::Format("histSpectrum_%d", i + 1), sFileNames[i].c_str(), RooArgSet(*rChannels), RooFit::Import(*fullTH1F[i]));
 	}
 
-	/*
-        __________                    .__          __  .__
-        \______   \ ____   __________ |  |  __ ___/  |_|__| ____   ____
-         |       _// __ \ /  ___/  _ \|  | |  |  \   __\  |/  _ \ /    \
-         |    |   \  ___/ \___ (  <_> )  |_|  |  /|  | |  (  <_> )   |  \
-         |____|_  /\___  >____  >____/|____/____/ |__| |__|\____/|___|  /
-                \/     \/     \/                                      \/
-        ___________                   __  .__
-        \_   _____/_ __  ____   _____/  |_|__| ____   ____
-         |    __)|  |  \/    \_/ ___\   __\  |/  _ \ /    \
-         |     \ |  |  /   |  \  \___|  | |  (  <_> )   |  \
-         \___  / |____/|___|  /\___  >__| |__|\____/|___|  /
-             \/             \/     \/                    \/
-
-        */
-
-
-	// CREATE RESOLUTION FUNCTIONS
-	// by  the way, FWHM = 2 sqrt(2 ln 2) * dispersion
-
-	// Read resolution function parameters from file
+	// Read fit parameters from file
         // parameters filename is "parameters_XXX.txt", where XXX is model name (1exp, 2exp etc)
-        std::string suffix = constants->getDecayModel() + "-" + constants->getResolutionFunctionModel();
-	ParamStorage* storage = new ParamStorage(suffix);
+	std::string subDirectoryName = StringUtils::joinStrings(constants->getDecayModels(), "-"); // e.g. "exp-trapping"
+	subDirectoryName += subDirectoryName += "-";
+	ParamStorage* storage = new ParamStorage(subDirectoryName);
 
-	RooConstVar* fwhm2disp = new RooConstVar("fwhm2disp", "Coefficient to convert fwhm to dispersion", 1./(2.*sqrt(2.*log(2.))));
-
-	// Zero channel value is relative to the MIN_CHANNEL value
-	RooRealVar** zero_ch = new RooRealVar*[iNumberOfFiles];
+	// Construct additive decay models
+        RooAbsPdf** decay_model = new RooAbsPdf*[iNumberOfFiles];
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
-            Double_t zeroChannelVal = iTopChannel[i];
-            Double_t zeroChannelDelta = 50;
-            TString name = TString::Format("zero_ch_%d", i + 1);
-            TString description = TString::Format("zero_channel_%d", i + 1);
-            // Don't store zero_channel in parameters
-//            zero_ch[i] = storage->getOrMakeNew(name, description, zeroChannelVal, zeroChannelVal - zeroChannelDelta, zeroChannelVal + zeroChannelDelta, "ch");
-            zero_ch[i] = new RooRealVar(name, description, zeroChannelVal, zeroChannelVal - zeroChannelDelta, zeroChannelVal + zeroChannelDelta, "ch");
+	    AdditiveConvolutionPdf* acp = new AdditiveConvolutionPdf(constants->getComponentIds(), const char* resolutionId, rChannels) {
+	    if (i == 1){
+		// Construct common parameters list
+	    }
 	}
-
-	// 1st Gauss FWHM
-	RooRealVar* g1_fwhm = storage->getOrMakeNew("g1_fwhm", "1st_gauss_fwhm", 0.3, 0.1, 5.0, "ns");
-	RooFormulaVar* gauss_1_dispersion = new RooFormulaVar("gauss_1_dispersion", "@0*@1/@2", RooArgList(*g1_fwhm, *fwhm2disp, *channelWidth));
-
-	// 2nd gauss FWHM
-	RooRealVar* g2_fwhm = storage->getOrMakeNew("g2_fwhm", "2nd_gauss_fwhm", 0.7, 0.5, 1.5, "ns");
-	RooFormulaVar* gauss_2_dispersion = new RooFormulaVar("gauss_2_dispersion", "@0*@1/@2", RooArgList(*g2_fwhm, *fwhm2disp, *channelWidth));
-
-       	// Fraction of the 2nd gauss
-	RooRealVar* gauss_2_fraction_pct = storage->getOrMakeNew("g2_frac", "2nd_gauss_fraction", 1, 0, 10, "%");
-	RooFormulaVar* gauss_2_fraction = new RooFormulaVar("g2_fraction", "@0/100", *gauss_2_fraction_pct);
-
-	// 2nd Gauss shift
-//	RooRealVar** g2_shift = new RooRealVar*[iNumberOfFiles];
-//	RooFormulaVar** zero_ch_relative_2 = new RooFormulaVar*[iNumberOfFiles];
-//	for (unsigned i = 0; i < iNumberOfFiles; i++) {
-//		g2_shift[i] = storage->getOrMakeNew(TString::Format("g2_shift_%d", i + 1), TString::Format("2nd_gauss_shift_%d", i + 1), 0, -10, 10, "ch");
-//		zero_ch_relative_2[i] = new RooFormulaVar(TString::Format("zero_ch_relative_2_%d", i + 1), "@0+@1", RooArgList(*zero_ch[i], *g2_shift[i]));
-//	}
-
+	// TODO: Go through all model parameters and set gauss mean to whatever we have on the spectra.
+	
+	// TODO: Go through all model parameters and make common things common
 	// Two-Gauss PDF
 	RooAbsPdf** res_funct = new RooAbsPdf*[iNumberOfFiles];
-
-        if (constants->getResolutionFunctionModel() == "2gauss"){
-            for (unsigned i = 0; i<iNumberOfFiles; i++){
-//                res_funct[i] = new TwoGaussian(TString::Format("res_funct_%d", i + 1), "Resolution Function for Convolution (2 Gauss)", *rChannels, *zero_ch[i], *gauss_1_dispersion, *zero_ch_relative_2[i], *gauss_2_dispersion, *gauss_2_fraction);
-                res_funct[i] = new TwoGaussian(TString::Format("res_funct_%d", i + 1), "Resolution Function for Convolution (2 Gauss)", *rChannels, *zero_ch[i], *gauss_1_dispersion, *zero_ch[i], *gauss_2_dispersion, *gauss_2_fraction);
-            }
-        } else {
-            // 3rd gauss dispertion
-            RooRealVar* g3_fwhm = storage->getOrMakeNew("g3_fwhm", "3rd_gauss_fwhm", 1.5, 1, 3, "ns");
-            RooFormulaVar* gauss_3_dispersion = new RooFormulaVar("gauss_3_dispersion", "@0*@1/@2", RooArgList(*g3_fwhm, *fwhm2disp, *channelWidth));
-
-            // Fraction of the 2nd gauss
-            RooRealVar* gauss_3_fraction_pct = storage->getOrMakeNew("g3_frac", "3rd_gauss_fraction", 1, 0, 10, "%");
-            RooFormulaVar* gauss_3_fraction = new RooFormulaVar("g3_fraction", "@0/100", *gauss_3_fraction_pct);
-
-            for (unsigned i = 0; i<iNumberOfFiles; i++){
-//                res_funct[i] = new ThreeGaussian(TString::Format("res_funct_%d", i + 1), "Resolution Function for Convolution (3 Gauss)", *rChannels, *zero_ch[i], *gauss_1_dispersion, *zero_ch_relative_2[i], *gauss_2_dispersion, *gauss_3_dispersion, *gauss_2_fraction, *gauss_3_fraction);
-                res_funct[i] = new ThreeGaussian(TString::Format("res_funct_%d", i + 1), "Resolution Function for Convolution (3 Gauss)", *rChannels, *zero_ch[i], *gauss_1_dispersion, *zero_ch[i], *gauss_2_dispersion, *gauss_3_dispersion, *gauss_2_fraction, *gauss_3_fraction);
-            }
-        }
 
 	// Output
 	std::cout << "Resolution Functions Created OK!" << std::endl;
 
-
-	/*
-        ________                                  _____             .___     .__
-        \______ \   ____   ____ _____  ___.__.   /     \   ____   __| _/____ |  |
-         |    |  \_/ __ \_/ ___\\__  \<   |  |  /  \ /  \ /  _ \ / __ |/ __ \|  |
-         |    `   \  ___/\  \___ / __ \\___  | /    Y    (  <_> ) /_/ \  ___/|  |__
-        /_______  /\___  >\___  >____  / ____| \____|__  /\____/\____ |\___  >____/
-                \/     \/     \/     \/\/              \/            \/    \/
-
-	*/
-
-        RooAbsPdf* decay_model; // Polymorphism lol
-        // Monoexponential model
-        if (constants->getDecayModel() == "1exp"){
-            RooRealVar* tau = storage->getOrMakeNew("tau", "positron_lifetime", 0.15, 0.1, 0.2, "ns");
-            RooFormulaVar* tau_ch = new RooFormulaVar("tau_ch", "@0/@1", RooArgList(*tau, *channelWidth));
-            decay_model = new ExpPdf("decay_model", "decay_model", *rChannels, *tau_ch);
-        }
-        // Two-exponential model
-        else if(constants->getDecayModel() == "2exp"){
-            RooRealVar* tau1 = storage->getOrMakeNew("tau1", "1st_exponent_lifetime", 0.15, 0.1, 0.7, "ns");
-            RooFormulaVar* tau1_ch = new RooFormulaVar("tau1_ch", "@0/@1", RooArgList(*tau1, *channelWidth));
-            RooRealVar* tau2 = storage->getOrMakeNew("tau2", "2nd_exponent_lifetime", 0.5, 0.2, 3.0, "ns");
-            RooFormulaVar* tau2_ch = new RooFormulaVar("tau2_ch", "@0/@1", RooArgList(*tau2, *channelWidth));
-            RooRealVar* I_tau2 = storage->getOrMakeNew("I_tau2", "2nd_exponent_fraction", 10, 0, 100, "%");
-            RooFormulaVar* I_tau2_ = new RooFormulaVar("I_tau2_", "@0/100.", *I_tau2);
-            decay_model = new TwoExpPdf("decay_model", "decay_model", *rChannels, *tau1_ch, *tau2_ch, *I_tau2_);
-        }
-        // Two-exponential model
-        else if(constants->getDecayModel() == "3exp"){
-            RooRealVar* tau1 = storage->getOrMakeNew("tau1", "1st_exponent_lifetime", 0.15, 0.1, 0.7, "ns");
-            RooFormulaVar* tau1_ch = new RooFormulaVar("tau1_ch", "@0/@1", RooArgList(*tau1, *channelWidth));
-            RooRealVar* tau2 = storage->getOrMakeNew("tau2", "2nd_exponent_lifetime", 0.5, 0.2, 3.0, "ns");
-            RooFormulaVar* tau2_ch = new RooFormulaVar("tau2_ch", "@0/@1", RooArgList(*tau2, *channelWidth));
-            RooRealVar* tau3 = storage->getOrMakeNew("tau3", "3rd_exponent_lifetime", 1, 0.5, 15, "ns");
-            RooFormulaVar* tau3_ch = new RooFormulaVar("tau3_ch", "@0/@1", RooArgList(*tau3, *channelWidth));
-            RooRealVar* I_tau2 = storage->getOrMakeNew("I_tau2", "2nd_exponent_fraction", 10, 0, 100, "%");
-            RooFormulaVar* I_tau2_ = new RooFormulaVar("I_tau2_", "@0/100.", *I_tau2);
-            RooRealVar* I_tau3 = storage->getOrMakeNew("I_tau3", "3rd_exponent_fraction", 2, 0, 100, "%");
-            RooFormulaVar* I_tau3_ = new RooFormulaVar("I_tau3_", "@0/100.", *I_tau3);
-            decay_model = new ThreeExpPdf("decay_model", "decay_model", *rChannels, *tau1_ch, *tau2_ch, *tau3_ch, *I_tau2_, *I_tau3_);
-        }
-        // Trapping Model
-        else if (constants->getDecayModel() == "trapping"){
-            RooRealVar* tauBulk = storage->getOrMakeNew("tauBulk", "e+_lifetime_in_source", 0.15, 0.1, 0.3, "ns");
-            RooFormulaVar* tauBulk_ch = new RooFormulaVar("tauBulk_ch", "@0/@1", RooArgList(*tauBulk, *channelWidth));
-            RooRealVar* tauVac = storage->getOrMakeNew("tauVac", "e+_lifetime_in_vacancy", 0.2, 0.1, 0.3, "ns");
-            RooFormulaVar* tauVac_ch = new RooFormulaVar("tauVac_ch", "@0/@1", RooArgList(*tauVac, *channelWidth));
-            RooRealVar* kappaVac = storage->getOrMakeNew("kappaVac", "vacancy_trapping_rate", 1, 1E-2, 1E2, "1/ns");
-            RooFormulaVar* kappaVac_ch = new RooFormulaVar("kappaVac_ch", "@0*@1", RooArgList(*kappaVac, *channelWidth));
-            decay_model = new TrapPdf("decay_model", "decay_model", *rChannels, *tauBulk_ch, *tauVac_ch, *kappaVac_ch);
-        }
-        // Grain Boundary Model
-        else if (constants->getDecayModel() == "grain"){
-            RooRealVar* tauBulk = storage->getOrMakeNew("tauBulk", "e+_lifetime_in_source", 0.120, 0.120, 0.120, "ns");
-            RooFormulaVar* lambdaBulk = new RooFormulaVar("lambdaBulk", "1/@0", *tauBulk);
-            RooFormulaVar* lambdaBulk_ch = new RooFormulaVar("lambdaBulk_ch", "@0*@1", RooArgList(*lambdaBulk, *channelWidth));
-
-            RooRealVar* tauGrain = storage->getOrMakeNew("tauGrain", "e+_lifetime_in_grain", 0.140, 0.140, 0.140, "ns");
-            RooFormulaVar* lambdaGrain = new RooFormulaVar("lambdaGrain", "1/@0", *tauGrain);
-            RooFormulaVar* lambdaGrain_ch = new RooFormulaVar("lambdaGrain_ch", "@0*@1", RooArgList(*lambdaGrain, *channelWidth));
-
-            RooRealVar* tauVac = storage->getOrMakeNew("tauVac", "e+_lifetime_in_vacancy", 0.180, 0.180, 0.180, "ns");
-            RooFormulaVar* lambdaVac = new RooFormulaVar("lambdaVac", "1/@0", *tauVac);
-            RooFormulaVar* lambdaVac_ch = new RooFormulaVar("lambdaVac_ch", "@0*@1", RooArgList(*lambdaVac, *channelWidth));
-
-            RooRealVar* kappaVac = storage->getOrMakeNew("kappaVac", "vacancy_trapping_rate", 1, 1E-2, 1E2, "1/ns");
-            RooFormulaVar* kappaVac_ch = new RooFormulaVar("kappaVac_ch", "@0*@1", RooArgList(*kappaVac, *channelWidth));
-
-            RooRealVar* lambdaJ = storage->getOrMakeNew("lambdaJ", "grain_trapping_rate", 1, 1E-2, 1E2, "1/ns");
-            RooFormulaVar* lambdaJ_ch = new RooFormulaVar("lambdaJ_ch", "@0*@1", RooArgList(*lambdaJ, *channelWidth));
-
-            // Initialize cache
-//            MyPdfCache* myPdfCache = new MyPdfCache(100, MIN_CHANNEL, MAX_CHANNEL);
-//            MyPdf::myPdfCache = myPdfCache;
-
-//            decay_model = new MyPdf("decay_model", "decay_model", *rChannels, *lambdaJ_ch, *lambdaBulk_ch, *lambdaGrain_ch, *lambdaVac_ch, *kappaVac_ch);
-            // add cache to model - counts 10x faster
-
-            decay_model = new GrainPdf("decay_model", "decay_model", *rChannels, *lambdaJ_ch, *lambdaBulk_ch, *lambdaGrain_ch, *lambdaVac_ch, *kappaVac_ch);
-        }
 
 	/*
           _________
@@ -636,7 +461,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             std::cout << "Doing Ranges!" << std::endl;
             rChannels->setRange("LEFT",1, EXCLUDE_MIN_CHANNEL);
             rChannels->setRange("RIGHT",EXCLUDE_MAX_CHANNEL, rChannels->getBins());
-            simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::Range("LEFT,RIGHT"), RooFit::NumCPU(getNumCpu()));
+	    Int_t numCpu = RootHelper::getNumCpu();
+            simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::Range("LEFT,RIGHT"), RooFit::NumCPU(numCpu));
 
 
             // Define ranges for every spectrum, then use SplitRange... (not worked)
@@ -662,7 +488,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 
         }
         else {
-            simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::NumCPU(getNumCpu()));
+	    Int_t numCpu = RootHelper::getNumCpu();	    
+            simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::NumCPU(numCpu));
         }
 
         RooMinimizer:
@@ -803,7 +630,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             graphFrame[i]->GetYaxis()->SetTitleOffset(0.5);
 
             if (doRange){
-                drawRegion(graphFrame[i], EXCLUDE_MIN_CHANNEL, EXCLUDE_MAX_CHANNEL);
+                GraphicsHelper::drawRegion(graphFrame[i], EXCLUDE_MIN_CHANNEL, EXCLUDE_MAX_CHANNEL);
             }
 
             graphFrame[i]->Draw(); // Draw frame on current canvas (pad)
@@ -819,7 +646,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             chiFrame[i]->GetXaxis()->SetTitleOffset(2);
 
             if (doRange){
-                drawRegion(chiFrame[i], EXCLUDE_MIN_CHANNEL, EXCLUDE_MAX_CHANNEL);
+                GraphicsHelper::drawRegion(chiFrame[i], EXCLUDE_MIN_CHANNEL, EXCLUDE_MAX_CHANNEL);
             }
 
             // Draw horizontal line along residuals
@@ -920,8 +747,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
     // Write
     //std::cout << "Current date and time is " << getCurrentTime() << std::endl;
 
-    watch.Stop();
-    watch.Print();
+	RootHelper::stopAndPrintTimer();
     return 1;
 }
 

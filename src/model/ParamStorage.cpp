@@ -94,23 +94,18 @@ Bool_t ParamStorage::isSet(const char* name){
     return obj != NULL;
 }
 
-RooRealVar* ParamStorage::getOrMakeNew(const char* name, const char* description, Double_t value, Double_t minValue, Double_t maxValue, const char *unit){
-    // ObjectNamer makes sure we don't have two variables with same name
-    // It generates "name1", "name2" - unique names for a given one
-    ObjectNamer* namer = ObjectNamer::getInstance();
-    const char* uniqueName = namer->getUniqueName(name);
-    
+RooRealVar* ParamStorage::getOrMakeNew(const char* name, const char* description, Double_t value, Double_t minValue, Double_t maxValue, const char *unit){   
     // Return variable if it was in file
-    if (isSet(uniqueName)){
-        return get(uniqueName);
+    if (isSet(name)){
+        return get(name);
     }
     // Or just define a new one
     RooRealVar* var;
     std::string strDescription(description);  
-    std::string strName(uniqueName); 
+    std::string strName(name); 
     // If parameter is resolution function related - use default values
     if (strName.find("zero")==0 || strName.find("g1")*strName.find("g2")*strName.find("g3")==0){
-        var = new RooRealVar(uniqueName, description, value, minValue, maxValue, unit);
+        var = new RooRealVar(name, description, value, minValue, maxValue, unit);
     }
     // For model parameters - ask to input from keyboard 
     else {
@@ -142,7 +137,7 @@ RooRealVar* ParamStorage::getOrMakeNew(const char* name, const char* description
 //            }            
         }
         else {
-            var = new RooRealVar(uniqueName, description, inputValue, inputMinValue, inputMaxValue, unit);        
+            var = new RooRealVar(name, description, inputValue, inputMinValue, inputMaxValue, unit);        
         }
     }
     parameters->Add(var);

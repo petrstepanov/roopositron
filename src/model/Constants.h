@@ -25,8 +25,7 @@ public:
     Constants(const Constants& orig);
     virtual ~Constants();
     
-    int getConvolutionBins();
-//    int getNumCPU();
+//    int getConvolutionBins();
     int getNumberOfChannels();
     double getChannelWidth();
     int getSkipLines();
@@ -34,33 +33,36 @@ public:
     int getMaxChannel();
     int getExcludeMinChannel();
     int getExcludeMaxChannel();    
-    std::string getResolutionFunctionModel();    
-    std::string getDecayModel();
-    std::string getSourceContributionModel();
+    const char* getResolutionFunctionModel();    
+    std::vector<const char*> getDecayModels();
+    std::vector<const char*> getCommonParameters();
+//    std::string getSourceContributionModel();
     int getImageWidth();
     int getImageHeight();
     void print();
-    bool isNew();
+    bool isReadSuccess();
     
 private:
-    int         convolutionBins; // Convolution bins
-//    int         numCPU;          // CPU number
-    int         channels;        // entries in maestro file
-    double      channelWidth;    // ns
-    int         skipLines;       // spectrum header size
-    int         minChannel;      // left channel
-    int         maxChannel;      // right channel
-    int         excludeMinChannel;      // left channel
-    int         excludeMaxChannel;      // right channel
-    std::string resolutionModel; // resolution function model `2gauss` or `3gauss`
-    std::string decayModel;      // decay model `1exp`, `2exp`, `trapping` or `grain`
-    std::string sourceModel;     // 1exp, 2exp (annihilation in air?)
+    int         convolutionBins;        // Convolution bins
+    int         channels;               // entries in maestro file
+    double      channelWidth;           // ns
+    int         skipLines;              // Maestro spectrum header size
+    int         minChannel;             // fit min channel
+    int         maxChannel;             // fit max channel
+    int         excludeMinChannel;      // exclude min channel
+    int         excludeMaxChannel;      // exclude max channel
+    std::string resolutionModel;        // resolution function model `2gauss` or `3gauss`
+    std::string decayModel;             // decay model `1exp`, `2exp`, `trapping` or `grain`
+    std::string sourceModel;            // 1exp, 2exp (annihilation in air?)
+    std::string commonParameters;       // gaussFWHM
     int         imageWidth;
     int         imageHeight;
-    void init();
-    void writeDefaultConstants();
+
+    bool readConstants();
+    void writeConstants();
+    
     const std::string filename = "constants.txt";
-    bool        isnew;
+    bool readSuccess;
 };
 
 #endif /* MY_CONSTANTS */
