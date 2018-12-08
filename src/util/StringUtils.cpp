@@ -86,3 +86,12 @@ bool StringUtils::isSubstring(const char* parent, const char* child) {
     }
     return false;
 }
+
+bool StringUtils::stringEnds(std::string& string, std::string& ending) {
+    if (string.length() >= ending.length()) {
+        return (0 == string.compare(string.length() - ending.length(), ending.length(), ending));
+    }
+    else {
+        return false;
+    }
+}

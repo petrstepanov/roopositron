@@ -27,17 +27,12 @@
 
 class FileUtils {
 public:
-    FileUtils();
-    FileUtils(const FileUtils& orig);
-    virtual ~FileUtils();
-    
-    std::list<std::string> getFilenamesInDrectory(std::string directory, const char* extension);
-    void importTH1F(TH1F* fullTH1F, std::string& filename, int channels, int skipLines, int minChannel, int maxChannel);
-    void saveImage(TCanvas*, const char*);
+    static std::vector<std::string> getFilenamesInCurrentDrectory(const char* extension);
+    static TH1F* importTH1F(std::string filename, int i);
+    static void saveImage(TCanvas*, const char*);
     static void createDirectory(std::string directoryName);
     
 private:
-    bool stringEnds(std::string& string, std::string& ending);
     std::string getCurrentPath();
     const char kPathSeparator =
 #ifdef _WIN32

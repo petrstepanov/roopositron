@@ -25,6 +25,7 @@ public:
     static const char* appendSuffix(const char*, int suffix);
     static const char* appendSuffix(const char*, const char*);
     static bool isSubstring(const char* parent, const char* find);
+    static bool stringEnds(std::string& string, std::string& ending);
 };
 
 #endif /* STRINGUTILS_H */
