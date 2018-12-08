@@ -41,7 +41,7 @@ void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentId
     // Build component PDFs
     for (std::vector<std::string>::const_iterator it = componentIds.begin(); it != componentIds.end(); ++it){
 //	std::cout << "Component " << *it << std::endl;
-	RooAbsPdf* pdf = PdfServer::getPdf((*it).c_str(), observable);
+	RooAbsPdf* pdf = PdfServer::getPdf(((std::string)*it).c_str(), observable);
 	// pdfNamer makes sure there are no two pdfs of a same type with same name (want exp, exp2, exp3)
 //	pdfNamer->fixUniqueName(pdf);
 	pdfAndCoeficientsNamer->fixUniquePdfAndParameterNames(pdf, observable);
@@ -96,15 +96,14 @@ void AdditiveConvolutionPdf::initCoefficients(){
 }
 
 void AdditiveConvolutionPdf::convoluteComponents(RooRealVar *observable){
-//    std::cout << std::endl << "AdditiveConvolutionPdf::convoluteComponents" << std::endl;
     // Convolute components
     for (unsigned i = 0; i < componentsNumber; i++){
 	RooAbsArg* arg = (componentsList->at(i));
-	RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(arg);	
-	RooFFTConvPdf* convCompPdf = new RooFFTConvPdf(TString::Format("compConv%d", i + 1), TString::Format("Convoluted component %d", i + 1), *observable, *component, *resolutionFunction);
+	RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(arg);
+	RooFFTConvPdf* convCompPdf = new RooFFTConvPdf(TString::Format("%dconvolutedComponent", i), TString::Format("%d Convoluted component", i), *observable, *component, *resolutionFunction);
 	convolutedComponentsList->add(*convCompPdf);
     }
-//    convolutedComponentsList->Print();
+    convolutedComponentsList->Print();
     
     // Convolute source contribution
     convolutedSourcePdf = new RooFFTConvPdf("convolutedSourcePdf", "Convoluted source PDF", *observable, *sourcePdf, *resolutionFunction);

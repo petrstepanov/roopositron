@@ -26,12 +26,20 @@ ParametersPool::ParametersPool(std::string ioPath){
 }
 
 void ParametersPool::constructExcludedParametersList(){
-    excludedParameterNames.push_back("gaussMean");
-//    excludedParameterNames.push_back("gauss1FWHM");
-//    excludedParameterNames.push_back("gauss2FWHM");
-//    excludedParameterNames.push_back("gauss2Frac");
-//    excludedParameterNames.push_back("gauss3FWHM");
-//    excludedParameterNames.push_back("gauss3Frac");
+    // Don't save mean value (not important for results)
+    parametersExcludedFromSave.push_back("gaussMean");
+    parametersExcludedFromSave.push_back("bgCount");
+    
+    // Don't user input gauss FWHM's and Intensities
+    // Always use default values. Otherwise it's too much stuff
+    parametersExcludedFromInput.push_back("gaussMean");
+    parametersExcludedFromInput.push_back("bgCount");
+    parametersExcludedFromInput.push_back("gauss1FWHM");
+    parametersExcludedFromInput.push_back("gauss2FWHM");
+    parametersExcludedFromInput.push_back("gauss2Frac");
+    parametersExcludedFromInput.push_back("gauss3FWHM");
+    parametersExcludedFromInput.push_back("gauss3Frac");
+
 }
 
 RooArgSet* ParametersPool::readPoolParametersFromFile(const char* filename){
@@ -66,12 +74,13 @@ RooArgSet* ParametersPool::readPoolParametersFromFile(const char* filename){
     }
     fclose(pFile);  
     
-    std::cout << "\"" << filename << "\" found. Successfully read " << parametersPool->getSize() << "values." << std::endl;
+    std::cout << "\"" << filename << "\" found. Successfully read " << parametersPool->getSize() << " values." << std::endl;
     return parametersPool;
 }
 
 void ParametersPool::updateModelParametersValuesFromPool(RooArgSet* modelParameters){
-    std::cout << std::endl << "Hit ENTER to use default parameter values." << std::endl;
+    std::cout << std::endl << "Updating model parameters from pool." << std::endl;
+    std::cout << "Hit ENTER to use default parameter values." << std::endl;
 
     // Iterate through model parameters. Either extend values from pool parameters from hard drive.
     TIterator* it = modelParameters->createIterator();
@@ -89,8 +98,10 @@ void ParametersPool::updateModelParametersValuesFromPool(RooArgSet* modelParamet
 		// TODO: set error if not constant?
 		parameter->setConstant(poolParameter->isConstant());
 	    } else {
-		if (!StringUtils::contains(parameter->GetName(), excludedParameterNames)){
+		if (!StringUtils::stringContainsToken(parameter->GetName(), parametersExcludedFromInput)){
 		    userInput(parameter);
+		}
+		if (!StringUtils::stringContainsToken(parameter->GetName(), parametersExcludedFromSave)){
 		    parametersPool->add(*parameter);		    
 		}
 	    }
@@ -100,9 +111,9 @@ void ParametersPool::updateModelParametersValuesFromPool(RooArgSet* modelParamet
 
 void ParametersPool::userInput(RooRealVar* parameter){
     std::string input;   
-    std::cout << std::endl << "Input \"" << parameter->GetName() << " - " << parameter->GetTitle() << "." << std::endl;
+    std::cout << std::endl << "Input \"" << parameter->GetName() << "\" - " << parameter->GetTitle() << "." << std::endl;
 
-    std::cout << "Value (" << parameter->getVal() << " " << parameter->getUnit() << "): ";
+    std::cout << "Value (default is " << parameter->getVal() << " " << parameter->getUnit() << "): ";
     std::getline(std::cin, input);
     if (!input.empty()) {
 	Double_t value;
@@ -110,15 +121,17 @@ void ParametersPool::userInput(RooRealVar* parameter){
         stream >> value;
 	parameter->setVal(value);
     }
-    std::cout << "Parameter is " << (parameter->isConstant() ? "fixed":"free") << ". Ok (y/n)?";  
-    char c;
-    std::cin >> c;
-    if (c=='n'){
-	parameter->setConstant(!parameter->isConstant());
-	std::cout << "Set to " << (parameter->isConstant()?"fixed":"free") << std::endl;
+    std::cout << "Parameter is " << (parameter->isConstant() ? "fixed":"free") << ". Ok (y/n)? ";  
+    std::getline(std::cin, input);
+    if (!input.empty()) {
+    	char character = input.at(0);
+	if (character == 'n' || character == 'N') {
+	    parameter->setConstant(!parameter->isConstant());
+	    std::cout << "Set to " << (parameter->isConstant()?"fixed":"free") << "." << std::endl;
+	}
     }
     if (!parameter->isConstant()){
-	std::cout << "Min value (" << parameter->getMin() << " " << parameter->getUnit() << "): ";
+	std::cout << "Min value (default is " << parameter->getMin() << " " << parameter->getUnit() << "): ";
 	std::getline(std::cin, input);
 	if (!input.empty()) {
 	    Double_t value;
@@ -127,7 +140,7 @@ void ParametersPool::userInput(RooRealVar* parameter){
 	    parameter->setMin(value);
 	}
 
-	std::cout << "Max value (" << parameter->getMax() << " " << parameter->getUnit() << "): ";
+	std::cout << "Max value (default is " << parameter->getMax() << " " << parameter->getUnit() << "): ";
 	std::getline(std::cin, input);
 	if (!input.empty()) {
 	    Double_t value;
@@ -136,7 +149,7 @@ void ParametersPool::userInput(RooRealVar* parameter){
 	    parameter->setMax(value);
 	}
     }
-    else {
+//    else {
 	// For correct rounding using autoprecision in legend
 //	if(TString(unit).EqualTo("ns")){
 //            var->setError(0.001);
@@ -144,7 +157,7 @@ void ParametersPool::userInput(RooRealVar* parameter){
 //        if(TString(unit).EqualTo("%")){
 //            var->setError(0.1);
 //        }   	
-    }
+//    }
 }
 
 Bool_t ParametersPool::save(){

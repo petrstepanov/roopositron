@@ -65,6 +65,24 @@ bool StringUtils::contains(const char* string, std::vector<std::string> vector) 
     return false;
 }
 
+bool StringUtils::containsSubstring(const char* string, std::vector<std::string> vector) {
+    for (std::vector<std::string>::iterator it = vector.begin(); it!=vector.end(); ++it){
+	if (isSubstring((std::string)*it,string)){
+	    return true;
+	}
+    }
+    return false;
+}
+
+bool StringUtils::stringContainsToken(const char* string, std::vector<std::string> vector) {
+    for (std::vector<std::string>::iterator it = vector.begin(); it!=vector.end(); ++it){
+	if (isSubstring(string, (std::string)*it)){
+	    return true;
+	}
+    }
+    return false;
+}
+
 const char* StringUtils::appendSuffix(const char* string, int suffix) {
     std::string s = std::to_string(suffix);
     return appendSuffix(string, s.c_str());
@@ -80,12 +98,17 @@ const char* StringUtils::appendSuffix(const char* string, const char* suffix) {
 bool StringUtils::isSubstring(const char* parent, const char* child) {
     std::string parentString (parent);
     std::string childString (child);
-    std::size_t found = parentString.find(childString);
+    return isSubstring(parentString, childString);
+}
+
+bool StringUtils::isSubstring(std::string parent, std::string child) {
+    std::size_t found = parent.find(child);
     if (found != std::string::npos){
 	return true;
     }
     return false;
 }
+
 
 bool StringUtils::stringEnds(std::string& string, std::string& ending) {
     if (string.length() >= ending.length()) {

@@ -54,7 +54,7 @@ TH1F* FileUtils::importTH1F(std::string filename, int i){
     }
     
     inFile.close();
-    histogram->Print();
+    return histogram;
 }
 
 void FileUtils::createDirectory(std::string directoryName) {

@@ -45,6 +45,7 @@
 
 #include "util/GraphicsHelper.h"
 #include "util/StringUtils.h"
+#include "util/HistProcessor.h"
 #include "roofit/AdditiveConvolutionPdf.h"
 #include "roofit/ModelCommonizer.h"
 #include "util/ObjectNamer.h"
@@ -69,13 +70,12 @@ typedef std::pair<std::string, RooDataHist*> dhistPair;
 struct Spectrum {
     TH1F* histogram;              // ROOT histogram
     std::string filename;
-    Int_t counts;                 // total counts
+    Double_t counts;                 // total counts
     Int_t channels;
     Int_t minimumBin;             // bin number with minimum event count
     Int_t maximumBin;             // bin number with maximum event count
-    Int_t minimumCount;           // minimum count across all bins
-    Int_t maximumCount;           // maximum count across all bins
-    Int_t averageBackgroundCount;
+    Double_t minimumCount;           // minimum count across all bins
+    Double_t maximumCount;           // maximum count across all bins
 };
 
 // ASCII font generator is here: http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Resolution%0AFunction
@@ -93,8 +93,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	    TH1F* histogram = FileUtils::importTH1F(filenames[i], i);
 	    s.histogram = histogram;
 	    s.filename = filenames[i];
-	    s.counts = histogram->GetIntegral();
 	    s.channels = histogram->GetXaxis()->GetNbins();
+	    s.counts = histogram->Integral();
 	    s.minimumBin = histogram->GetMinimumBin();
 	    s.maximumBin = histogram->GetMaximumBin();
 	    s.minimumCount = histogram->GetBinContent(histogram->GetMinimumBin());
@@ -115,8 +115,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	const char** array = new const char*[filenames.size()];
 	unsigned index = 0;
 	std::string* sFileNames = new std::string[filenames.size()];
-	for (std::list<std::string>::const_iterator it = filenames.begin(); it != filenames.end(); ++it) {
-		sFileNames[index] = it->c_str();
+	for (std::vector<std::string>::iterator it = filenames.begin(); it != filenames.end(); ++it) {
+		sFileNames[index] = ((std::string)*it).c_str();
 		index++;
 	}
 
@@ -147,7 +147,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
                 // Open File
                 std::cout << std::endl << "Spectrum " << i + 1 << " filename is \"" << sFileNames[i] << "\"" << std::endl;
                 std::string path = sFileNames[i];
-		fullTH1F[i] = FileUtils::importTH1F(path, CHANNELS, SKIP_LINES, MIN_CHANNEL, MAX_CHANNEL);
+		fullTH1F[i] = FileUtils::importTH1F(path, i);
 
 		iTopChannel[i] = fullTH1F[i]->GetMaximumBin();
 		iLowChannel[i] = fullTH1F[i]->GetMinimumBin();
@@ -180,7 +180,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	}
 
 	// Construct additive decay models
-	ObjectNamer* simultaneousNamer = new ObjectNamer("_");
+	ObjectNamer* simultaneousNamer = new ObjectNamer("-");
         RooAbsPdf** decay_model = new RooAbsPdf*[iNumberOfFiles];
 	RooAbsPdf** res_funct = new RooAbsPdf*[iNumberOfFiles];
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
@@ -196,46 +196,51 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	    // Initialize background here
 	    RooPolynomial* bg = new RooPolynomial("bg", "y=1", *rChannels, RooArgSet());
 	    Double_t averageBackground = HistProcessor::getAverageBackground(fullTH1F[i]);
-	    Double_t bins = fullTH1F[i]->GetXaxis()->GetNbins();
+	    Int_t b = fullTH1F[i]->GetXaxis()->GetNbins();
 	    // Parameterize background as counts, not as fraction
-	    RooRealVar* bgCount = new RooRealVar("bgCount", "Background level counts", averageBackground, averageBackground/2, averageBackground*2);
-	    RooConstVar* bins = new RooConstVar("bins", "Histogram bins", bins);
-	    RooConstVar* fullIntegral = new RooConstVar("fullIntegral", "Full histogram integral", fullTH1F[i]->Integral(1, bins));
-	    RooFormulaVar** IBg = new RooFormulaVar("IBg", "@0*@1/@2", RooArgList(*bgCount, *bins, *fullIntegral));	    
+	    RooRealVar* bgCount = new RooRealVar("bgCount", "Background level counts", averageBackground, averageBackground/2, averageBackground*2, "counts");
+	    RooConstVar* bins = new RooConstVar("bins", "Histogram bins", b);
+	    RooConstVar* fullIntegral = new RooConstVar("fullIntegral", "Full histogram integral", fullTH1F[i]->Integral(1, b));
+	    RooFormulaVar* IBg = new RooFormulaVar("IBg", "@0*@1/@2", RooArgList(*bgCount, *bins, *fullIntegral));	    
 	    
 	    decay_model[i] = new RooAddPdf("componentsSourceBackgroundModel", "Components model with source contribution and background", RooArgList(*bg, *pdf), *IBg);
 	    res_funct[i] = acp->getResolutionFunction();
 	    
 	    // Run namer, add "_#" to every parameter and model name
-	    simultaneousNamer->fixUniquePdfAndParameterNames(decay_model[i], rChannels);
+//	    simultaneousNamer->fixUniquePdfAndParameterNames(decay_model[i], rChannels);
 	}
 
-	// Introduce common parameters if more than one spectrum (simultaneous fit).
-	if (iNumberOfFiles > 1){
-	    // Initialize comonizer, read parameters from the first spectrum
-	    ModelCommonizer* commonizer = new ModelCommonizer(decay_model[0], rChannels, constants->getCommonParameters());	
-	    // All other spectra 
-	    for (unsigned i = 1; i < iNumberOfFiles; i++){
-		RooAbsPdf* newPdf = commonizer->replaceParametersWithCommon(decay_model[i]);
-		decay_model[i] = newPdf;
-	    }
-	}
+//	// Introduce common parameters if more than one spectrum (simultaneous fit).
+//	if (iNumberOfFiles > 1){
+//	    // Initialize commonizer, read parameters from the first spectrum
+//	    ModelCommonizer* commonizer = new ModelCommonizer(decay_model[0], rChannels, constants->getCommonParameters());	
+//	    // All other spectra 
+//	    for (unsigned i = 1; i < iNumberOfFiles; i++){
+//		RooAbsPdf* newPdf = commonizer->replaceParametersWithCommon(decay_model[i]);
+//		decay_model[i] = newPdf;
+//	    }
+//	}
 
 	// Output
 	std::cout << std::endl << "Constructed following models" << std::endl;
 	for (unsigned i = 0; i < iNumberOfFiles; i++){	
-	    RootHelper::printPdfCoefficientNames(decay_model[i], rChannels);
+	    std::cout << std::endl << "Model " << i+1 << ": " << decay_model[i]->GetName() << std::endl;
+	    //RootHelper::printPdfCoefficientNames(decay_model[i], rChannels);
+	    decay_model[i]->Print();
 	}	
 	
 	// Create output folder out of model components' names and resolution function name, e.g. "exp-exp-2gauss"
 	std::string outputPath = StringUtils::joinStrings(constants->getDecayModels())
-			       + constants->getResolutionFunctionModel();
+			       + "-" + constants->getResolutionFunctionModel();
 	FileUtils::createDirectory(outputPath);
 	
 	// Read models' parameters from the pool.
 	// User input parameter values from keyboard if not found in the pool
 	ParametersPool* storage = new ParametersPool(outputPath);
-
+	for (unsigned i = 0; i<iNumberOfFiles; i++){
+	    storage->updateModelParametersValuesFromPool(decay_model[i]->getParameters(*rChannels));
+	}	
+	
 
 	// Obtain and store number of free parameters for every model (why?)
 	RooArgSet** floatPars = new RooArgSet*[iNumberOfFiles];
@@ -301,7 +306,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
             simPdf->addPdf(*decay_model[i], types[i].Data());
 	}
-
+	RootHelper::printPdfCoefficientNames(simPdf, rChannels);
         // simPdf->fitTo(*combData) ;
 	// simPdf->fitTo(*combData, NumCPU(NUM_CPU));
 
@@ -355,7 +360,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
         // m->setStrategy(); // RooMinimizer::Speed (default), RooMinimizer::Balance, RooMinimizer::Robustness
         m->setMinimizerType("Minuit");
         Int_t resultMigrad = 1; //m->migrad();
-        Int_t resultHesse = 1; //m->hesse();
+        Int_t resultHesse = 2; //m->hesse();
         std::cout << "RooMinimizer: migrad=" << resultMigrad << ", hesse=" << resultHesse << std::endl;
 
 	RooArgSet* simFloatPars = simPdf->getParameters(*combinedData);
@@ -418,7 +423,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             }
 
             //                std::string legendLabel = constants->getDecayModel() + " model parameters";
-            decay_model[i]->paramOn(graphFrame[i], RooFit::Layout(0.78, 0.97, 0.9), RooFit::Format("NEU", RooFit::AutoPrecision(3)), RooFit::ShowConstants(kTRUE));// , Label(legendLabel.c_str()) Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);
+            decay_model[i]->paramOn(graphFrame[i], RooFit::Layout(0.78, 1, 0.9), RooFit::Format("NEU", RooFit::AutoPrecision(3)), RooFit::ShowConstants(kTRUE));// , Label(legendLabel.c_str()) Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);
 
             graphFrame[i]->Print("V");
 	}

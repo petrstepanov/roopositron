@@ -30,9 +30,9 @@ void ObjectNamer::fixUniquePdfAndParameterNames(RooAbsPdf* pdf, RooRealVar* obse
 
     // Fix pdf's coefficient names
     RooArgSet* params = pdf->getParameters(*observable);
-    TIterator* it2 = params->createIterator();
+    TIterator* it = params->createIterator();
     TObject* temp;
-    while((temp = it2->Next())){
+    while((temp = it->Next())){
 	TNamed* named = dynamic_cast<TNamed*>(temp);
 	if(named){
 	    fixUniqueName(named);
@@ -44,11 +44,13 @@ void ObjectNamer::fixUniqueName(TNamed* object) {
     std::string name = object->GetName();
     // If name is not unique add prefix to it
     if (findName(name) == kTRUE){
-	name = getPrefixedName(name);
-	object->SetName(name.c_str());
-    }
+	std::string newName = getPrefixedName(name);
+	object->SetName(newName.c_str());
+	names.push_back(newName);		
+    } else {
     // Remember object's name
-    names.push_back(name);
+	names.push_back(name);	
+    }
 }
 
 std::string ObjectNamer::getPrefixedName(std::string name) {

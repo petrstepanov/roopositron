@@ -55,8 +55,8 @@ std::vector<std::string> ModelCommonizer::initCommonParameters(RooAbsPdf* pdf, s
 	if(rrv){
 	    Bool_t isCommon = StringUtils::contains(rrv->GetName(), defaultCommonNames);
 	    std::cout << std::left << std::setw(TAB_WIDTH) << rrv->GetName() 
-		      << std::left << std::setw(TAB_WIDTH) << rrv->GetTitle()
-		      << std::left << std::setw(TAB_WIDTH) << isCommon << std::endl;
+		      << std::left << std::setw(2*TAB_WIDTH) << rrv->GetTitle()
+		      << (isCommon?"common":"") << std::endl;
 	}
     }
 

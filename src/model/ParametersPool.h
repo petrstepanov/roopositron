@@ -32,8 +32,10 @@ public:
 private:
     std::string filePathName;
     RooArgSet* parametersPool;
-    std::vector<std::string> excludedParameterNames;   
-    const std::string DEFAULT_FILENAME = "constants.txt";
+    std::vector<std::string> parametersExcludedFromSave;
+    std::vector<std::string> parametersExcludedFromInput;
+
+    const std::string DEFAULT_FILENAME = "parameters.txt";
 
     void constructExcludedParametersList();
     Bool_t addParameterToPool(RooRealVar *);
