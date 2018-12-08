@@ -487,7 +487,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             graphFrame[i]->GetXaxis()->SetLabelColor(0);
             graphFrame[i]->GetXaxis()->SetTitleSize(0);
             graphFrame[i]->GetYaxis()->SetLabelSize(fontSize - 0.01);
-//            graphFrame[i]->GetYaxis()->SetRangeUser(1, iUpperLimit[i]);
+            graphFrame[i]->GetYaxis()->SetRangeUser(1, iUpperLimit[i]);
             graphFrame[i]->GetYaxis()->SetTitleSize(fontSize);
             graphFrame[i]->GetYaxis()->SetTitleOffset(0.5);
 
