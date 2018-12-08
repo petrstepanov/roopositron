@@ -53,7 +53,7 @@ private:
     
     RooConstVar* channelWidth;
     const std::string DEFAULT_FILENAME = "constants.txt";
-    const int TAB_SIZE = 12; 
+    const int TAB_SIZE = 20; 
 };
 
 #endif /* MY_CONSTANTS */

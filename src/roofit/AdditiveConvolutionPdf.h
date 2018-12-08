@@ -31,6 +31,7 @@ public:
     void initCoefficients();
 
     RooAbsPdf* getPdf();
+    RooAbsPdf* getResolutionFunction();
     
 private:
     void initComponents(std::vector<std::string> componentIds, RooRealVar* observable);

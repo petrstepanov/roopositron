@@ -25,9 +25,10 @@ RooAbsPdf* SourceProvider::initPdf() {
     RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
     
     // Instantiate RooRealVar parameters
-    RooRealVar* tSource = new RooRealVar("tSource", "positron lifetime in source", 0.385, "ns");
-    tSource->setConstant(kTRUE);
-    RooFormulaVar* tSourceCh = new RooFormulaVar("tSourceCh", "@0/@1", RooArgList(*tSource, *channelWidth));
-    // Instantinate model
-    return new ExpPdf("source", "Source contribution model", *observable, *tSourceCh);
+    RooRealVar* tauSource = new RooRealVar("tauSource", "positron lifetime in source", 0.385, "ns");
+    tauSource->setConstant(kTRUE);
+    RooFormulaVar* tauSourceCh = new RooFormulaVar("tauSourceCh", "@0/@1", RooArgList(*tauSource, *channelWidth));
+
+    // Instantiate model
+    return new ExpPdf("source", "Source contribution model", *observable, *tauSourceCh);
 }

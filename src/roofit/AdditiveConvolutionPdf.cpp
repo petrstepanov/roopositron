@@ -131,3 +131,7 @@ void AdditiveConvolutionPdf::constructModel(){
 RooAbsPdf* AdditiveConvolutionPdf::getPdf() {
     return model;
 }
+
+RooAbsPdf* AdditiveConvolutionPdf::getResolutionFunction() {
+    return resolutionFunction;
+}

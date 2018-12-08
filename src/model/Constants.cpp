@@ -26,10 +26,10 @@
 Constants::Constants() {
     // Init default constant values
     constants = initDefaultValues();
+
     // Replace some default values with values read from file
     extendFromFile(constants, DEFAULT_FILENAME);
     writeToFile(constants, DEFAULT_FILENAME);
-    print();
     
     RooStringVar* var = (RooStringVar*) constants->find("channelWidth");
     channelWidth = new RooConstVar("channelWidth", "Width of channel, ns", atof(var->getVal()));    
@@ -51,18 +51,31 @@ Constants::~Constants() {
 
 RooArgList* Constants::initDefaultValues() {
     RooArgList* constants = new RooArgList();
-    constants->add(RooStringVar("channels", "# entries in maestro file", "8192"));
-    constants->add(RooStringVar("channelWidth", "# channel width, ns", "0.006186"));
-    constants->add(RooStringVar("skipLines", "# spectrum header lines", "12"));
-    constants->add(RooStringVar("minChannel", "# left fit channel", "1000"));
-    constants->add(RooStringVar("maxChannel", "# right fit channel", "4000"));
-    constants->add(RooStringVar("excludeMinChannel", "# left exclude channel", "0"));
-    constants->add(RooStringVar("excludeMaxChannel", "# right exclude channel", "0"));
-    constants->add(RooStringVar("resolutionFunction", "# \"2gauss\" or \"3gauss\"", "2gauss"));
-    constants->add(RooStringVar("decayModel", "# comma-separated combination of \"exp\", \"trapping\", \"grain\", e.g. \"exp,exp\"", "exp"));
-    constants->add(RooStringVar("commonParameters", "# comma-separated parameters of simultaneous fit", "gauss1FWHM,gauss2FWHM,gauss3FWHM,tSource"));
-    constants->add(RooStringVar("imageWidth", "# output image width", "1280"));
-    constants->add(RooStringVar("imageHeight", "# output image height", "700"));
+    RooStringVar* constant;
+    constant = new RooStringVar("channels", " # entries in maestro file", "8192");
+    constants->add(*constant);
+    constant = new RooStringVar("channelWidth", " # channel width, ns", "0.006186");
+    constants->add(*constant);
+    constant = new RooStringVar("skipLines", " # spectrum header lines", "12");
+    constants->add(*constant);
+    constant = new RooStringVar("minChannel", " # left fit channel", "1000");
+    constants->add(*constant);
+    constant = new RooStringVar("maxChannel", " # right fit channel", "4000");
+    constants->add(*constant);
+    constant = new RooStringVar("excludeMinChannel", " # left exclude channel", "0");
+    constants->add(*constant);
+    constant = new RooStringVar("excludeMaxChannel", " # right exclude channel", "0");
+    constants->add(*constant);
+    constant = new RooStringVar("resolutionFunction", " # \"2gauss\" or \"3gauss\"", "2gauss");
+    constants->add(*constant);
+    constant = new RooStringVar("decayModel", " # comma-separated names \"exp\", \"trapping\", \"grain\"", "exp");
+    constants->add(*constant);
+    constant = new RooStringVar("commonParameters", " # comma-separated parameters of simultaneous fit", "gauss1FWHM,gauss2FWHM,gauss3FWHM,tauSource,ISource");
+    constants->add(*constant);
+    constant = new RooStringVar("imageWidth", " # output image width", "1280");
+    constants->add(*constant);
+    constant = new RooStringVar("imageHeight", " # output image height", "700");
+    constants->add(*constant);
     return constants;
 }
 
@@ -87,7 +100,8 @@ bool Constants::extendFromFile(RooArgList* constants, std::string filename){
 	// Read description
 	// std::size_t pos = line.find("#"); 
 	// std::string description = line.substr(pos);
-	constantsFromFile->add(RooStringVar(name.c_str(), "", value.c_str()));
+	RooStringVar* constant = new RooStringVar(name.c_str(), "", value.c_str());
+	constantsFromFile->add(*constant);
     }    
     constantsFile.close();
 
@@ -106,20 +120,21 @@ bool Constants::extendFromFile(RooArgList* constants, std::string filename){
     }
     
     std::cout << "\"" << filename << "\" found. Successfully read " << constantsFromFile->getSize() 
-	      << " out of " << constants->getSize() << "values." << std::endl;
+	      << " out of " << constants->getSize() << " values." << std::endl;
     return true;
 }
 
 void Constants::print(){
+    std::cout << std::endl << "Application constants in memory" << std::endl;     
+    
     std::cout << std::endl;
     TIterator* it = constants->createIterator();
     TObject* temp;
     while((temp = it->Next())){
 	RooStringVar* constant = dynamic_cast<RooStringVar*>(temp);
 	if (constant){
-	    std::cout << std::left << std::setw(TAB_SIZE) << constant->GetName()
-		      << std::left << std::setw(TAB_SIZE) << constant->getVal()
-		      << constant->GetTitle() << std::endl;
+	    std::cout << std::left << std::setw(TAB_SIZE) << constant->GetName() << constant->GetTitle() << std::endl
+		      << constant->getVal() << std::endl << std::endl;
 	}
     }      
 }
@@ -136,7 +151,7 @@ void Constants::writeToFile(RooArgList* constants, std::string filename){
 	constant->Print();
 	if (constant){
 	    myfile << std::left << std::setw(TAB_SIZE) << constant->GetName()
-		   << std::left << std::setw(TAB_SIZE) << constant->getVal()
+		   << std::left << std::setw(TAB_SIZE*2) << constant->getVal()
 		   << constant->GetTitle() << std::endl;
 	}
     }
