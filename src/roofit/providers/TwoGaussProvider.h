@@ -23,7 +23,7 @@ public:
     virtual ~TwoGaussProvider();
     
 private:
-    RooAbsPdf* initPdf() override;
+    RooAbsPdf* initPdf();
 };
 
 #endif /* TWOGAUSSPROVIDER_H */

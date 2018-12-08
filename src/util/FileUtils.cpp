@@ -12,6 +12,7 @@
  */
 
 #include "FileUtils.h"
+#include <TUnixSystem.h>
 
 FileUtils::FileUtils() {
 }
@@ -66,6 +67,12 @@ void FileUtils::importTH1F(TH1F* fullTH1F, std::string& filename, int channels, 
 	inFile.close();
 	fullTH1F->Print();
 }
+
+void FileUtils::createDirectory(std::string directoryName) {
+    std::string createDirCommand = "mkdir " + directoryName;
+    gSystem->Exec(createDirCommand.c_str());
+}
+
 
 bool FileUtils::stringEnds(std::string& string, std::string& ending) {
     if (string.length() >= ending.length()) {

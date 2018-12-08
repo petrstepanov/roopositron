@@ -13,189 +13,196 @@
 
 #include "Constants.h"
 #include "../util/StringUtils.h"
+#include "RooStringVar.h"
 #include <vector>
+#include <iostream>
+#include <sstream>
+#include <iomanip>
+#include <fstream>
+#include <list>
+#include <string>
+#include <cstdlib>
 
 Constants::Constants() {
-    // Initialize default values
-    channels        = 8192;        // entries in maestro file
-    channelWidth    = 0.006186;    // ns
-    skipLines       = 12;          // spectrum header size
-    minChannel      = 1000;        // left fit channel
-    maxChannel      = 4000;        // right fit channel   
-    excludeMinChannel = 0;         // left exclude channel
-    excludeMaxChannel = 0;         // right exclude channel
-    resolutionModel = "2gauss";
-    decayModel      = "1exp";
-    sourceModel     = "1exp";
-    commonParameters = "gauss1FWHM,gauss2FWHM,tSource,ISource";
-    imageWidth      = 1280;
-    imageHeight     = 700;    
+    // Init default constant values
+    constants = initDefaultValues();
+    // Replace some default values with values read from file
+    extendFromFile(constants, DEFAULT_FILENAME);
+    writeToFile(constants, DEFAULT_FILENAME);
+    print();
     
-    // Read from file
-    readSuccess = readConstants();
-    if (readSuccess) {
-	print();
-    }
+    RooStringVar* var = (RooStringVar*) constants->find("channelWidth");
+    channelWidth = new RooConstVar("channelWidth", "Width of channel, ns", atof(var->getVal()));    
 }
 
-Constants::Constants(const Constants& orig) {}
+Constants* Constants::instance = NULL;
+
+Constants* Constants::getInstance(){
+    if (!instance){
+        instance = new Constants;
+    }
+    return instance;
+}
+
+RooConstVar* Constants::fwhm2disp = new RooConstVar("fwhm2disp", "Coefficient to convert fwhm to dispersion", 1./(2.*sqrt(2.*log(2.))));
 
 Constants::~Constants() {
 }
 
-bool Constants::isReadSuccess() {
-    return readSuccess;
+RooArgList* Constants::initDefaultValues() {
+    RooArgList* constants = new RooArgList();
+    constants->add(RooStringVar("channels", "# entries in maestro file", "8192"));
+    constants->add(RooStringVar("channelWidth", "# channel width, ns", "0.006186"));
+    constants->add(RooStringVar("skipLines", "# spectrum header lines", "12"));
+    constants->add(RooStringVar("minChannel", "# left fit channel", "1000"));
+    constants->add(RooStringVar("maxChannel", "# right fit channel", "4000"));
+    constants->add(RooStringVar("excludeMinChannel", "# left exclude channel", "0"));
+    constants->add(RooStringVar("excludeMaxChannel", "# right exclude channel", "0"));
+    constants->add(RooStringVar("resolutionFunction", "# \"2gauss\" or \"3gauss\"", "2gauss"));
+    constants->add(RooStringVar("decayModel", "# comma-separated combination of \"exp\", \"trapping\", \"grain\", e.g. \"exp,exp\"", "exp"));
+    constants->add(RooStringVar("commonParameters", "# comma-separated parameters of simultaneous fit", "gauss1FWHM,gauss2FWHM,gauss3FWHM,tSource"));
+    constants->add(RooStringVar("imageWidth", "# output image width", "1280"));
+    constants->add(RooStringVar("imageHeight", "# output image height", "700"));
+    return constants;
 }
 
-bool Constants::readConstants(){
-    // Read from file
-    std::string line;
+bool Constants::extendFromFile(RooArgList* constants, std::string filename){
+    std::cout << std::endl << "Reading app constants from file \"" << filename << "\"." << std::endl; 
+    RooArgSet* constantsFromFile = new RooArgSet();
+    
     std::ifstream constantsFile(filename.c_str());
     if (!constantsFile.is_open()) {
-        std::cout << "Constants::readConstants" << std::endl;        
-        std::cout << "\"" << filename << "\" not found. Generated default constants file." << std::endl;        
-        writeConstants();
+        std::cout << "\"" << filename << "\" not found. Using default values." << std::endl;
         return false;
     }
 
-//    constantsFile >> convolutionBins;
-//    std::getline(constantsFile, line);    
-       
-    constantsFile >> channels;
-    std::getline(constantsFile, line);
-
-    constantsFile >> channelWidth;
-    std::getline(constantsFile, line);
-
-    constantsFile >> skipLines;
-    std::getline(constantsFile, line);
-
-    constantsFile >> minChannel;
-    std::getline(constantsFile, line);
-
-    constantsFile >> maxChannel;
-    std::getline(constantsFile, line);
-
-    constantsFile >> excludeMinChannel;
-    std::getline(constantsFile, line);
-
-    constantsFile >> excludeMaxChannel;
-    std::getline(constantsFile, line);
-    
-    constantsFile >> resolutionModel;
-    std::getline(constantsFile, line);
-
-    constantsFile >> decayModel;
-    std::getline(constantsFile, line);
-
-    constantsFile >> sourceModel;
-    std::getline(constantsFile, line);
-
-    constantsFile >> commonParameters;
-    std::getline(constantsFile, line);
-    
-    constantsFile >> imageWidth;
-    std::getline(constantsFile, line);
-    
-    constantsFile >> imageHeight;
-    std::getline(constantsFile, line);
-    
+    std::string line;
+    while (std::getline(constantsFile, line)){
+	// Read name and value
+	std::istringstream streamLine(line);
+	std::string name, value;
+	streamLine >> name;	
+	streamLine >> value;
+	
+	// Read description
+	// std::size_t pos = line.find("#"); 
+	// std::string description = line.substr(pos);
+	constantsFromFile->add(RooStringVar(name.c_str(), "", value.c_str()));
+    }    
     constantsFile.close();
 
-    std::cout << "Constants::readConstants" << std::endl;        
-    std::cout << "\"" << filename << "\" found. Constants read successfully" << std::endl;     
+    // Iterate default constants and update their values with ones from file
+    TIterator* it = constants->createIterator();
+    TObject* temp;
+    while((temp = it->Next())){
+	RooStringVar* constant = dynamic_cast<RooStringVar*>(temp);
+	if(constant){
+	    const char* name = constant->GetName();
+	    RooStringVar* constantFromFile = (RooStringVar*) constantsFromFile->find(name);
+	    if (constantFromFile){
+		constant->setVal(constantFromFile->getVal());
+	    }
+	}
+    }
+    
+    std::cout << "\"" << filename << "\" found. Successfully read " << constantsFromFile->getSize() 
+	      << " out of " << constants->getSize() << "values." << std::endl;
     return true;
 }
 
 void Constants::print(){
-//    std::cout << "convolutionBins:    " << convolutionBins << std::endl;
-    std::cout << "channels:           " << channels << std::endl;
-    std::cout << "channel width:      " << channelWidth << std::endl;
-    std::cout << "skip lines:         " << skipLines << std::endl;
-    std::cout << "minChannel:         " << minChannel << std::endl;
-    std::cout << "maxChannel:         " << maxChannel << std::endl;
-    std::cout << "excludeMinChannel:  " << excludeMinChannel << std::endl;
-    std::cout << "excludeMaxChannel:  " << excludeMaxChannel << std::endl;
-    std::cout << "resolutionModel:    " << resolutionModel << std::endl;
-    std::cout << "decayModel:         " << decayModel << std::endl;
-    std::cout << "sourceModel:        " << sourceModel << std::endl;    
-    std::cout << "commonParameters:   " << commonParameters << std::endl; 
-    std::cout << "imageWidth:         " << imageWidth << std::endl;   
-    std::cout << "imageHeight:        " << imageHeight << std::endl;       
+    std::cout << std::endl;
+    TIterator* it = constants->createIterator();
+    TObject* temp;
+    while((temp = it->Next())){
+	RooStringVar* constant = dynamic_cast<RooStringVar*>(temp);
+	if (constant){
+	    std::cout << std::left << std::setw(TAB_SIZE) << constant->GetName()
+		      << std::left << std::setw(TAB_SIZE) << constant->getVal()
+		      << constant->GetTitle() << std::endl;
+	}
+    }      
 }
 
-void Constants::writeConstants(){
+void Constants::writeToFile(RooArgList* constants, std::string filename){
+    std::cout << std::endl << "Writing app constants to file \"" << filename << "\"." << std::endl; 
     std::ofstream myfile;
-    myfile.open (filename.c_str());
-//    myfile << std::left << std::setw(12) << convolutionBins   << "# number of bins for convolution" << std::endl;
-    myfile << std::left << std::setw(12) << channels          << "# number of channels in Maestro .Spe file" << std::endl;
-    myfile << std::left << std::setw(12) << channelWidth      << "# channel width, ns" << std::endl;
-    myfile << std::left << std::setw(12) << skipLines         << "# Maestro header size" << std::endl;
-    myfile << std::left << std::setw(12) << minChannel        << "# minimum channel (>= 1), included in plot" << std::endl;
-    myfile << std::left << std::setw(12) << maxChannel        << "# maximum channel, included in plot" << std::endl;
-    myfile << std::left << std::setw(12) << excludeMinChannel << "# exclude region minimum channel, relative to minimum channel (set 0 if not needed)" << std::endl;
-    myfile << std::left << std::setw(12) << excludeMaxChannel << "# exclude region maximum channel, relative to minimum channel" << std::endl;
-    myfile << std::left << std::setw(12) << resolutionModel   << "# resolution model - \"2gauss\" or \"3gauss\"" << std::endl;
-    myfile << std::left << std::setw(12) << decayModel        << "# decay model - \"1exp\", \"2exp\", \"3exp\", \"trapping\", \"grain\"" << std::endl;
-    myfile << std::left << std::setw(12) << sourceModel       << "# source contribution - \"1exp\", \"2exp\" (annihilation in air?)" << std::endl;    
-    myfile << std::left << std::setw(12) << commonParameters  << "# comma-separated parameter names for fitting multiple files - \"gaussFWHM,..\"" << std::endl;    
-    myfile << std::left << std::setw(12) << imageWidth        << "# image width" << std::endl;   
-    myfile << std::left << std::setw(12) << imageHeight       << "# image height" << std::endl;       
+    myfile.open(filename.c_str());
+    
+    TIterator* it = constants->createIterator();
+    TObject* temp;
+    while((temp = it->Next())){
+	RooStringVar* constant = dynamic_cast<RooStringVar*>(temp);
+	constant->Print();
+	if (constant){
+	    myfile << std::left << std::setw(TAB_SIZE) << constant->GetName()
+		   << std::left << std::setw(TAB_SIZE) << constant->getVal()
+		   << constant->GetTitle() << std::endl;
+	}
+    }
     myfile.close();  
 }
 
-//int Constants::getConvolutionBins(){
-//    return convolutionBins;
-//}
-
-//int Constants::getNumCPU(){
-//    return numCPU;
-//}
-
 int Constants::getNumberOfChannels(){
-    return channels;
+    RooStringVar* var = (RooStringVar*) constants->find("channels");
+    return atoi(var->getVal());
 }
 
 double Constants::getChannelWidth(){
+    RooStringVar* var = (RooStringVar*) constants->find("channelWidth");
+    return atof(var->getVal());
+}
+
+RooConstVar* Constants::getRooChannelWidth(){
     return channelWidth;
 }
 
 int Constants::getSkipLines(){
-    return skipLines;
+    RooStringVar* var = (RooStringVar*) constants->find("skipLines");
+    return atoi(var->getVal());
 }
 
 int Constants::getMinChannel(){
-    return minChannel;
+    RooStringVar* var = (RooStringVar*) constants->find("minChannel");
+    return atoi(var->getVal());
 }
 
 int Constants::getMaxChannel(){
-    return maxChannel;
+    RooStringVar* var = (RooStringVar*) constants->find("maxChannel");
+    return atoi(var->getVal());
 }
 
 int Constants::getExcludeMinChannel() {
-    return excludeMinChannel;
+    RooStringVar* var = (RooStringVar*) constants->find("excludeMinChannel");
+    return atoi(var->getVal());
 }
 
 int Constants::getExcludeMaxChannel() {
-    return excludeMaxChannel;
+    RooStringVar* var = (RooStringVar*) constants->find("excludeMaxChannel");
+    return atoi(var->getVal());
 }
 
 const char* Constants::getResolutionFunctionModel(){
-    return resolutionModel.c_str();
+    RooStringVar* var = (RooStringVar*) constants->find("resolutionFunction");    
+    return var->getVal();
 }
 
-std::vector<const char*> Constants::getDecayModels() {
-    return StringUtils::parseString(decayModel);
+std::vector<std::string> Constants::getDecayModels() {
+    RooStringVar* var = (RooStringVar*) constants->find("decayModel");       
+    return StringUtils::parseString(var->getVal());
 }
 
-std::vector<const char*> Constants::getCommonParameters() {
-    return StringUtils::parseString(commonParameters);
+std::vector<std::string> Constants::getCommonParameters() {
+    RooStringVar* var = (RooStringVar*) constants->find("commonParameters");       
+    return StringUtils::parseString(var->getVal());
 }
 
 int Constants::getImageWidth(){
-    return imageWidth;
+    RooStringVar* var = (RooStringVar*) constants->find("imageWidth");
+    return atoi(var->getVal());
 }
 
 int Constants::getImageHeight(){
-    return imageHeight;
+    RooStringVar* var = (RooStringVar*) constants->find("imageHeight");
+    return atoi(var->getVal());
 }

@@ -12,10 +12,11 @@
  */
 
 #include "ExpProvider.h"
+#include "RooRealVar.h"
 #include "RooFormulaVar.h"
 #include "../pdfs/ExpPdf.h"
-#include "../../model/RootConstants.h"
-
+#include "../../model/Constants.h"
+#include <iostream>
 
 ExpProvider::ExpProvider(RooRealVar* _observable) : AbstractProvider(_observable) {}
 
@@ -23,12 +24,12 @@ ExpProvider::~ExpProvider() {
 }
 
 RooAbsPdf* ExpProvider::initPdf() {
-    RooConstVar* channelWidth = RootConstants::getInstance()->channelWidth;
+    RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
     
     // Instantiate RooRealVar parameters
     RooRealVar* tau = new RooRealVar("tau", "positron lifetime", 0.2, 0.05, 2, "ns");
     RooFormulaVar* tauCh = new RooFormulaVar("tauCh", "@0/@1", RooArgList(*tau, *channelWidth));
     
     // Instantinate model
-    return new ExpPdf("exp", "exponential model", *observable, *tauCh);
+    return new ExpPdf("exp", "Exponential model", *observable, *tauCh);
 }

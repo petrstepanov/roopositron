@@ -13,8 +13,8 @@
 
 #include "SourceProvider.h"
 #include "RooFormulaVar.h"
-#include "../../model/RootConstants.h"
 #include "../pdfs/ExpPdf.h"
+#include "../../model/Constants.h"
 
 SourceProvider::SourceProvider(RooRealVar* _observable) : AbstractProvider(_observable) {}
 
@@ -22,12 +22,12 @@ SourceProvider::~SourceProvider() {
 }
 
 RooAbsPdf* SourceProvider::initPdf() {
-    RooConstVar* channelWidth = RootConstants::getInstance()->channelWidth;    
+    RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
     
     // Instantiate RooRealVar parameters
     RooRealVar* tSource = new RooRealVar("tSource", "positron lifetime in source", 0.385, "ns");
     tSource->setConstant(kTRUE);
     RooFormulaVar* tSourceCh = new RooFormulaVar("tSourceCh", "@0/@1", RooArgList(*tSource, *channelWidth));
     // Instantinate model
-    return new ExpPdf("sourcePdf", "Source contribution model", *observable, *tSourceCh);
+    return new ExpPdf("source", "Source contribution model", *observable, *tSourceCh);
 }

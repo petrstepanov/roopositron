@@ -22,11 +22,10 @@ PdfHashNames PdfServer::hashPdfName(const char* pdfName) {
     std::string name = pdfName;
     if (name == "2gauss") return kTwoGaussPdf;
     if (name == "3gauss") return kThreeGaussPdf;	
-    if (name == "1exp") return kOneExponentPdf;
+    if (name == "exp") return kExponentPdf;
     if (name == "trapping") return kTrappingPdf;
     if (name == "grain") return kGrainPdf;
-//    if (name == "2exp") return kTwoExponentPdf;
-    return kOneExponentPdf;
+    return kExponentPdf;
 }
 
 RooAbsPdf* PdfServer::getPdf(const char* name, RooRealVar* observable) {
@@ -43,7 +42,7 @@ RooAbsPdf* PdfServer::getPdf(const char* name, RooRealVar* observable) {
 		return tgp->getPdf();
 	    }
 	    break;
-	case kOneExponentPdf:
+	case kExponentPdf:
 	    {
 		ExpProvider* ep = new ExpProvider(observable);
 		return ep->getPdf();

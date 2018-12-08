@@ -23,7 +23,7 @@ public:
     virtual ~TrappingProvider();
     
 private:
-    RooAbsPdf* initPdf() override;
+    RooAbsPdf* initPdf();
 };
 
 #endif /* TRAPPINGPROVIDER_H */

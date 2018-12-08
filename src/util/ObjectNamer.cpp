@@ -20,37 +20,48 @@
 #include "TObjString.h"
 #include "TNamed.h"
 
-ObjectNamer::ObjectNamer() {
+ObjectNamer::ObjectNamer(const char* prefix) {
+    this->prefix = prefix;
+}
+
+void ObjectNamer::fixUniquePdfAndParameterNames(RooAbsPdf* pdf, RooRealVar* observable) {
+    // Fix pdf name
+    fixUniqueName(pdf);
+
+    // Fix pdf's coefficient names
+    RooArgSet* params = pdf->getParameters(*observable);
+    TIterator* it2 = params->createIterator();
+    TObject* temp;
+    while((temp = it2->Next())){
+	TNamed* named = dynamic_cast<TNamed*>(temp);
+	if(named){
+	    fixUniqueName(named);
+	}
+    }
 }
 
 void ObjectNamer::fixUniqueName(TNamed* object) {
-    const char* currentName = object->GetName();
+    std::string name = object->GetName();
     // If name is not unique add prefix to it
-    if (findName(currentName) == kTRUE){
-	const char* newName = getPrefixedName(currentName);
-	object->SetName(newName);
+    if (findName(name) == kTRUE){
+	name = getPrefixedName(name);
+	object->SetName(name.c_str());
     }
     // Remember object's name
-    names.push_back(object->GetName());
+    names.push_back(name);
 }
 
-const char* ObjectNamer::getPrefixedName(const char* name) {
-    if (findName(name) == kFALSE){
-        names.push_back(name);
-        return name;
-    }
-    for (Int_t i = 2; ; i++) {
-        std::string temp(name + std::to_string(i));
-        const char* name_i = temp.c_str();
-        if (findName(name_i) == kFALSE){
-            std::cout << name_i << std::endl;
-            names.push_back(name_i);
-            return name_i;
-        }
-    }
+std::string ObjectNamer::getPrefixedName(std::string name) {
+    Int_t suffix = 1;
+    std::string newName;
+    do {
+	newName = name + prefix;
+	newName += std::to_string(++suffix);
+    } while(findName(newName) == kTRUE);
+    return newName;
 }
 
-Bool_t ObjectNamer::findName(const char* name) {
+Bool_t ObjectNamer::findName(std::string name) {
     if (std::find(names.begin(), names.end(), name) != names.end()){
         return kTRUE;
     }

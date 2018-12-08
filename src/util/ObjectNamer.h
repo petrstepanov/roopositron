@@ -15,16 +15,21 @@
 #define OBJECTNAMER_H
 
 #include <TList.h>
+#include <RooAbsPdf.h>
+#include <RooRealVar.h>
 
 class ObjectNamer {
 public:
-    ObjectNamer();
-    void fixUniqueName(TNamed* object);
+    ObjectNamer(const char* prefix = "");
+    void fixUniquePdfAndParameterNames(RooAbsPdf* pdf, RooRealVar* observable);
     
 private:
-    const char* getPrefixedName(const char* name);
-    std::vector<std::string> names;
-    Bool_t findName(const char* name);
+    void fixUniqueName(TNamed* object);
+
+    std::string prefix;
+    std::vector<std::string> names;   
+    std::string getPrefixedName(std::string name);
+    Bool_t findName(std::string name);
 };
 
 #endif /* OBJECTNAMER_H */

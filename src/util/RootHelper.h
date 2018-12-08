@@ -16,6 +16,8 @@
 
 #include <TROOT.h>
 #include <TStopwatch.h>
+#include <RooAbsPdf.h>
+#include <RooRealVar.h>
 
 class RootHelper {
 public:
@@ -24,6 +26,7 @@ public:
     static Int_t getNumCpu();
     static void startTimer(void);
     static void stopAndPrintTimer();
+    static void printPdfCoefficientNames(RooAbsPdf* pdf, RooRealVar* observable);
     
 private:
     static TStopwatch* watch;

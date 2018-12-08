@@ -17,23 +17,17 @@
 #include "RooArgList.h"
 #include "RooRealVar.h"
 #include "RooAbsPdf.h"
-#include "../../model/ParamStorage.h"
+#include "../../model/ParametersPool.h"
 
 class AbstractProvider {
 public:
     AbstractProvider(RooRealVar* observable);
     RooAbsPdf* getPdf();
-
-private:
-    void init();
-    virtual RooAbsPdf* initPdf()=0;
-//    virtual RooArgList* initParameters()=0;
-
+    
 protected:
-//    ParamStorage* paramStorage;
+    virtual RooAbsPdf* initPdf()=0;  
     RooRealVar* observable;
-//    RooArgList* parameters;
-    RooAbsPdf* pdf;
+    RooAbsPdf* pdf = NULL;   
 };
 
 #endif /* ABSTRACTPROVIDER_H */

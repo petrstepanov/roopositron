@@ -15,15 +15,12 @@
 
 AbstractProvider::AbstractProvider(RooRealVar* _observable) {
     observable = _observable;
-    init();
-}
-
-void AbstractProvider::init() {
-//    parameters = initParameters();
-    pdf = initPdf();
 }
 
 RooAbsPdf* AbstractProvider::getPdf() {
+    if(pdf == NULL){
+	pdf = initPdf();
+    }
     return pdf;
 }
 

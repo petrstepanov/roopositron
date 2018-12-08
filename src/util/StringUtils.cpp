@@ -13,39 +13,76 @@
 
 #include "StringUtils.h"
 #include <cstring>
+#include <sstream>
 #include <iostream>
 #include <vector>
 
-std::vector<const char*> StringUtils::parseString(const char* string, const char* delimeter) {
+std::vector<std::string> StringUtils::parseString(const char* string, const char* delimeter) {
     std::string s = string;
     return parseString(s, delimeter);
 }
 
-std::vector<const char*> StringUtils::parseString(std::string string, const char* delimeter) {
-    std::string delimiter = ",";
-    std::vector<const char*> tokens;
-
+std::vector<std::string> StringUtils::parseString(std::string s, const char* d) {
+    std::string delimiter = d;
     size_t pos = 0;
     std::string token;
-    while ((pos = string.find(delimiter)) != std::string::npos) {
-        token = string.substr(0, pos);
-        // std::cout << token << std::endl;
-        tokens.push_back(token.c_str());
-        string.erase(0, pos + delimiter.length());
+    std::vector<std::string> tokens;
+//    std::cout << "StringUtils::parseString" << std::endl;     
+//    std::cout << "parsing: \"" << s << "\""<< std::endl;
+    while ((pos = s.find(delimiter)) != std::string::npos) {
+	token = s.substr(0, pos);
+//	std::cout << "token: \"" << token << "\"" << std::endl;
+	tokens.push_back(token);
+	s.erase(0, pos + delimiter.length());
     }
-    // std::cout << s << std::endl;
-    tokens.push_back(string.c_str());
+//    std::cout << "token: \"" << s << "\"" << std::endl;
+    tokens.push_back(s);
     return tokens;
 }
 
-const char* joinStrings(std::vector<const char*> tokens, const char* delimeter){
+std::string StringUtils::joinStrings(std::vector<std::string> tokens, const char* delimeter) {
+//    std::cout << "StringUtils::joinStrings" << std::endl;  
     if (tokens.size() == 1){
+//	std::cout << "token: \"" << tokens.front() << "\"" <<std::endl;
+//	std::cout << "join: \"" << tokens.front().c_str() << "\"" << std::endl;	
 	return tokens.front();
     }
-    std::string string = "";
-    for(std::vector<const char*>::const_iterator i = tokens.begin(); i != tokens.end(); ++i) {
-	string += *i;
+    std::string string = ""; 
+    for(std::vector<std::string>::const_iterator it = tokens.begin(); it != tokens.end(); ++it) {
+//	std::cout << "token: \"" << *it << "\"" <<std::endl;
+	string += *it;
 	string += delimeter;
     }
-    return string .c_str();
+    string = string.substr(0, string.length() - 1);
+//    std::cout << "join: \"" << string.c_str() << "\"" << std::endl;    
+    return string;
+}
+
+bool StringUtils::contains(const char* string, std::vector<std::string> vector) {
+    if (std::find(vector.begin(), vector.end(), string) != vector.end()){
+	return true;
+    }
+    return false;
+}
+
+const char* StringUtils::appendSuffix(const char* string, int suffix) {
+    std::string s = std::to_string(suffix);
+    return appendSuffix(string, s.c_str());
+}
+
+const char* StringUtils::appendSuffix(const char* string, const char* suffix) {
+    std::string temp = string;
+    temp += "_";
+    temp += suffix;
+    return temp.c_str();
+}
+
+bool StringUtils::isSubstring(const char* parent, const char* child) {
+    std::string parentString (parent);
+    std::string childString (child);
+    std::size_t found = parentString.find(childString);
+    if (found != std::string::npos){
+	return true;
+    }
+    return false;
 }

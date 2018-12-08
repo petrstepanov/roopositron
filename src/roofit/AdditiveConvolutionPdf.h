@@ -14,27 +14,27 @@
 #ifndef ADDITIVECONVOLUTIONPDF_H
 #define ADDITIVECONVOLUTIONPDF_H
 
-#include "../model/ParamStorage.h"
-#include "RooAddPdf.h"
+#include "../model/ParametersPool.h"
+#include "RooAbsPdf.h"
 #include "RooFormulaVar.h"
+#include <vector>
 
 class AdditiveConvolutionPdf {
 public:
     // Constructor accepts two strings: "1exp,1exp,trapping" - coma separated component names and 
     // "2gauss" or "3gauss" - resolution function model
-    AdditiveConvolutionPdf(std::vector<const char*> componentIds, const char* resolutionId, RooRealVar* observable);
+    AdditiveConvolutionPdf(std::vector<std::string> componentIds, const char* resolutionId, RooRealVar* observable);
+    virtual ~AdditiveConvolutionPdf();
+
     void constructModel();
-
     void convoluteComponents(RooRealVar* observable);
-
     void initCoefficients();
 
-    virtual ~AdditiveConvolutionPdf();
     RooAbsPdf* getPdf();
     
 private:
-    RooArgList* initComponents(std::vector<const char*> componentIds, RooRealVar* observable);
-    RooAbsPdf* initResolutionModel(const char* resolutionId, RooRealVar* observable);
+    void initComponents(std::vector<std::string> componentIds, RooRealVar* observable);
+    void initResolutionModel(const char* resolutionId, RooRealVar* observable);
     
     RooArgList* componentsList = new RooArgList();
     RooAbsPdf* resolutionFunction; 

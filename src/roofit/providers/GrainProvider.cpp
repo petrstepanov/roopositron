@@ -13,8 +13,8 @@
 
 #include "GrainProvider.h"
 #include "RooFormulaVar.h"
-#include "../../model/RootConstants.h"
 #include "../pdfs/GrainPdf.h"
+#include "../../model/Constants.h"
 
 GrainProvider::GrainProvider(RooRealVar* observable) : AbstractProvider(observable) {}
     
@@ -22,8 +22,8 @@ GrainProvider::~GrainProvider() {
 }
 
 RooAbsPdf* GrainProvider::initPdf() {
-    RooConstVar* fwhm2disp = RootConstants::getInstance()->fwhm2disp;
-    RooConstVar* channelWidth = RootConstants::getInstance()->channelWidth;
+    RooConstVar* fwhm2disp = Constants::fwhm2disp;
+    RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
 	
     RooRealVar* tauBulk = new RooRealVar("tauBulk", "e+_lifetime_in_source", 0.120, 0.120, 0.120, "ns");
     RooFormulaVar* lambdaBulk = new RooFormulaVar("lambdaBulk", "1/@0", *tauBulk);
@@ -50,5 +50,5 @@ RooAbsPdf* GrainProvider::initPdf() {
 //            decay_model = new MyPdf("decay_model", "decay_model", *rChannels, *lambdaJ_ch, *lambdaBulk_ch, *lambdaGrain_ch, *lambdaVac_ch, *kappaVac_ch);
     // add cache to model - counts 10x faster
 
-    return new GrainPdf("decay_model", "decay_model", *observable, *lambdaJCh, *lambdaBulkCh, *lambdaGrainCh, *lambdaVacCh, *kappaVacCh);
+    return new GrainPdf("grain", "Grain model", *observable, *lambdaJCh, *lambdaBulkCh, *lambdaGrainCh, *lambdaVacCh, *kappaVacCh);
 }

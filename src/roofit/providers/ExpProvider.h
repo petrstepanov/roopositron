@@ -16,15 +16,14 @@
 
 #include "AbstractProvider.h"
 #include "RooRealVar.h"
+#include "RooAbsPdf.h"
 
 class ExpProvider : public AbstractProvider {
 public:
     ExpProvider(RooRealVar* observable);
     virtual ~ExpProvider();
-    
-private:
-//    RooArgList* initParameters() override;
-    RooAbsPdf* initPdf() override;
+
+    RooAbsPdf* initPdf();
 };
 
 #endif /* EXPPROVIDER_H */

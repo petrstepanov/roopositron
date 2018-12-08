@@ -18,9 +18,13 @@
 
 class StringUtils {
 public:
-    static std::vector<const char*> parseString(const char* string, const char* delimeter = ",");
-    static std::vector<const char*> parseString(std::string string, const char* delimeter = ",");
-    static const char* joinStrings(std::vector<const char*> tokens, const char* delimeter = "-");
+    static std::vector<std::string> parseString(const char* string, const char* delimeter = ",");
+    static std::vector<std::string> parseString(std::string string, const char* delimeter = ",");
+    static std::string joinStrings(std::vector<std::string> tokens, const char* delimeter = "-");
+    static bool contains(const char* name, std::vector<std::string> names);
+    static const char* appendSuffix(const char*, int suffix);
+    static const char* appendSuffix(const char*, const char*);
+    static bool isSubstring(const char* parent, const char* find);
 };
 
 #endif /* STRINGUTILS_H */

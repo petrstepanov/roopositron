@@ -23,7 +23,7 @@ public:
     virtual ~ThreeGaussProvider();
     
 private:
-    RooAbsPdf* initPdf() override;
+    RooAbsPdf* initPdf();
 };
 
 #endif /* THREEGAUSSPROVIDER_H */

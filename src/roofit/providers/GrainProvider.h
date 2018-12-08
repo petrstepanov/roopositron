@@ -23,7 +23,7 @@ public:
     virtual ~GrainProvider();
 
 private:
-    RooAbsPdf* initPdf() override;
+    RooAbsPdf* initPdf();
 };
 
 #endif /* GRAINPROVIDER_H */

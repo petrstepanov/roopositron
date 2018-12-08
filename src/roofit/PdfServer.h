@@ -19,7 +19,7 @@
 enum PdfHashNames {
     kTwoGaussPdf,
     kThreeGaussPdf,
-    kOneExponentPdf,
+    kExponentPdf,
     kTrappingPdf,
     kGrainPdf
 };
