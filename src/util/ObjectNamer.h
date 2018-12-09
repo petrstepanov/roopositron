@@ -22,6 +22,7 @@ class ObjectNamer {
 public:
     ObjectNamer(const char* prefix = "");
     void fixUniquePdfAndParameterNames(RooAbsPdf* pdf, RooRealVar* observable);
+    static void suffixAllModelParameters(RooAbsPdf* pdf, RooRealVar* observable, Int_t suffix);
     
 private:
     void fixUniqueName(TNamed* object);

@@ -149,19 +149,14 @@ void ParametersPool::userInput(RooRealVar* parameter){
 	    parameter->setMax(value);
 	}
     }
-//    else {
-	// For correct rounding using autoprecision in legend
-//	if(TString(unit).EqualTo("ns")){
-//            var->setError(0.001);
-//        }
-//        if(TString(unit).EqualTo("%")){
-//            var->setError(0.1);
-//        }   	
-//    }
+    else {
+	parameter->setMin(parameter->getVal());
+	parameter->setMax(parameter->getVal());
+    }
 }
 
 Bool_t ParametersPool::save(){
-    std::cout << std::endl << "Saving parameters pool from hard drive." << std::endl;    
+    std::cout << std::endl << "Saving parameters pool to hard drive." << std::endl;    
     FILE* pFile = fopen(filePathName.c_str(), "w");
     if (pFile == NULL) {
 	std::cout << "Error writing to file \"" << filePathName << "\"." << std::endl; 
@@ -176,8 +171,8 @@ Bool_t ParametersPool::save(){
     while((temp = it->Next())){
 	RooRealVar* parameter = dynamic_cast<RooRealVar*>(temp);
 	if(parameter){
-	    const char* type = parameter->isConstant() ? "fixed" : "free";
-	    fprintf(pFile, "%-*s%-*s%-*f%-*f%-*f%-*f%-*s%-*s\n", tab, parameter->GetName(), 32, parameter->GetTitle(), tab, parameter->getVal(), tab, parameter->getMin(), tab, parameter->getMax(), tab, parameter->getError(), 10, parameter->getUnit(), tab, type);
+	    std::string type = parameter->isConstant() ? "fixed" : "free";
+	    fprintf(pFile, "%-*s%-*s%-*f%-*f%-*f%-*f%-*s%-*s\n", tab, parameter->GetName(), 32, parameter->GetTitle(), tab, parameter->getVal(), tab, parameter->getMin(), tab, parameter->getMax(), tab, parameter->getError(), 10, parameter->getUnit(), tab, type.c_str());
 	}
     }
     

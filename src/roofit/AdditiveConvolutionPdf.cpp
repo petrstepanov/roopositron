@@ -44,7 +44,9 @@ void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentId
 	RooAbsPdf* pdf = PdfServer::getPdf(((std::string)*it).c_str(), observable);
 	// pdfNamer makes sure there are no two pdfs of a same type with same name (want exp, exp2, exp3)
 //	pdfNamer->fixUniqueName(pdf);
-	pdfAndCoeficientsNamer->fixUniquePdfAndParameterNames(pdf, observable);
+
+//	pdfAndCoeficientsNamer->fixUniquePdfAndParameterNames(pdf, observable);
+
 	// coefficientsNamer makes sure there are no pdf coeficients with same name (want exp, exp2, exp3)
 //	RooArgSet* params = pdf->getParameters(*observable);
 //	TIterator* it2 = params->createIterator();

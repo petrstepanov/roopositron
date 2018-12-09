@@ -69,3 +69,18 @@ Bool_t ObjectNamer::findName(std::string name) {
     }
     return kFALSE;
 }
+
+void ObjectNamer::suffixAllModelParameters(RooAbsPdf* pdf, RooRealVar* observable, Int_t suffix) {
+    RooArgSet* parameters = pdf->getParameters(*observable);
+    TIterator* it = parameters->createIterator();
+    TObject* temp;
+    while((temp = it->Next())){
+	TNamed* named = dynamic_cast<TNamed*>(temp);
+	if(named){
+	    std::string name = named->GetName();
+	    name += "_";
+	    name += std::to_string(suffix);
+	    named->SetName(name.c_str());
+	}
+    }
+}

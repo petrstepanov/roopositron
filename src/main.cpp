@@ -32,6 +32,8 @@
 #include <TPaveStats.h>
 #include <TLegend.h>
 
+#include "RooWorkspace.h"
+
 #include "util/FileUtils.h"
 #include "util/RootHelper.h"
 
@@ -127,8 +129,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	Int_t* iLowChannel = new Int_t[iNumberOfFiles];
 
 //	// Y axis plotting range
-//	Int_t* iUpperLimit = new Int_t[iNumberOfFiles];
-//	Int_t* iLowerLimit = new Int_t[iNumberOfFiles];
+	Int_t* iUpperLimit = new Int_t[iNumberOfFiles];
+	Int_t* iLowerLimit = new Int_t[iNumberOfFiles];
 
         // Constants object reads values from "constants.txt" file
         Constants* constants = Constants::getInstance();
@@ -162,8 +164,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
                 std::cout << "  Total number of events:" << fullTH1F[i]->Integral() << std::endl;
 
 		// Evaluate counts axis limits (for graphical output)
-//		iUpperLimit[i] = 2 * iMaxCount;
-//		iLowerLimit[i] = iMinCount / 2;
+		iUpperLimit[i] = 2 * iMaxCount;
+		iLowerLimit[i] = iMinCount / 2;
 	}
 
 	// Define Channels Axis
@@ -180,16 +182,19 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	}
 
 	// Construct additive decay models
-	ObjectNamer* simultaneousNamer = new ObjectNamer("-");
+//	ObjectNamer* simultaneousNamer = new ObjectNamer("-");
         RooAbsPdf** decay_model = new RooAbsPdf*[iNumberOfFiles];
 	RooAbsPdf** res_funct = new RooAbsPdf*[iNumberOfFiles];
+	RooWorkspace* w = new RooWorkspace("w","w");
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
 	    AdditiveConvolutionPdf* acp = new AdditiveConvolutionPdf(constants->getDecayModels(), constants->getResolutionFunctionModel(), rChannels);
 	    RooAbsPdf* pdf = acp->getPdf();
 	    
-	    // Hack - set mean gauss values
+	    // Set mean gauss values
 	    RooRealVar* gaussMean = (RooRealVar*) (pdf->getParameters(*rChannels))->find("gaussMean");
-	    if (gaussMean){ 
+	    if (gaussMean){
+		gaussMean->setMin(iTopChannel[i]-50);
+		gaussMean->setMax(iTopChannel[i]+50);
 		gaussMean->setVal(iTopChannel[i]);
 	    }
 	    
@@ -203,30 +208,50 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	    RooConstVar* fullIntegral = new RooConstVar("fullIntegral", "Full histogram integral", fullTH1F[i]->Integral(1, b));
 	    RooFormulaVar* IBg = new RooFormulaVar("IBg", "@0*@1/@2", RooArgList(*bgCount, *bins, *fullIntegral));	    
 	    
-	    decay_model[i] = new RooAddPdf("componentsSourceBackgroundModel", "Components model with source contribution and background", RooArgList(*bg, *pdf), *IBg);
+	    // Final PDFs can have the same name, need to provide resolution protocol
+	    RooAddPdf* pdfWithBg = new RooAddPdf("pdf", "Final model", RooArgList(*bg, *pdf), *IBg);
+	    
+	    // Rename PDF parameters via RooWorkspace
+	    if (i == 0){
+		w->import(*pdfWithBg);
+		decay_model[i] = w->pdf("pdf");
+	    } else {
+		std::string suffix = std::to_string(i+1);
+//		w->import(*pdfWithBg); // "no conflict resolution protocol specified"
+//		w->import(*pdfWithBg, RooFit::RenameAllVariablesExcept(suffix.c_str(), rChannels->GetName()));
+		w->import(*pdfWithBg, RooFit::RenameAllVariablesExcept(suffix.c_str(), rChannels->GetName()), RooFit::RenameAllNodes(suffix.c_str()));
+		std::string pdfName = "pdf_" + std::to_string(i+1);
+		decay_model[i] = w->pdf(pdfName.c_str());
+	    }
 	    res_funct[i] = acp->getResolutionFunction();
+
+	    // from workspace
 	    
 	    // Run namer, add "_#" to every parameter and model name
 //	    simultaneousNamer->fixUniquePdfAndParameterNames(decay_model[i], rChannels);
+//	    ObjectNamer::suffixAllModelParameters(decay_model[i], rChannels, i+1);
 	}
 
-//	// Introduce common parameters if more than one spectrum (simultaneous fit).
-//	if (iNumberOfFiles > 1){
-//	    // Initialize commonizer, read parameters from the first spectrum
-//	    ModelCommonizer* commonizer = new ModelCommonizer(decay_model[0], rChannels, constants->getCommonParameters());	
-//	    // All other spectra 
-//	    for (unsigned i = 1; i < iNumberOfFiles; i++){
-//		RooAbsPdf* newPdf = commonizer->replaceParametersWithCommon(decay_model[i]);
-//		decay_model[i] = newPdf;
-//	    }
-//	}
+	w->Print();
+	
+	// Introduce common parameters if more than one spectrum (simultaneous fit).
+	if (iNumberOfFiles > 1){
+	    // Initialize commonizer, read parameters from the first spectrum
+	    ModelCommonizer* commonizer = new ModelCommonizer(decay_model[0], rChannels, constants->getCommonParameters());	
+	    // All other spectra 
+	    
+	    for (unsigned i = 1; i < iNumberOfFiles; i++){
+		RooAbsPdf* newPdf = commonizer->replaceParametersWithCommon(decay_model[i]);
+		decay_model[i] = newPdf;
+	    }
+	}
 
 	// Output
 	std::cout << std::endl << "Constructed following models" << std::endl;
 	for (unsigned i = 0; i < iNumberOfFiles; i++){	
-	    std::cout << std::endl << "Model " << i+1 << ": " << decay_model[i]->GetName() << std::endl;
-	    //RootHelper::printPdfCoefficientNames(decay_model[i], rChannels);
-	    decay_model[i]->Print();
+//	    std::cout << std::endl << "Model " << i+1 << ": " << decay_model[i]->GetName() << std::endl;
+//	    RootHelper::printPdfCoefficientNames(decay_model[i], rChannels);
+//	    decay_model[i]->Print();
 	}	
 	
 	// Create output folder out of model components' names and resolution function name, e.g. "exp-exp-2gauss"
@@ -359,8 +384,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
         RooMinimizer* m = new RooMinimizer(*simChi2);
         // m->setStrategy(); // RooMinimizer::Speed (default), RooMinimizer::Balance, RooMinimizer::Robustness
         m->setMinimizerType("Minuit");
-        Int_t resultMigrad = 1; //m->migrad();
-        Int_t resultHesse = 2; //m->hesse();
+        Int_t resultMigrad = m->migrad();
+        Int_t resultHesse = m->hesse();
         std::cout << "RooMinimizer: migrad=" << resultMigrad << ", hesse=" << resultHesse << std::endl;
 
 	RooArgSet* simFloatPars = simPdf->getParameters(*combinedData);
