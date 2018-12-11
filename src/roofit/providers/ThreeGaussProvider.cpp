@@ -21,7 +21,7 @@ ThreeGaussProvider::ThreeGaussProvider(RooRealVar* observable) : AbstractProvide
 ThreeGaussProvider::~ThreeGaussProvider() {
 }
 
-RooAbsPdf* ThreeGaussProvider::initPdf() {
+RooAbsPdf* ThreeGaussProvider::initPdf(int i) {
     RooConstVar* fwhm2disp = Constants::fwhm2disp;
     RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
 

@@ -17,9 +17,9 @@ AbstractProvider::AbstractProvider(RooRealVar* _observable) {
     observable = _observable;
 }
 
-RooAbsPdf* AbstractProvider::getPdf() {
+RooAbsPdf* AbstractProvider::getPdf(int i) {
     if(pdf == NULL){
-	pdf = initPdf();
+	pdf = initPdf(i);
     }
     return pdf;
 }

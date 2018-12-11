@@ -23,7 +23,7 @@ public:
     virtual ~ThreeGaussProvider();
     
 private:
-    RooAbsPdf* initPdf();
+    RooAbsPdf* initPdf(int i);
 };
 
 #endif /* THREEGAUSSPROVIDER_H */

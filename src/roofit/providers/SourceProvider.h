@@ -24,7 +24,7 @@ public:
     
 private:
 //    RooArgList* initParameters() override;
-    RooAbsPdf* initPdf();
+    RooAbsPdf* initPdf(int i);
 };
 
 #endif /* EXPPROVIDER_H */

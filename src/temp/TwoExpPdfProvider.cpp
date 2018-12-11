@@ -18,7 +18,7 @@ TwoExpPdfProvider::TwoExpPdfProvider(RooRealVar* _observable) : AbstractProvider
 TwoExpPdfProvider::~TwoExpPdfProvider() {
 }
 
-RooAbsPdf* TwoExpPdfProvider::initPdf() {
+RooAbsPdf* TwoExpPdfProvider::initPdf(int i) {
 //    RooRealVar* tau1 = storage->getOrMakeNew("tau1", "1st_exponent_lifetime", 0.15, 0.1, 0.7, "ns");
 //    RooFormulaVar* tau1_ch = new RooFormulaVar("tau1_ch", "@0/@1", RooArgList(*tau1, *channelWidth));
 //    RooRealVar* tau2 = storage->getOrMakeNew("tau2", "2nd_exponent_lifetime", 0.5, 0.2, 3.0, "ns");

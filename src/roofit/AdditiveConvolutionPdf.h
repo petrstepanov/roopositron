@@ -15,6 +15,7 @@
 #define ADDITIVECONVOLUTIONPDF_H
 
 #include "../model/ParametersPool.h"
+#include "../roofit/PdfServer.h"
 #include "RooAbsPdf.h"
 #include "RooFormulaVar.h"
 #include <vector>
@@ -36,6 +37,8 @@ public:
 private:
     void initComponents(std::vector<std::string> componentIds, RooRealVar* observable);
     void initResolutionModel(const char* resolutionId, RooRealVar* observable);
+
+    PdfServer* pdfServer;
     
     RooArgList* componentsList = new RooArgList();
     RooAbsPdf* resolutionFunction; 

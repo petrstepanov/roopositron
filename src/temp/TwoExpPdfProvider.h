@@ -23,7 +23,7 @@ public:
     
 private:
 //    RooArgList* initParameters() override;
-    RooAbsPdf* initPdf() override;
+    RooAbsPdf* initPdf(int i) override;
 };
 
 #endif /* TWOEXPPDFPROVIDER_H */

@@ -21,7 +21,7 @@ SourceProvider::SourceProvider(RooRealVar* _observable) : AbstractProvider(_obse
 SourceProvider::~SourceProvider() {
 }
 
-RooAbsPdf* SourceProvider::initPdf() {
+RooAbsPdf* SourceProvider::initPdf(int i) {
     RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
     
     // Instantiate RooRealVar parameters

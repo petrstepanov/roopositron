@@ -21,7 +21,7 @@ TwoGaussProvider::TwoGaussProvider(RooRealVar* observable) : AbstractProvider(ob
 TwoGaussProvider::~TwoGaussProvider() {
 }
 
-RooAbsPdf* TwoGaussProvider::initPdf() {
+RooAbsPdf* TwoGaussProvider::initPdf(int i) {
     RooConstVar* fwhm2disp = Constants::fwhm2disp;
     RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
 
@@ -30,7 +30,7 @@ RooAbsPdf* TwoGaussProvider::initPdf() {
     RooFormulaVar* g1Dispersion = new RooFormulaVar("gauss1Dispersion", "@0*@1/@2", RooArgList(*g1FWHM, *fwhm2disp, *channelWidth));
 
     // 2nd gauss FWHM
-    RooRealVar* g2FWHM = new RooRealVar("gauss2FWHM", "2nd gauss FWHM", 0.7, 0.4, 2.0, "ns");
+    RooRealVar* g2FWHM = new RooRealVar("gauss2FWHM", "2nd gauss FWHM", 0.8, 0.4, 2.0, "ns");
     RooFormulaVar* g2Dispersion = new RooFormulaVar("gauss2Dispersion", "@0*@1/@2", RooArgList(*g2FWHM, *fwhm2disp, *channelWidth));
 
     // Fraction of the 2nd gauss

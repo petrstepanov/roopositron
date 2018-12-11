@@ -19,6 +19,7 @@
 #include <RooAddPdf.h>
 
 AdditiveConvolutionPdf::AdditiveConvolutionPdf(std::vector<std::string> componentIds, const char* resolutionId, RooRealVar* observable) {
+    pdfServer = new PdfServer();
     componentsNumber = componentIds.size();
     initComponents(componentIds, observable);
     initResolutionModel(resolutionId, observable);
@@ -35,17 +36,16 @@ void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentId
 //    ObjectNamer* pdfNamer = new ObjectNamer();
 //    ObjectNamer* coefficientsNamer = new ObjectNamer();
 
-    ObjectNamer* pdfAndCoeficientsNamer = new ObjectNamer();
+//    ObjectNamer* pdfAndCoeficientsNamer = new ObjectNamer();
 
-    
     // Build component PDFs
     for (std::vector<std::string>::const_iterator it = componentIds.begin(); it != componentIds.end(); ++it){
 //	std::cout << "Component " << *it << std::endl;
-	RooAbsPdf* pdf = PdfServer::getPdf(((std::string)*it).c_str(), observable);
+	RooAbsPdf* pdf = pdfServer->getPdf(((std::string)*it).c_str(), observable);
 	// pdfNamer makes sure there are no two pdfs of a same type with same name (want exp, exp2, exp3)
 //	pdfNamer->fixUniqueName(pdf);
 
-	pdfAndCoeficientsNamer->fixUniquePdfAndParameterNames(pdf, observable);
+//	pdfAndCoeficientsNamer->fixUniquePdfAndParameterNames(pdf, observable);
 
 	// coefficientsNamer makes sure there are no pdf coeficients with same name (want exp, exp2, exp3)
 //	RooArgSet* params = pdf->getParameters(*observable);
@@ -71,7 +71,7 @@ void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentId
 
 void AdditiveConvolutionPdf::initResolutionModel(const char* resolutionId, RooRealVar* observable) {
 //    std::cout << std::endl << "AdditiveConvolutionPdf::initResolutionModel" << std::endl;
-    resolutionFunction = PdfServer::getPdf(resolutionId, observable);
+    resolutionFunction = pdfServer->getPdf(resolutionId, observable);
 //    resolutionFunction->Print();    
 }
 
@@ -123,10 +123,11 @@ void AdditiveConvolutionPdf::constructModel(){
 	    sumConvolutedComponents = pdf;
     	}
     } else {
-	sumConvolutedComponents = new RooAddPdf("componentsModel", "Components model", *convolutedComponentsList, *recursiveCoefficients, kTRUE);	
+//	sumConvolutedComponents = new RooAddPdf("componentsModel", "Components model", *convolutedComponentsList, *recursiveCoefficients, kTRUE);	
+	sumConvolutedComponents = new RooAddPdf("componentsModel", "Components model", *convolutedComponentsList, *normalizedCoefficients, kTRUE);	
     }
 
-    model = new RooAddPdf("componentsSourceModel", "Components model with source", RooArgList(*convolutedSourcePdf,*sumConvolutedComponents), RooArgList(*ISourceNorm));   
+    model = convolutedSourcePdf; //new RooAddPdf("componentsSourceModel", "Components model with source", RooArgList(*convolutedSourcePdf,*sumConvolutedComponents), RooArgList(*ISourceNorm));   
 }
 
 RooAbsPdf* AdditiveConvolutionPdf::getPdf() {

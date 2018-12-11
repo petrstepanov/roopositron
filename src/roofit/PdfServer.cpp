@@ -18,6 +18,8 @@
 #include "providers/GrainProvider.h"
 #include "providers/TrappingProvider.h"
 
+PdfServer::PdfServer(){}
+
 PdfHashNames PdfServer::hashPdfName(const char* pdfName) {
     std::string name = pdfName;
     if (name == "2gauss") return kTwoGaussPdf;
@@ -33,30 +35,30 @@ RooAbsPdf* PdfServer::getPdf(const char* name, RooRealVar* observable) {
 	case kTwoGaussPdf:
 	    {
 		TwoGaussProvider* tgp = new TwoGaussProvider(observable);
-		return tgp->getPdf();
+		return tgp->getPdf(pdfIndexes[kTwoGaussPdf]++);
 	    }
 	    break;
 	case kThreeGaussPdf:
 	    {
 		ThreeGaussProvider* tgp = new ThreeGaussProvider(observable);
-		return tgp->getPdf();
+		return tgp->getPdf(pdfIndexes[kThreeGaussPdf]++);
 	    }
 	    break;
 	case kExponentPdf:
 	    {
 		ExpProvider* ep = new ExpProvider(observable);
-		return ep->getPdf();
+		return ep->getPdf(pdfIndexes[kExponentPdf]++);
 	    }
 	case kTrappingPdf:
 	    {
 		TrappingProvider* tp = new TrappingProvider(observable);
-		return tp->getPdf();
+		return tp->getPdf(pdfIndexes[kTrappingPdf]++);
 	    }	
 	    break;
 	case kGrainPdf:
 	    {
 		GrainProvider* gp = new GrainProvider(observable);
-		return gp->getPdf();
+		return gp->getPdf(pdfIndexes[kGrainPdf]++);
 	    }	
 	    break;	    
 	default: 

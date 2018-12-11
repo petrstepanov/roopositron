@@ -23,13 +23,13 @@ ExpProvider::ExpProvider(RooRealVar* _observable) : AbstractProvider(_observable
 ExpProvider::~ExpProvider() {
 }
 
-RooAbsPdf* ExpProvider::initPdf() {
+RooAbsPdf* ExpProvider::initPdf(int i) {
     RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
     
     // Instantiate RooRealVar parameters
-    RooRealVar* tau = new RooRealVar("tau", "positron lifetime", 0.2, 0.05, 2, "ns");
-    RooFormulaVar* tauCh = new RooFormulaVar("tauCh", "@0/@1", RooArgList(*tau, *channelWidth));
+    RooRealVar* tau = new RooRealVar((i==0)?"tau":TString::Format("tau%d",i).Data(), "positron lifetime", 0.2, 0.05, 2, "ns");
+    RooFormulaVar* tauCh = new RooFormulaVar((i==0)?"tauCh":TString::Format("tauCh%d",i).Data(), "@0/@1", RooArgList(*tau, *channelWidth));
     
     // Instantinate model
-    return new ExpPdf("exp", "Exponential model", *observable, *tauCh);
+    return new ExpPdf((i==0)?"exp":TString::Format("exp%d",i).Data(), "Exponential model", *observable, *tauCh);
 }

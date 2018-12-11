@@ -25,10 +25,13 @@ enum PdfHashNames {
 };
 
 class PdfServer {
-public:
-    static RooAbsPdf* getPdf(const char* name, RooRealVar* observable);
+public:   
+    PdfServer();
+    RooAbsPdf* getPdf(const char* name, RooRealVar* observable);
+
 private:
     static PdfHashNames hashPdfName(const char* pdfName);
+    int pdfIndexes[16] = {0};
 };
 
 #endif /* PDFHASH_H */

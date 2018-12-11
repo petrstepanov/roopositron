@@ -21,7 +21,7 @@ GrainProvider::GrainProvider(RooRealVar* observable) : AbstractProvider(observab
 GrainProvider::~GrainProvider() {
 }
 
-RooAbsPdf* GrainProvider::initPdf() {
+RooAbsPdf* GrainProvider::initPdf(int i) {
     RooConstVar* fwhm2disp = Constants::fwhm2disp;
     RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
 	

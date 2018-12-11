@@ -23,7 +23,7 @@ public:
     ExpProvider(RooRealVar* observable);
     virtual ~ExpProvider();
 
-    RooAbsPdf* initPdf();
+    RooAbsPdf* initPdf(int i);
 };
 
 #endif /* EXPPROVIDER_H */

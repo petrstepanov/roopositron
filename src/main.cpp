@@ -193,8 +193,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	    // Set mean gauss values
 	    RooRealVar* gaussMean = (RooRealVar*) (pdf->getParameters(*rChannels))->find("gaussMean");
 	    if (gaussMean){
-		gaussMean->setMin(iTopChannel[i]-50);
-		gaussMean->setMax(iTopChannel[i]+50);
+		gaussMean->setMin(iTopChannel[i]-100);
+		gaussMean->setMax(iTopChannel[i]+100);
 		gaussMean->setVal(iTopChannel[i]);
 	    }
 	    
@@ -235,22 +235,22 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	w->Print();
 	
 	// Introduce common parameters if more than one spectrum (simultaneous fit).
-	if (iNumberOfFiles > 1){
-	    // Initialize commonizer, read parameters from the first spectrum
-	    ModelCommonizer* commonizer = new ModelCommonizer(decay_model[0], rChannels, constants->getCommonParameters());	
-	    // All other spectra 
-	    
-	    for (unsigned i = 1; i < iNumberOfFiles; i++){
-		RooAbsPdf* newPdf = commonizer->replaceParametersWithCommon(decay_model[i]);
-		decay_model[i] = newPdf;
-	    }
-	}
+//	if (iNumberOfFiles > 1){
+//	    // Initialize commonizer, read parameters from the first spectrum
+//	    ModelCommonizer* commonizer = new ModelCommonizer(decay_model[0], rChannels, constants->getCommonParameters());	
+//	    // All other spectra 
+//	    
+//	    for (unsigned i = 1; i < iNumberOfFiles; i++){
+//		RooAbsPdf* newPdf = commonizer->replaceParametersWithCommon(decay_model[i]);
+//		decay_model[i] = newPdf;
+//	    }
+//	}
 
 	// Output
 	std::cout << std::endl << "Constructed following models" << std::endl;
 	for (unsigned i = 0; i < iNumberOfFiles; i++){	
 //	    std::cout << std::endl << "Model " << i+1 << ": " << decay_model[i]->GetName() << std::endl;
-//	    RootHelper::printPdfCoefficientNames(decay_model[i], rChannels);
+	    RootHelper::printPdfCoefficientNames(decay_model[i], rChannels);
 //	    decay_model[i]->Print();
 	}	
 	
@@ -261,10 +261,10 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	
 	// Read models' parameters from the pool.
 	// User input parameter values from keyboard if not found in the pool
-	ParametersPool* storage = new ParametersPool(outputPath);
-	for (unsigned i = 0; i<iNumberOfFiles; i++){
-	    storage->updateModelParametersValuesFromPool(decay_model[i]->getParameters(*rChannels));
-	}	
+//	ParametersPool* storage = new ParametersPool(outputPath);
+//	for (unsigned i = 0; i<iNumberOfFiles; i++){
+//	    storage->updateModelParametersValuesFromPool(decay_model[i]->getParameters(*rChannels));
+//	}	
 	
 
 	// Obtain and store number of free parameters for every model (why?)
@@ -296,7 +296,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 
 	// Save storage before fitting to create file with parameters
         // in case   user doesnt want to wait till fitting ends
-        storage->save();
+//        storage->save();
 
         // Make array of category names
         TString* types = new TString[iNumberOfFiles];
@@ -395,7 +395,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	std::cout << "Fit Performed OK!" << std::endl;
 
 	// Save parameters to file
-	storage->save();
+//	storage->save();
 
       	// Variable to store chi2 values for every spectrum
 	RooChi2Var** chi2 = new RooChi2Var*[iNumberOfFiles];

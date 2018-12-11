@@ -21,7 +21,7 @@ TrappingProvider::TrappingProvider(RooRealVar* observable) : AbstractProvider(ob
 TrappingProvider::~TrappingProvider() {
 }
 
-RooAbsPdf* TrappingProvider::initPdf() {
+RooAbsPdf* TrappingProvider::initPdf(int i) {
     RooConstVar* fwhm2disp = Constants::fwhm2disp;
     RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
 	
