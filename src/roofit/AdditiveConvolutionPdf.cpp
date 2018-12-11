@@ -103,14 +103,15 @@ void AdditiveConvolutionPdf::convoluteComponents(RooRealVar *observable){
 	RooAbsArg* arg = (componentsList->at(i));
 	RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(arg);
 	RooFFTConvPdf* convCompPdf = new RooFFTConvPdf(TString::Format("%dconvolutedComponent", i), TString::Format("%d Convoluted component", i), *observable, *component, *resolutionFunction);
+	convCompPdf->setBufferFraction(0.2);
 	convolutedComponentsList->add(*convCompPdf);
     }
     convolutedComponentsList->Print();
     
     // Convolute source contribution
     convolutedSourcePdf = new RooFFTConvPdf("convolutedSourcePdf", "Convoluted source PDF", *observable, *sourcePdf, *resolutionFunction);
+    ((RooFFTConvPdf*)convolutedSourcePdf)->setBufferFraction(0.2);
 }
-
 
 void AdditiveConvolutionPdf::constructModel(){
 //    std::cout << std::endl << "AdditiveConvolutionPdf::constructModel" << std::endl;
@@ -127,7 +128,7 @@ void AdditiveConvolutionPdf::constructModel(){
 	sumConvolutedComponents = new RooAddPdf("componentsModel", "Components model", *convolutedComponentsList, *normalizedCoefficients, kTRUE);	
     }
 
-    model = convolutedSourcePdf; //new RooAddPdf("componentsSourceModel", "Components model with source", RooArgList(*convolutedSourcePdf,*sumConvolutedComponents), RooArgList(*ISourceNorm));   
+    model = new RooAddPdf("componentsSourceModel", "Components model with source", RooArgList(*convolutedSourcePdf,*sumConvolutedComponents), RooArgList(*ISourceNorm));   
 }
 
 RooAbsPdf* AdditiveConvolutionPdf::getPdf() {
@@ -136,4 +137,20 @@ RooAbsPdf* AdditiveConvolutionPdf::getPdf() {
 
 RooAbsPdf* AdditiveConvolutionPdf::getResolutionFunction() {
     return resolutionFunction;
+}
+
+RooArgList* AdditiveConvolutionPdf::getAllComponents() {
+    return componentsList ;
+}
+
+RooArgList* AdditiveConvolutionPdf::getConvolutedComponents() {
+    return convolutedComponentsList;
+}
+
+RooAbsPdf* AdditiveConvolutionPdf::getSourceCompoment() {
+    return sourcePdf;
+}
+
+RooAbsPdf* AdditiveConvolutionPdf::getConvolutedSourceComponent() {
+    return convolutedSourcePdf;
 }

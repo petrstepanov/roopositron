@@ -17,6 +17,7 @@
 #include "RooAbsPdf.h"
 
 enum PdfHashNames {
+    kOneGaussPdf,
     kTwoGaussPdf,
     kThreeGaussPdf,
     kExponentPdf,

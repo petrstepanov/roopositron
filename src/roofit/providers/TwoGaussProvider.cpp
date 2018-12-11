@@ -34,8 +34,8 @@ RooAbsPdf* TwoGaussProvider::initPdf(int i) {
     RooFormulaVar* g2Dispersion = new RooFormulaVar("gauss2Dispersion", "@0*@1/@2", RooArgList(*g2FWHM, *fwhm2disp, *channelWidth));
 
     // Fraction of the 2nd gauss
-    RooRealVar* g2FractionPct = new RooRealVar("gauss2Frac", "2nd gauss fraction", 1, 0, 20, "%");
-    RooFormulaVar* g2Fraction = new RooFormulaVar("gauss2Frac", "@0/100", *g2FractionPct);
+    RooRealVar* g2Fraction = new RooRealVar("gauss2Frac", "2nd gauss fraction", 1, 0, 20, "%");
+    RooFormulaVar* g2FractionNorm = new RooFormulaVar("gauss2FracNorm", "@0/100", *g2Fraction);
 
     // 2nd Gauss shift
 //	RooRealVar** g2_shift = new RooRealVar*[iNumberOfFiles];
@@ -47,5 +47,5 @@ RooAbsPdf* TwoGaussProvider::initPdf(int i) {
 
     // Zero channel start values are assigned later (relative to the MIN_CHANNEL value)
     RooRealVar* gMean = new RooRealVar("gaussMean", "Resolution function mean", 300, 250, 350, "ch");
-    return new TwoGaussian("twoGauss", "Three gauss model", *observable, *gMean, *g1Dispersion, *gMean, *g2Dispersion, *g2Fraction);	
+    return new TwoGaussian("twoGauss", "Two gauss model", *observable, *gMean, *g1Dispersion, *gMean, *g2Dispersion, *g2FractionNorm);	
 }

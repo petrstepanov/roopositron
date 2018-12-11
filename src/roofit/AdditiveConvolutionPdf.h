@@ -33,6 +33,10 @@ public:
 
     RooAbsPdf* getPdf();
     RooAbsPdf* getResolutionFunction();
+    RooArgList* getAllComponents();
+    RooArgList* getConvolutedComponents();
+    RooAbsPdf* getSourceCompoment();
+    RooAbsPdf* getConvolutedSourceComponent();
     
 private:
     void initComponents(std::vector<std::string> componentIds, RooRealVar* observable);

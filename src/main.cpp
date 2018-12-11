@@ -173,7 +173,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	RooRealVar* rChannels = new RooRealVar("rChannels", "Channels axis", 0, MAX_CHANNEL-MIN_CHANNEL+1, "ch");
 	rChannels->setBins(MAX_CHANNEL - MIN_CHANNEL + 1);
 	// Set convolution bins same as 
-	rChannels->setBins(MAX_CHANNEL - MIN_CHANNEL + 1,"cache");
+	rChannels->setBins(MAX_CHANNEL - MIN_CHANNEL + 1);
+//	rChannels->setBins(2048, "cache");
 
 	// Convert TH1F spectra to RooDataHist
 	RooDataHist** histSpectrum = new RooDataHist*[iNumberOfFiles];
@@ -184,7 +185,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	// Construct additive decay models
 //	ObjectNamer* simultaneousNamer = new ObjectNamer("-");
         RooAbsPdf** decay_model = new RooAbsPdf*[iNumberOfFiles];
+//        RooArgList** components = new RooArgList*[iNumberOfFiles];	
+//        RooArgList** convolutedComponents = new RooArgList*[iNumberOfFiles];	
 	RooAbsPdf** res_funct = new RooAbsPdf*[iNumberOfFiles];
+//        RooAbsPdf** source_component = new RooAbsPdf*[iNumberOfFiles];
+//        RooAbsPdf** source_component_convoluted = new RooAbsPdf*[iNumberOfFiles];
+
 	RooWorkspace* w = new RooWorkspace("w","w");
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
 	    AdditiveConvolutionPdf* acp = new AdditiveConvolutionPdf(constants->getDecayModels(), constants->getResolutionFunctionModel(), rChannels);
@@ -217,14 +223,16 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 		decay_model[i] = w->pdf("pdf");
 	    } else {
 		std::string suffix = std::to_string(i+1);
-//		w->import(*pdfWithBg); // "no conflict resolution protocol specified"
-//		w->import(*pdfWithBg, RooFit::RenameAllVariablesExcept(suffix.c_str(), rChannels->GetName()));
 		w->import(*pdfWithBg, RooFit::RenameAllVariablesExcept(suffix.c_str(), rChannels->GetName()), RooFit::RenameAllNodes(suffix.c_str()));
 		std::string pdfName = "pdf_" + std::to_string(i+1);
 		decay_model[i] = w->pdf(pdfName.c_str());
 	    }
+//	    components[i] = acp->getAllComponents();
+//	    convolutedComponents[i] = acp->getConvolutedComponents();
+//	    decay_model[i] = pdfWithBg;
 	    res_funct[i] = acp->getResolutionFunction();
-
+//	    source_component[i] = acp->getSourceCompoment();
+//	    source_component_convoluted[i] = acp->getConvolutedSourceComponent();
 	    // from workspace
 	    
 	    // Run namer, add "_#" to every parameter and model name
@@ -235,16 +243,16 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	w->Print();
 	
 	// Introduce common parameters if more than one spectrum (simultaneous fit).
-//	if (iNumberOfFiles > 1){
-//	    // Initialize commonizer, read parameters from the first spectrum
-//	    ModelCommonizer* commonizer = new ModelCommonizer(decay_model[0], rChannels, constants->getCommonParameters());	
-//	    // All other spectra 
-//	    
-//	    for (unsigned i = 1; i < iNumberOfFiles; i++){
-//		RooAbsPdf* newPdf = commonizer->replaceParametersWithCommon(decay_model[i]);
-//		decay_model[i] = newPdf;
-//	    }
-//	}
+	if (iNumberOfFiles > 1){
+	    // Initialize commonizer, read parameters from the first spectrum
+	    ModelCommonizer* commonizer = new ModelCommonizer(decay_model[0], rChannels, constants->getCommonParameters());	
+	    // All other spectra 
+	    
+	    for (unsigned i = 1; i < iNumberOfFiles; i++){
+		RooAbsPdf* newPdf = commonizer->replaceParametersWithCommon(decay_model[i]);
+		decay_model[i] = newPdf;
+	    }
+	}
 
 	// Output
 	std::cout << std::endl << "Constructed following models" << std::endl;
@@ -258,7 +266,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	std::string outputPath = StringUtils::joinStrings(constants->getDecayModels())
 			       + "-" + constants->getResolutionFunctionModel();
 	FileUtils::createDirectory(outputPath);
-	
+
+		
 	// Read models' parameters from the pool.
 	// User input parameter values from keyboard if not found in the pool
 //	ParametersPool* storage = new ParametersPool(outputPath);
@@ -634,6 +643,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
     }
 
     RootHelper::stopAndPrintTimer();
+    
     return 1;
 }
 

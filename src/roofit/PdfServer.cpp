@@ -12,6 +12,7 @@
  */
 
 #include "PdfServer.h"
+#include "providers/OneGaussProvider.h"
 #include "providers/TwoGaussProvider.h"
 #include "providers/ThreeGaussProvider.h"
 #include "providers/ExpProvider.h"
@@ -22,6 +23,7 @@ PdfServer::PdfServer(){}
 
 PdfHashNames PdfServer::hashPdfName(const char* pdfName) {
     std::string name = pdfName;
+    if (name == "1gauss") return kOneGaussPdf;
     if (name == "2gauss") return kTwoGaussPdf;
     if (name == "3gauss") return kThreeGaussPdf;	
     if (name == "exp") return kExponentPdf;
@@ -32,6 +34,12 @@ PdfHashNames PdfServer::hashPdfName(const char* pdfName) {
 
 RooAbsPdf* PdfServer::getPdf(const char* name, RooRealVar* observable) {
     switch (hashPdfName(name)) {
+	case kOneGaussPdf:
+	    {
+		OneGaussProvider* ogp = new OneGaussProvider(observable);
+		return ogp->getPdf(pdfIndexes[kOneGaussPdf]++);
+	    }
+	    break;
 	case kTwoGaussPdf:
 	    {
 		TwoGaussProvider* tgp = new TwoGaussProvider(observable);
