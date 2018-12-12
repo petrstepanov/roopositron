@@ -35,7 +35,7 @@ Double_t HistProcessor::getConstBackgroundFraction(TH1F* hist){
 
 // Calculate average background value on the left side of the spectrum
 Double_t HistProcessor::getAverageBackground(TH1F* hist) {
-    const Int_t wingBins = 50;
+    const Int_t wingBins = 200;
     Double_t wingIntegral = hist->Integral(1, wingBins);
     return wingIntegral / wingBins;
 }

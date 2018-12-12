@@ -15,6 +15,7 @@
 #include "PdfServer.h"
 #include "../util/ObjectNamer.h"
 #include "providers/SourceProvider.h"
+#include "ReverseAddPdf.h"
 #include <RooFFTConvPdf.h>
 #include <RooAddPdf.h>
 
@@ -125,7 +126,9 @@ void AdditiveConvolutionPdf::constructModel(){
     	}
     } else {
 //	sumConvolutedComponents = new RooAddPdf("componentsModel", "Components model", *convolutedComponentsList, *recursiveCoefficients, kTRUE);	
-	sumConvolutedComponents = new RooAddPdf("componentsModel", "Components model", *convolutedComponentsList, *normalizedCoefficients, kTRUE);	
+//	sumConvolutedComponents = new RooAddPdf("componentsModel", "Components model", *convolutedComponentsList, *normalizedCoefficients, kTRUE);	
+	sumConvolutedComponents = ReverseAddPdf::addPdfRecursive(convolutedComponentsList);	
+
     }
 
     model = new RooAddPdf("componentsSourceModel", "Components model with source", RooArgList(*convolutedSourcePdf,*sumConvolutedComponents), RooArgList(*ISourceNorm));   

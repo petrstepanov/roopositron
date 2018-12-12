@@ -26,7 +26,7 @@ public:
     ParametersPool(std::string ioPath);
 
     void updateModelParametersValuesFromPool(RooArgSet* modelParameters);
-    Bool_t save();
+    Bool_t save(RooArgSet* modelParameters);
     void print();
 
 private:
@@ -36,7 +36,8 @@ private:
     std::vector<std::string> parametersExcludedFromInput;
 
     const std::string DEFAULT_FILENAME = "parameters.txt";
-
+    const unsigned tab = 20;
+    
     void constructExcludedParametersList();
     Bool_t addParameterToPool(RooRealVar *);
     RooArgSet* readPoolParametersFromFile(const char*);   

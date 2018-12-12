@@ -28,7 +28,7 @@ ParametersPool::ParametersPool(std::string ioPath){
 void ParametersPool::constructExcludedParametersList(){
     // Don't save mean value (not important for results)
     parametersExcludedFromSave.push_back("gaussMean");
-    parametersExcludedFromSave.push_back("bgCount");
+//    parametersExcludedFromSave.push_back("bgCount");
     
     // Don't user input gauss FWHM's and Intensities
     // Always use default values. Otherwise it's too much stuff
@@ -51,19 +51,21 @@ RooArgSet* ParametersPool::readPoolParametersFromFile(const char* filename){
 	std::cout << "\"" << filename << "\" file not found." << std::endl; 	
         return parametersPool;
     }
-    char* name = new char[64];
-    char* description = new char[64];
-    char* unit = new char[8];
-    char* type = new char[8];
+    char* name = new char[tab+1];
+    char* description = new char[tab*2+1];
+    char* unit = new char[tab+1];
+    char* type = new char[tab+1];
     Double_t val, min, max, error;
 
     // Skip header
     char buffer[256];
     fgets(buffer, 256, pFile);
-
+    
     // Read parameters
-    while (fscanf(pFile, "%s %s %lf %lf %lf %lf %s %s", name, description, &val, &min, &max, &error, unit, type) == 8){
+    // Scanf with spaces. https://stackoverflow.com/questions/2854488/reading-a-string-with-spaces-with-sscanf
+    while (fscanf(pFile, "%s %lf %lf %lf %lf %s %s %[^\n]s", name, &val, &min, &max, &error, unit, type, description) != EOF){
 	RooRealVar* parameter = new RooRealVar(name, description, val, min, max, unit);
+	parameter->Print();
 	if (strcmp(type, "fixed") == 0){
 	    parameter->setConstant(kTRUE);
 	}
@@ -155,7 +157,22 @@ void ParametersPool::userInput(RooRealVar* parameter){
     }
 }
 
-Bool_t ParametersPool::save(){
+Bool_t ParametersPool::save(RooArgSet* modelParameters){
+    // Iterate through model parameters. Either extend values from pool parameters from hard drive.
+    TIterator* it = modelParameters->createIterator();
+    TObject* temp;
+    while((temp = it->Next())){
+	RooRealVar* modelParameter = dynamic_cast<RooRealVar*>(temp);
+	if(modelParameter){
+	    const char* name = modelParameter->GetName();
+	    RooRealVar* poolParameter = (RooRealVar*) parametersPool->find(name);
+	    // Either set model parameter value, error etc
+	    if (poolParameter){
+		parametersPool->replace(*poolParameter, *modelParameter);
+	    }
+	}
+    }
+    
     std::cout << std::endl << "Saving parameters pool to hard drive." << std::endl;    
     FILE* pFile = fopen(filePathName.c_str(), "w");
     if (pFile == NULL) {
@@ -163,16 +180,16 @@ Bool_t ParametersPool::save(){
         return kFALSE;
     }
     
-    const unsigned tab = 20;
-    fprintf(pFile, "%-*s%-*s%-*s%-*s%-*s%-*s%-*s%-*s\n", tab, "Parameter name", 32, "Description", tab, "Value", tab, "Minimum", tab, "Maximum", tab, "Error", 10, "Unit", tab, "Type");
+    fprintf(pFile, "%-*s%-*s%-*s%-*s%-*s%-*s%-*s%s\n", tab, "Parameter name", tab, "Value", tab, "Minimum", tab, "Maximum", tab, "Error", tab, "Unit", tab, "Type", "Description");
 
-    TIterator* it = parametersPool->createIterator();
-    TObject* temp;
+    // Save parameters
+    it = parametersPool->createIterator();
     while((temp = it->Next())){
 	RooRealVar* parameter = dynamic_cast<RooRealVar*>(temp);
 	if(parameter){
-	    std::string type = parameter->isConstant() ? "fixed" : "free";
-	    fprintf(pFile, "%-*s%-*s%-*f%-*f%-*f%-*f%-*s%-*s\n", tab, parameter->GetName(), 32, parameter->GetTitle(), tab, parameter->getVal(), tab, parameter->getMin(), tab, parameter->getMax(), tab, parameter->getError(), 10, parameter->getUnit(), tab, type.c_str());
+	    std::string freeOrFixed = parameter->isConstant() ? "fixed" : "free";
+	    // https://stackoverflow.com/questions/23776824/what-is-the-meaning-of-s-in-a-printf-format-string/23777065
+	    fprintf(pFile, "%-*s%-*f%-*f%-*f%-*f%-*s%-*s%s\n", tab, parameter->GetName(), tab, parameter->getVal(), tab, parameter->getMin(), tab, parameter->getMax(), tab, parameter->getError(), tab, parameter->getUnit(), tab, freeOrFixed.c_str(), parameter->GetTitle());
 	}
     }
     

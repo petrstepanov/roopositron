@@ -70,7 +70,7 @@ RooArgList* Constants::initDefaultValues() {
     constants->add(*constant);
     constant = new RooStringVar("decayModel", " # comma-separated names \"exp\", \"trapping\", \"grain\"", "exp");
     constants->add(*constant);
-    constant = new RooStringVar("commonParameters", " # comma-separated parameters of simultaneous fit", "gauss1FWHM,gauss2FWHM,gauss3FWHM,tauSource,ISource");
+    constant = new RooStringVar("commonParameters", " # comma-separated parameters of simultaneous fit", "gauss1FWHM,gauss2FWHM,gauss3FWHM,gauss2Frac,gauss3Frac,tauSource,ISource");
     constants->add(*constant);
     constant = new RooStringVar("imageWidth", " # output image width", "1280");
     constants->add(*constant);

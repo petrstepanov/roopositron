@@ -207,9 +207,10 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	    // Initialize background here
 	    RooPolynomial* bg = new RooPolynomial("bg", "y=1", *rChannels, RooArgSet());
 	    Double_t averageBackground = HistProcessor::getAverageBackground(fullTH1F[i]);
-	    Int_t b = fullTH1F[i]->GetXaxis()->GetNbins();
 	    // Parameterize background as counts, not as fraction
 	    RooRealVar* bgCount = new RooRealVar("bgCount", "Background level counts", averageBackground, averageBackground/2, averageBackground*2, "counts");
+	    bgCount->setConstant(kTRUE);
+	    Int_t b = fullTH1F[i]->GetXaxis()->GetNbins();
 	    RooConstVar* bins = new RooConstVar("bins", "Histogram bins", b);
 	    RooConstVar* fullIntegral = new RooConstVar("fullIntegral", "Full histogram integral", fullTH1F[i]->Integral(1, b));
 	    RooFormulaVar* IBg = new RooFormulaVar("IBg", "@0*@1/@2", RooArgList(*bgCount, *bins, *fullIntegral));	    
@@ -270,10 +271,10 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 		
 	// Read models' parameters from the pool.
 	// User input parameter values from keyboard if not found in the pool
-//	ParametersPool* storage = new ParametersPool(outputPath);
-//	for (unsigned i = 0; i<iNumberOfFiles; i++){
-//	    storage->updateModelParametersValuesFromPool(decay_model[i]->getParameters(*rChannels));
-//	}	
+	ParametersPool* storage = new ParametersPool(outputPath);
+	for (unsigned i = 0; i<iNumberOfFiles; i++){
+	    storage->updateModelParametersValuesFromPool(decay_model[i]->getParameters(*rChannels));
+	}	
 	
 
 	// Obtain and store number of free parameters for every model (why?)
@@ -302,10 +303,6 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
                                       \/    \/     \/     \/
 
 	*/
-
-	// Save storage before fitting to create file with parameters
-        // in case   user doesnt want to wait till fitting ends
-//        storage->save();
 
         // Make array of category names
         TString* types = new TString[iNumberOfFiles];
@@ -340,7 +337,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
             simPdf->addPdf(*decay_model[i], types[i].Data());
 	}
-	RootHelper::printPdfCoefficientNames(simPdf, rChannels);
+
+	// Save storage before fitting to create file with parameters
+        // in case   user doesnt want to wait till fitting ends
+        storage->save(simPdf->getParameters(*rChannels));	
+	
+//	RootHelper::printPdfCoefficientNames(simPdf, rChannels);
         // simPdf->fitTo(*combData) ;
 	// simPdf->fitTo(*combData, NumCPU(NUM_CPU));
 
@@ -404,8 +406,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	std::cout << "Fit Performed OK!" << std::endl;
 
 	// Save parameters to file
-//	storage->save();
-
+        storage->save(simPdf->getParameters(*rChannels));
+	
       	// Variable to store chi2 values for every spectrum
 	RooChi2Var** chi2 = new RooChi2Var*[iNumberOfFiles];
 	//  for (i=0; i<iNumberOfFiles; i++) chi2[i] = new RooChi2Var (TString::Format("chi2_%d",i+1),"chi powered",*decay_model_with_source_bg[i],*histSpectrum[i],NumCPU(2),DataError(RooAbsData::Poisson));
