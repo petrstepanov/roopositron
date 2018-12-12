@@ -127,8 +127,7 @@ void AdditiveConvolutionPdf::constructModel(){
     } else {
 //	sumConvolutedComponents = new RooAddPdf("componentsModel", "Components model", *convolutedComponentsList, *recursiveCoefficients, kTRUE);	
 //	sumConvolutedComponents = new RooAddPdf("componentsModel", "Components model", *convolutedComponentsList, *normalizedCoefficients, kTRUE);	
-	sumConvolutedComponents = ReverseAddPdf::addPdfRecursive(convolutedComponentsList);	
-
+	sumConvolutedComponents = ReverseAddPdf::reverseAddPdf(convolutedComponentsList);	
     }
 
     model = new RooAddPdf("componentsSourceModel", "Components model with source", RooArgList(*convolutedSourcePdf,*sumConvolutedComponents), RooArgList(*ISourceNorm));   

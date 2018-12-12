@@ -459,7 +459,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             }
 
             //                std::string legendLabel = constants->getDecayModel() + " model parameters";
-            decay_model[i]->paramOn(graphFrame[i], RooFit::Layout(0.78, 1, 0.9), RooFit::Format("NEU", RooFit::AutoPrecision(3)), RooFit::ShowConstants(kTRUE));// , Label(legendLabel.c_str()) Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);
+            decay_model[i]->paramOn(graphFrame[i], RooFit::Layout(0.78, 0.99, 0.9), RooFit::Format("NEU", RooFit::AutoPrecision(3)), RooFit::ShowConstants(kTRUE));// , Label(legendLabel.c_str()) Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);
 
             graphFrame[i]->Print("V");
 	}
