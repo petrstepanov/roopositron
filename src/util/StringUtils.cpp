@@ -12,10 +12,13 @@
  */
 
 #include "StringUtils.h"
+
 #include <cstring>
 #include <sstream>
 #include <iostream>
 #include <vector>
+#include "TString.h"
+
 
 std::vector<std::string> StringUtils::parseString(const char* string, const char* delimeter) {
     std::string s = string;
@@ -83,16 +86,16 @@ bool StringUtils::stringContainsToken(const char* string, std::vector<std::strin
     return false;
 }
 
-const char* StringUtils::appendSuffix(const char* string, int suffix) {
-    std::string s = std::to_string(suffix);
-    return appendSuffix(string, s.c_str());
-}
+//std::string char* StringUtils::appendSuffix(const char* string, int suffix) {
+//    std::string s = std::to_string(suffix);
+//    return appendSuffix(string, s.c_str());
+//}
 
-const char* StringUtils::appendSuffix(const char* string, const char* suffix) {
+std::string StringUtils::underscoreSuffix(const char* string, const char* suffix) {
     std::string temp = string;
     temp += "_";
     temp += suffix;
-    return temp.c_str();
+    return temp;
 }
 
 bool StringUtils::isSubstring(const char* parent, const char* child) {
@@ -117,4 +120,33 @@ bool StringUtils::stringEnds(std::string& string, std::string& ending) {
     else {
         return false;
     }
+}
+
+std::string StringUtils::suffix(const char* name, int index, const char* nameSuffix) {
+    std::string s = name;
+    s += nameSuffix;
+    if (index == 1){
+	return s;
+    }
+    s += std::to_string(index);
+    return s;
+}
+
+std::string StringUtils::ordinal(const char* name, int index) {
+    if (index == 1){
+	return name;
+    }
+    if (index == 2){
+	std::string s = "2nd ";
+	s += name;
+	return s.c_str();
+    }
+    if (index == 3){
+	std::string s = "3rd ";
+	s += name;
+	return s.c_str();
+    }
+    std::string s = std::to_string(index) + "th ";
+    s += name;
+    return s;
 }

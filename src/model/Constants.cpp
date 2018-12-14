@@ -66,9 +66,11 @@ RooArgList* Constants::initDefaultValues() {
     constants->add(*constant);
     constant = new RooStringVar("excludeMaxChannel", " # right exclude channel", "0");
     constants->add(*constant);
+    constant = new RooStringVar("decayModel", " # comma-separated names \"exp\", \"trapping\", \"grain\"", "exp");
+    constants->add(*constant);
     constant = new RooStringVar("resolutionFunction", " # \"2gauss\" or \"3gauss\"", "2gauss");
     constants->add(*constant);
-    constant = new RooStringVar("decayModel", " # comma-separated names \"exp\", \"trapping\", \"grain\"", "exp");
+    constant = new RooStringVar("sourceComponents", " # number of components in source", "1");
     constants->add(*constant);
     constant = new RooStringVar("commonParameters", " # comma-separated parameters of simultaneous fit", "gauss1FWHM,gauss2FWHM,gauss3FWHM,gauss2Frac,gauss3Frac,tauSource,ISource");
     constants->add(*constant);
@@ -206,6 +208,11 @@ std::vector<std::string> Constants::getDecayModels() {
     RooStringVar* var = (RooStringVar*) constants->find("decayModel");       
     return StringUtils::parseString(var->getVal());
 }
+int Constants::getSourceComponentsNumber() {
+    RooStringVar* var = (RooStringVar*) constants->find("sourceComponents");    
+    return atoi(var->getVal());
+}
+
 
 std::vector<std::string> Constants::getCommonParameters() {
     RooStringVar* var = (RooStringVar*) constants->find("commonParameters");       

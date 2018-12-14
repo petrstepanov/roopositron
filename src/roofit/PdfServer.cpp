@@ -33,40 +33,47 @@ PdfHashNames PdfServer::hashPdfName(const char* pdfName) {
 }
 
 RooAbsPdf* PdfServer::getPdf(const char* name, RooRealVar* observable) {
+    int hashName = hashPdfName(name);
+    pdfIndexes[hashName]++;
+    
     switch (hashPdfName(name)) {
 	case kOneGaussPdf:
 	    {
 		OneGaussProvider* ogp = new OneGaussProvider(observable);
-		return ogp->getPdf(pdfIndexes[kOneGaussPdf]++);
+		return ogp->getPdf(pdfIndexes[kOneGaussPdf]);
 	    }
 	    break;
 	case kTwoGaussPdf:
 	    {
 		TwoGaussProvider* tgp = new TwoGaussProvider(observable);
-		return tgp->getPdf(pdfIndexes[kTwoGaussPdf]++);
+		return tgp->getPdf(pdfIndexes[kTwoGaussPdf]);
 	    }
 	    break;
 	case kThreeGaussPdf:
 	    {
 		ThreeGaussProvider* tgp = new ThreeGaussProvider(observable);
-		return tgp->getPdf(pdfIndexes[kThreeGaussPdf]++);
+		return tgp->getPdf(pdfIndexes[kThreeGaussPdf]);
 	    }
 	    break;
 	case kExponentPdf:
 	    {
+		std::cout << "------------*******" << std::endl;
 		ExpProvider* ep = new ExpProvider(observable);
-		return ep->getPdf(pdfIndexes[kExponentPdf]++);
+		RooAbsPdf* a = ep->getPdf(pdfIndexes[kExponentPdf]);
+		a->Print("v");
+		return a;
+
 	    }
 	case kTrappingPdf:
 	    {
 		TrappingProvider* tp = new TrappingProvider(observable);
-		return tp->getPdf(pdfIndexes[kTrappingPdf]++);
+		return tp->getPdf(pdfIndexes[kTrappingPdf]);
 	    }	
 	    break;
 	case kGrainPdf:
 	    {
 		GrainProvider* gp = new GrainProvider(observable);
-		return gp->getPdf(pdfIndexes[kGrainPdf]++);
+		return gp->getPdf(pdfIndexes[kGrainPdf]);
 	    }	
 	    break;	    
 	default: 

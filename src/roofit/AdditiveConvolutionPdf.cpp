@@ -16,13 +16,15 @@
 #include "../util/ObjectNamer.h"
 #include "providers/SourceProvider.h"
 #include "ReverseAddPdf.h"
+#include "../util/StringUtils.h"
 #include <RooFFTConvPdf.h>
 #include <RooAddPdf.h>
 
-AdditiveConvolutionPdf::AdditiveConvolutionPdf(std::vector<std::string> componentIds, const char* resolutionId, RooRealVar* observable) {
+AdditiveConvolutionPdf::AdditiveConvolutionPdf(std::vector<std::string> componentIds, const char* resolutionId, int sourceComponents, RooRealVar* observable) {
     pdfServer = new PdfServer();
     componentsNumber = componentIds.size();
-    initComponents(componentIds, observable);
+    sourceComponentsNumber = sourceComponents;
+    initComponents(componentIds, sourceComponents, observable);
     initResolutionModel(resolutionId, observable);
     initCoefficients();
     convoluteComponents(observable);
@@ -31,7 +33,7 @@ AdditiveConvolutionPdf::AdditiveConvolutionPdf(std::vector<std::string> componen
 
 AdditiveConvolutionPdf::~AdditiveConvolutionPdf() {}
 
-void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentIds, RooRealVar* observable) {
+void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentIds, int sourceComponents, RooRealVar* observable) {
 //    std::cout << std::endl << "AdditiveConvolutionPdf::initComponents" << std::endl;
 //    std::cout << "Found " << componentsNumber << " components" << std::endl;
 //    ObjectNamer* pdfNamer = new ObjectNamer();
@@ -42,7 +44,8 @@ void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentId
     // Build component PDFs
     for (std::vector<std::string>::const_iterator it = componentIds.begin(); it != componentIds.end(); ++it){
 //	std::cout << "Component " << *it << std::endl;
-	RooAbsPdf* pdf = pdfServer->getPdf(((std::string)*it).c_str(), observable);
+	const char* componentId = ((std::string)*it).c_str();
+	RooAbsPdf* pdf = pdfServer->getPdf(componentId, observable);
 	// pdfNamer makes sure there are no two pdfs of a same type with same name (want exp, exp2, exp3)
 //	pdfNamer->fixUniqueName(pdf);
 
@@ -65,8 +68,12 @@ void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentId
 //    componentsList->Print();
     
     // Build source contribution PDF from ExpPdf, replace "tau" parameter name with "tauSource"
-    SourceProvider* sp = new SourceProvider(observable);
-    sourcePdf = sp->getPdf();
+    for (unsigned i = 1; i <= sourceComponents; i++){
+        SourceProvider* sp = new SourceProvider(observable);
+	RooAbsPdf* sourceComponent = sp->getPdf(i);
+	sourceComponentsList->add(*sourceComponent);
+    }
+    
 //    sourcePdf->Print();    
 }
 
@@ -77,23 +84,7 @@ void AdditiveConvolutionPdf::initResolutionModel(const char* resolutionId, RooRe
 }
 
 void AdditiveConvolutionPdf::initCoefficients(){
-//    std::cout << std::endl << "AdditiveConvolutionPdf::initCoefficients" << std::endl;
-    // Initialize recursive coefficients
-    // https://app.box.com/s/ddokty1zxp8x0wqoug52e260apx2q5gv
-    for (unsigned i = 0; i < componentsNumber-1; i++){
-	// Initialize percent coefficients
-	RooRealVar* I = new RooRealVar(TString::Format("I%d", i+1), TString::Format("Component %d fraction", i+1), 100/componentsNumber, 0, 100, "%");
-	coefficientsList->add(*I);
-	RooFormulaVar* INorm = new RooFormulaVar(TString::Format("I%dNorm", i+1), "@0/100.", *I);
-	normalizedCoefficients->add(*INorm);
-	RooFormulaVar* IRec = (i==0) ? 
-	    new RooFormulaVar(TString::Format("I%dRecursive", i+1), "@0", *INorm):
-	    new RooFormulaVar(TString::Format("I%dRecursive", i+1), "@0/@1*@2/(1-@2)", RooArgList(*(coefficientsList->at(i)),*(coefficientsList->at(i-1)),*(normalizedCoefficients->at(i))));
-	recursiveCoefficients->add(*IRec);
-    }
-//    recursiveCoefficients->Print();
-    
-    // Initialize source contribution coefficient
+        // Initialize source contribution coefficient
     ISource = new RooRealVar("ISource", "Source contribution", 11, 5, 20, "%");
     ISourceNorm = new RooFormulaVar("ISourceNorm", "@0/100", *ISource);
 }
@@ -103,34 +94,36 @@ void AdditiveConvolutionPdf::convoluteComponents(RooRealVar *observable){
     for (unsigned i = 0; i < componentsNumber; i++){
 	RooAbsArg* arg = (componentsList->at(i));
 	RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(arg);
-	RooFFTConvPdf* convCompPdf = new RooFFTConvPdf(TString::Format("%dconvolutedComponent", i), TString::Format("%d Convoluted component", i), *observable, *component, *resolutionFunction);
-	convCompPdf->setBufferFraction(0.2);
-	convolutedComponentsList->add(*convCompPdf);
+	RooFFTConvPdf* pdf = new RooFFTConvPdf(StringUtils::suffix("convolutedComponent", i+1).c_str(), 
+		StringUtils::ordinal("convoluted component", i+1).c_str(), *observable, *component, *resolutionFunction);
+	pdf->setBufferFraction(0.2);
+	convolutedComponentsList->add(*pdf);
     }
     convolutedComponentsList->Print();
-    
+
+    // Convolute source components
+    for (unsigned i = 0; i < sourceComponentsNumber; i++){
+	RooAbsArg* arg = (sourceComponentsList->at(i));
+	RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(arg);
+	RooFFTConvPdf* pdf = new RooFFTConvPdf(StringUtils::suffix("sourceConvolutedComponent", i+1).c_str(), 
+		StringUtils::ordinal("source convoluted component", i+1).c_str(), *observable, *component, *resolutionFunction);
+	pdf->setBufferFraction(0.2);
+	convolutedSourceComponentsList->add(*pdf);
+    }
+    convolutedSourceComponentsList->Print();
+
     // Convolute source contribution
-    convolutedSourcePdf = new RooFFTConvPdf("convolutedSourcePdf", "Convoluted source PDF", *observable, *sourcePdf, *resolutionFunction);
-    ((RooFFTConvPdf*)convolutedSourcePdf)->setBufferFraction(0.2);
+//    convolutedSourcePdf = new RooFFTConvPdf("convolutedSourcePdf", "Convoluted source PDF", *observable, *sourcePdf, *resolutionFunction);
+//    ((RooFFTConvPdf*)convolutedSourcePdf)->setBufferFraction(0.2);
 }
 
 void AdditiveConvolutionPdf::constructModel(){
 //    std::cout << std::endl << "AdditiveConvolutionPdf::constructModel" << std::endl;
     // Sum components
-    RooAbsPdf* sumConvolutedComponents;
-    if (componentsNumber == 1){
-	RooAbsArg* temp = convolutedComponentsList->at(0);
-	RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(temp);
-	if (pdf){
-	    sumConvolutedComponents = pdf;
-    	}
-    } else {
-//	sumConvolutedComponents = new RooAddPdf("componentsModel", "Components model", *convolutedComponentsList, *recursiveCoefficients, kTRUE);	
-//	sumConvolutedComponents = new RooAddPdf("componentsModel", "Components model", *convolutedComponentsList, *normalizedCoefficients, kTRUE);	
-	sumConvolutedComponents = ReverseAddPdf::reverseAddPdf(convolutedComponentsList);	
-    }
+    RooAbsPdf* sumConvolutedComponents = ReverseAddPdf::add(convolutedComponentsList);
+    RooAbsPdf* sumSourceConvolutedComponents = ReverseAddPdf::add(convolutedSourceComponentsList, "Src");
 
-    model = new RooAddPdf("componentsSourceModel", "Components model with source", RooArgList(*convolutedSourcePdf,*sumConvolutedComponents), RooArgList(*ISourceNorm));   
+    model = new RooAddPdf("componentsSourceModel", "Components model with source", RooArgList(*sumSourceConvolutedComponents,*sumConvolutedComponents), RooArgList(*ISourceNorm));   
 }
 
 RooAbsPdf* AdditiveConvolutionPdf::getPdf() {

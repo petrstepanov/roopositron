@@ -77,7 +77,7 @@ std::vector<std::string> ModelCommonizer::initCommonParameters(RooAbsPdf* pdf, s
 
 RooAbsPdf* ModelCommonizer::replaceParametersWithCommon(RooAbsPdf* pdf) {
     // Instantiate Customizer that will replace model parameters
-    RooCustomizer* customizer = new RooCustomizer(*pdf, StringUtils::appendSuffix(pdf->GetName(), "custom"));
+    RooCustomizer* customizer = new RooCustomizer(*pdf, StringUtils::underscoreSuffix(pdf->GetName(), "custom").c_str());
     Bool_t replacedFlag = kFALSE;
     
     // Iterate through model local parameters that might need replacement

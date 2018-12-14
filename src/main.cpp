@@ -193,7 +193,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 
 	RooWorkspace* w = new RooWorkspace("w","w");
 	for (unsigned i = 0; i < iNumberOfFiles; i++){
-	    AdditiveConvolutionPdf* acp = new AdditiveConvolutionPdf(constants->getDecayModels(), constants->getResolutionFunctionModel(), rChannels);
+	    AdditiveConvolutionPdf* acp = new AdditiveConvolutionPdf(constants->getDecayModels(), constants->getResolutionFunctionModel(), constants->getSourceComponentsNumber(), rChannels);
 	    RooAbsPdf* pdf = acp->getPdf();
 	    
 	    // Set mean gauss values

@@ -65,13 +65,13 @@ RooArgSet* ParametersPool::readPoolParametersFromFile(const char* filename){
     // Scanf with spaces. https://stackoverflow.com/questions/2854488/reading-a-string-with-spaces-with-sscanf
     while (fscanf(pFile, "%s %lf %lf %lf %lf %s %s %[^\n]s", name, &val, &min, &max, &error, unit, type, description) != EOF){
 	RooRealVar* parameter = new RooRealVar(name, description, val, min, max, unit);
-	parameter->Print();
 	if (strcmp(type, "fixed") == 0){
 	    parameter->setConstant(kTRUE);
 	}
 	else {
 	    parameter->setError(error);
 	}
+	parameter->Print();
 	parametersPool->add(*parameter);
     }
     fclose(pFile);  
@@ -94,11 +94,16 @@ void ParametersPool::updateModelParametersValuesFromPool(RooArgSet* modelParamet
 	    RooRealVar* poolParameter = (RooRealVar*) parametersPool->find(name);
 	    // Either set model parameter value, error etc
 	    if (poolParameter){
-		parameter->setVal(poolParameter->getVal());
+		std::cout << "Parameter" << poolParameter->GetName() << " found" << std::endl;
+		// Fix: roofit can't set min larger than current max and vice versa
+		parameter->setMin(0);
+		parameter->setMax(100);	
 		parameter->setMin(poolParameter->getMin());
 		parameter->setMax(poolParameter->getMax());
+		parameter->setVal(poolParameter->getVal());
 		// TODO: set error if not constant?
 		parameter->setConstant(poolParameter->isConstant());
+//		int a; std::cin >> a;
 	    } else {
 		if (!StringUtils::stringContainsToken(parameter->GetName(), parametersExcludedFromInput)){
 		    userInput(parameter);

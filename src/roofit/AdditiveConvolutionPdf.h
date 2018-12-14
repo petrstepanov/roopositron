@@ -24,7 +24,7 @@ class AdditiveConvolutionPdf {
 public:
     // Constructor accepts two strings: "1exp,1exp,trapping" - coma separated component names and 
     // "2gauss" or "3gauss" - resolution function model
-    AdditiveConvolutionPdf(std::vector<std::string> componentIds, const char* resolutionId, RooRealVar* observable);
+    AdditiveConvolutionPdf(std::vector<std::string> componentIds, const char* resolutionId, int sourceComponents, RooRealVar* observable);
     virtual ~AdditiveConvolutionPdf();
 
     void constructModel();
@@ -39,12 +39,13 @@ public:
     RooAbsPdf* getConvolutedSourceComponent();
     
 private:
-    void initComponents(std::vector<std::string> componentIds, RooRealVar* observable);
+    void initComponents(std::vector<std::string> componentIds, int sourceComponents, RooRealVar* observable);
     void initResolutionModel(const char* resolutionId, RooRealVar* observable);
 
     PdfServer* pdfServer;
     
     RooArgList* componentsList = new RooArgList();
+    RooArgList* sourceComponentsList = new RooArgList();
     RooAbsPdf* resolutionFunction; 
     
     RooArgList* coefficientsList = new RooArgList(); // in percent
@@ -52,6 +53,7 @@ private:
     RooArgList* recursiveCoefficients = new RooArgList();
     
     RooArgList* convolutedComponentsList = new RooArgList();
+    RooArgList* convolutedSourceComponentsList = new RooArgList();
     RooAbsPdf* model;
 
     RooAbsPdf* sourcePdf;
@@ -62,6 +64,7 @@ private:
     RooFormulaVar* ISourceNorm;
     
     Int_t componentsNumber;
+    Int_t sourceComponentsNumber;
 };
 
 #endif /* ADDITIVECONVOLUTIONPDF_H */

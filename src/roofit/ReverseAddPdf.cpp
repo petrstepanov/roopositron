@@ -19,6 +19,7 @@
 #include "RooRealVar.h"
 #include "RooFormulaVar.h"
 #include "RooAddPdf.h"
+#include "../util/StringUtils.h"
 
 ReverseAddPdf::ReverseAddPdf() {
 }
@@ -85,62 +86,62 @@ ReverseAddPdf::~ReverseAddPdf() {
 //    return RooAddPdf(TString::Format("reverseModelI%s", prefix), TString::Format("Reverse Coefficients Model %s", prefix), *pdfInverseList, *C_i, kTRUE);	
 //}
 
-RooAbsPdf* ReverseAddPdf::addPdfRecursive(RooArgList* pdfList, const char* prefix) {
-    // Construct inverse list;
-    RooArgList* pdfInverseList = new RooArgList();
-    TIterator* it = pdfList->createIterator(kIterBackward);
-    TObject* temp;
-    while((temp = it->Next())){
-	RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(temp);
-	if(pdf){
-	    pdfInverseList->add(*pdf);
-	}
-    }
-    
-    // https://app.box.com/s/jlqd4mpi26x9pnl1a084cyy9knyk0jy0
-    std::cout << "---------------------------------" << std::endl;
-    pdfList->Print();
-    std::cout << "---------------------------------" << std::endl;
-    pdfInverseList->Print();  
+//RooAbsPdf* ReverseAddPdf::addPdfRecursive(RooArgList* pdfList, const char* prefix) {
+//    // Construct inverse list;
+//    RooArgList* pdfInverseList = new RooArgList();
+//    TIterator* it = pdfList->createIterator(kIterBackward);
+//    TObject* temp;
+//    while((temp = it->Next())){
+//	RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(temp);
+//	if(pdf){
+//	    pdfInverseList->add(*pdf);
+//	}
+//    }
+//    
+//    // https://app.box.com/s/jlqd4mpi26x9pnl1a084cyy9knyk0jy0
+//    std::cout << "---------------------------------" << std::endl;
+//    pdfList->Print();
+//    std::cout << "---------------------------------" << std::endl;
+//    pdfInverseList->Print();  
+//
+//    // If one component given just return it
+//    unsigned numberOfComponents = pdfList->getSize();
+//    if (numberOfComponents == 1){
+//	RooAbsArg* arg = pdfList->at(0);
+//	RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(arg);
+//	return pdf;
+//    }
+//    
+//    RooArgList* I_i = new RooArgList();
+//    RooArgList* C_i = new RooArgList();    
+//    for (unsigned i = 0; i < numberOfComponents-1; i++){
+//	// Construct list of original model coefficients
+//	// I_i = [I4, I3, I2]
+//	RooRealVar* I = new RooRealVar(TString::Format("I%s%d", prefix, numberOfComponents-i), TString::Format("Intensity I%s%d", prefix, numberOfComponents-i), 5.0, 0.0, 100.0, "%");
+//	std::cout << "creating coefficient" << std::endl;
+//	I->Print();
+//	RooFormulaVar* INorm = new RooFormulaVar(TString::Format("INorm%s%d", prefix, numberOfComponents-i), "@0/100", *I);
+//	I_i->add(*INorm);
+//	
+//	RooFormulaVar* Ci;
+//	const char* cName = TString::Format("C%s%d", prefix, i+1).Data();
+//	const char* cTitle = TString::Format("Coefficient C%s%d", prefix, i+1).Data();
+//	if (i==0){
+//	    Ci = new RooFormulaVar(cName, cTitle, "@0", RooArgList(*INorm));
+//	} else {
+//	    RooFormulaVar* Ii = INorm;
+//	    RooFormulaVar* Ii_minus_1 = dynamic_cast<RooFormulaVar*>(I_i->at(i-1));
+//	    RooFormulaVar* Cprev = dynamic_cast<RooFormulaVar*>(C_i->at(i-1)); 
+//	    Ci = new RooFormulaVar(cName, cTitle, "@0/@1*@2/(1-@2)", RooArgList(*Ii,*Ii_minus_1,*Cprev));
+//	}
+//
+//	C_i->add(*Ci);	
+//    }
+//
+//    return new RooAddPdf(TString::Format("reverseModel%s", prefix), TString::Format("Reverse Coefficients Model %s", prefix), *pdfInverseList, *C_i, kTRUE);	
+//}
 
-    // If one component given just return it
-    unsigned numberOfComponents = pdfList->getSize();
-    if (numberOfComponents == 1){
-	RooAbsArg* arg = pdfList->at(0);
-	RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(arg);
-	return pdf;
-    }
-    
-    RooArgList* I_i = new RooArgList();
-    RooArgList* C_i = new RooArgList();    
-    for (unsigned i = 0; i < numberOfComponents-1; i++){
-	// Construct list of original model coefficients
-	// I_i = [I4, I3, I2]
-	RooRealVar* I = new RooRealVar(TString::Format("I%s%d", prefix, numberOfComponents-i), TString::Format("Intensity I%s%d", prefix, numberOfComponents-i), 5.0, 0.0, 100.0, "%");
-	std::cout << "creating coefficient" << std::endl;
-	I->Print();
-	RooFormulaVar* INorm = new RooFormulaVar(TString::Format("INorm%s%d", prefix, numberOfComponents-i), "@0/100", *I);
-	I_i->add(*INorm);
-	
-	RooFormulaVar* Ci;
-	const char* cName = TString::Format("C%s%d", prefix, i+1).Data();
-	const char* cTitle = TString::Format("Coefficient C%s%d", prefix, i+1).Data();
-	if (i==0){
-	    Ci = new RooFormulaVar(cName, cTitle, "@0", RooArgList(*INorm));
-	} else {
-	    RooFormulaVar* Ii = INorm;
-	    RooFormulaVar* Ii_minus_1 = dynamic_cast<RooFormulaVar*>(I_i->at(i-1));
-	    RooFormulaVar* Cprev = dynamic_cast<RooFormulaVar*>(C_i->at(i-1)); 
-	    Ci = new RooFormulaVar(cName, cTitle, "@0/@1*@2/(1-@2)", RooArgList(*Ii,*Ii_minus_1,*Cprev));
-	}
-
-	C_i->add(*Ci);	
-    }
-
-    return new RooAddPdf(TString::Format("reverseModel%s", prefix), TString::Format("Reverse Coefficients Model %s", prefix), *pdfInverseList, *C_i, kTRUE);	
-}
-
-RooAbsPdf* ReverseAddPdf::reverseAddPdf(RooArgList* pdfList, const char* prefix) {
+RooAbsPdf* ReverseAddPdf::add(RooArgList* pdfList, const char* coeffName) {
     // Construct inverse list;
     RooArgList* pdfInverseList = new RooArgList();
     TIterator* it = pdfList->createIterator(kIterBackward);
@@ -164,11 +165,68 @@ RooAbsPdf* ReverseAddPdf::reverseAddPdf(RooArgList* pdfList, const char* prefix)
     for (unsigned i = 0; i < numberOfComponents-1; i++){
 	// Construct list of original model coefficients
 	// I_i = [I4, I3, I2]
-	RooRealVar* I = new RooRealVar(TString::Format("I%s%d", prefix, numberOfComponents-i), TString::Format("Intensity I%s%d", prefix, numberOfComponents-i), 5.0, 0.0, 100.0, "%");
-	RooFormulaVar* INorm = new RooFormulaVar(TString::Format("INorm%s%d", prefix, numberOfComponents-i), "@0/100", *I);
+	// 1st "Source" component intensity
+	std::string IName = StringUtils::suffix("I", numberOfComponents-i, coeffName);
+	
+	std::string ITitle = coeffName;
+	if (ITitle.empty()){
+	    ITitle = "component intensity";
+	} else {
+	    ITitle += " component intensity";
+	}
+	ITitle = StringUtils::ordinal(ITitle.c_str(), numberOfComponents-i);
+	
+	RooRealVar* I = new RooRealVar(IName.c_str(), ITitle.c_str(), 5.0, 0.0, 100.0, "%");
+
+	RooFormulaVar* INorm = new RooFormulaVar(TString::Format("INorm%s%d", coeffName, numberOfComponents-i).Data(), "@0/100", *I);
 	I_i->add(*INorm);	
     }
 
-    return new RooAddPdf(TString::Format("reverseModel%s", prefix), TString::Format("Reverse Coefficients Model %s", prefix), *pdfInverseList, *I_i);	
+    return new RooAddPdf(TString::Format("reverseModel%s", coeffName), TString::Format("Reverse Coefficients Model %s", coeffName), *pdfInverseList, *I_i);	
+
+}
+
+RooAbsPdf* ReverseAddPdf::addRecursive(RooArgList* pdfList, const char* coeffName) {
+    // Construct inverse list;
+    RooArgList* pdfInverseList = new RooArgList();
+    TIterator* it = pdfList->createIterator(kIterBackward);
+    TObject* temp;
+    while((temp = it->Next())){
+	RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(temp);
+	if(pdf){
+	    pdfInverseList->add(*pdf);
+	}
+    } 
+    
+    // If one component given just return it
+    unsigned numberOfComponents = pdfList->getSize();
+    if (numberOfComponents == 1){
+	RooAbsArg* arg = pdfList->at(0);
+	RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(arg);
+	return pdf;
+    }
+
+    RooArgList* I_i = new RooArgList();
+    for (unsigned i = 0; i < numberOfComponents-1; i++){
+	// Construct list of original model coefficients
+	// I_i = [I4, I3, I2]
+	// 1st "Source" component intensity
+	std::string IName = StringUtils::suffix("I", numberOfComponents-i, coeffName);
+	
+	std::string ITitle = coeffName;
+	if (ITitle.empty()){
+	    ITitle = "component intensity";
+	} else {
+	    ITitle += " component intensity";
+	}
+	ITitle = StringUtils::ordinal(ITitle.c_str(), numberOfComponents-i);
+	
+	RooRealVar* I = new RooRealVar(IName.c_str(), ITitle.c_str(), 5.0, 0.0, 100.0, "%");
+
+	RooFormulaVar* INorm = new RooFormulaVar(TString::Format("INorm%s%d", coeffName, numberOfComponents-i).Data(), "@0/100", *I);
+	I_i->add(*INorm);	
+    }
+
+    return new RooAddPdf(TString::Format("reverseModel%s", coeffName), TString::Format("Reverse Coefficients Model %s", coeffName), *pdfInverseList, *I_i, kTRUE);	
 
 }

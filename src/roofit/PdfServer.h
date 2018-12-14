@@ -32,7 +32,7 @@ public:
 
 private:
     static PdfHashNames hashPdfName(const char* pdfName);
-    int pdfIndexes[16] = {1};
+    int pdfIndexes[16] = {0};
 };
 
 #endif /* PDFHASH_H */

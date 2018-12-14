@@ -23,8 +23,9 @@ public:
     virtual ~ReverseAddPdf();
     
 //    static addPdf(RooArgList* pdfList, char* intensityNamePrefix = "");
-    static RooAbsPdf* addPdfRecursive(RooArgList* pdfList, const char* prefix = "");
-    static RooAbsPdf* reverseAddPdf(RooArgList* pdfList, const char* prefix = "");
+//    static RooAbsPdf* addPdfRecursive(RooArgList* pdfList, const char* prefix = "");
+    static RooAbsPdf* add(RooArgList* pdfList, const char* prefix = "");
+    static RooAbsPdf* addRecursive(RooArgList* pdfList, const char* prefix = "");    
 private:
 
 };
