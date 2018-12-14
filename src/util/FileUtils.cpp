@@ -49,6 +49,11 @@ TH1F* FileUtils::importTH1F(std::string filename, int i){
 	std::istringstream streamLine(sLine);
 	Double_t dCount;
 	streamLine >> dCount;
+	if (streamLine.fail()){
+	    std::cout << "Failed parsing file." << std::endl;
+	    streamLine.clear();
+	    dCount = 0;
+	}
 	histogram->SetBinContent(j, dCount + 1); // The RooFit chi2 fit does not work when the bins have zero entries.
 	histogram->SetBinError(j, sqrt(dCount+1));
     }

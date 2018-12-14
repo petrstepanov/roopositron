@@ -24,7 +24,7 @@ class Constants {
 public:
     virtual ~Constants();
     
-    int getNumberOfChannels();
+//    int getNumberOfChannels();
     double getChannelWidth();
     RooConstVar* getRooChannelWidth();
     int getSkipLines();
@@ -36,6 +36,7 @@ public:
     int getSourceComponentsNumber();
     std::vector<std::string> getDecayModels();
     std::vector<std::string> getCommonParameters();
+    double getBufferFraction();
     int getImageWidth();
     int getImageHeight();
     void print();

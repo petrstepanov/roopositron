@@ -52,8 +52,8 @@ Constants::~Constants() {
 RooArgList* Constants::initDefaultValues() {
     RooArgList* constants = new RooArgList();
     RooStringVar* constant;
-    constant = new RooStringVar("channels", " # entries in maestro file", "8192");
-    constants->add(*constant);
+//    constant = new RooStringVar("channels", " # entries in maestro file", "8192");
+//    constants->add(*constant);
     constant = new RooStringVar("channelWidth", " # channel width, ns", "0.006186");
     constants->add(*constant);
     constant = new RooStringVar("skipLines", " # spectrum header lines", "12");
@@ -73,6 +73,8 @@ RooArgList* Constants::initDefaultValues() {
     constant = new RooStringVar("sourceComponents", " # number of components in source", "1");
     constants->add(*constant);
     constant = new RooStringVar("commonParameters", " # comma-separated parameters of simultaneous fit", "gauss1FWHM,gauss2FWHM,gauss3FWHM,gauss2Frac,gauss3Frac,tauSource,ISource");
+    constants->add(*constant);
+    constant = new RooStringVar("bufferFraction", " # set to about 1.5-2 when dealing with larger lifetime components ~5ns", "0.2");
     constants->add(*constant);
     constant = new RooStringVar("imageWidth", " # output image width", "1280");
     constants->add(*constant);
@@ -160,10 +162,10 @@ void Constants::writeToFile(RooArgList* constants, std::string filename){
     myfile.close();  
 }
 
-int Constants::getNumberOfChannels(){
-    RooStringVar* var = (RooStringVar*) constants->find("channels");
-    return atoi(var->getVal());
-}
+//int Constants::getNumberOfChannels(){
+//    RooStringVar* var = (RooStringVar*) constants->find("channels");
+//    return atoi(var->getVal());
+//}
 
 double Constants::getChannelWidth(){
     RooStringVar* var = (RooStringVar*) constants->find("channelWidth");
@@ -218,6 +220,12 @@ std::vector<std::string> Constants::getCommonParameters() {
     RooStringVar* var = (RooStringVar*) constants->find("commonParameters");       
     return StringUtils::parseString(var->getVal());
 }
+
+double Constants::getBufferFraction() {
+    RooStringVar* var = (RooStringVar*) constants->find("bufferFraction");    
+    return atof(var->getVal());
+}
+
 
 int Constants::getImageWidth(){
     RooStringVar* var = (RooStringVar*) constants->find("imageWidth");

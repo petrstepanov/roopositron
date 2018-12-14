@@ -139,7 +139,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 
         const Int_t MIN_CHANNEL = constants->getMinChannel();
         const Int_t MAX_CHANNEL = constants->getMaxChannel();
-        const Int_t CHANNELS = constants->getNumberOfChannels();
+//        const Int_t CHANNELS = constants->getNumberOfChannels();
         Double_t CHANNEL_WIDTH = constants->getChannelWidth();
         const Int_t SKIP_LINES = constants->getSkipLines();
 
@@ -173,7 +173,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
 	RooRealVar* rChannels = new RooRealVar("rChannels", "Channels axis", 0, MAX_CHANNEL-MIN_CHANNEL+1, "ch");
 	rChannels->setBins(MAX_CHANNEL - MIN_CHANNEL + 1);
 	// Set convolution bins same as 
-	rChannels->setBins(MAX_CHANNEL - MIN_CHANNEL + 1);
+	rChannels->setBins(MAX_CHANNEL - MIN_CHANNEL + 1, "cache");
 //	rChannels->setBins(2048, "cache");
 
 	// Convert TH1F spectra to RooDataHist

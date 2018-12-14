@@ -17,6 +17,7 @@
 #include "providers/SourceProvider.h"
 #include "ReverseAddPdf.h"
 #include "../util/StringUtils.h"
+#include "../model/Constants.h"
 #include <RooFFTConvPdf.h>
 #include <RooAddPdf.h>
 
@@ -91,12 +92,14 @@ void AdditiveConvolutionPdf::initCoefficients(){
 
 void AdditiveConvolutionPdf::convoluteComponents(RooRealVar *observable){
     // Convolute components
+    double bufferFraction = Constants::getInstance()->getBufferFraction();
     for (unsigned i = 0; i < componentsNumber; i++){
 	RooAbsArg* arg = (componentsList->at(i));
 	RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(arg);
 	RooFFTConvPdf* pdf = new RooFFTConvPdf(StringUtils::suffix("convolutedComponent", i+1).c_str(), 
 		StringUtils::ordinal("convoluted component", i+1).c_str(), *observable, *component, *resolutionFunction);
-	pdf->setBufferFraction(0.2);
+	pdf->setBufferFraction(bufferFraction);
+//	pdf->setBufferStrategy(RooFFTConvPdf::Extend);	
 	convolutedComponentsList->add(*pdf);
     }
     convolutedComponentsList->Print();
@@ -107,14 +110,11 @@ void AdditiveConvolutionPdf::convoluteComponents(RooRealVar *observable){
 	RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(arg);
 	RooFFTConvPdf* pdf = new RooFFTConvPdf(StringUtils::suffix("sourceConvolutedComponent", i+1).c_str(), 
 		StringUtils::ordinal("source convoluted component", i+1).c_str(), *observable, *component, *resolutionFunction);
-	pdf->setBufferFraction(0.2);
+	pdf->setBufferFraction(bufferFraction); // because sometimes (on some ranges) convolution produced PDF with weird peak
+//	pdf->setBufferStrategy(RooFFTConvPdf::Extend); // large lifetimes ~ 4.8ns give "p.d.f. normalization integral is zero" Extend=0, Mirror=1, Flat=2
 	convolutedSourceComponentsList->add(*pdf);
     }
     convolutedSourceComponentsList->Print();
-
-    // Convolute source contribution
-//    convolutedSourcePdf = new RooFFTConvPdf("convolutedSourcePdf", "Convoluted source PDF", *observable, *sourcePdf, *resolutionFunction);
-//    ((RooFFTConvPdf*)convolutedSourcePdf)->setBufferFraction(0.2);
 }
 
 void AdditiveConvolutionPdf::constructModel(){
