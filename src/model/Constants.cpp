@@ -58,7 +58,7 @@ RooArgList* Constants::initDefaultValues() {
     constants->add(*constant);
     constant = new RooStringVar("skipLines", " # spectrum header lines", "12");
     constants->add(*constant);
-    constant = new RooStringVar("minChannel", " # left fit channel", "1000");
+    constant = new RooStringVar("minChannel", " # left fit channel; allow 200 left bins for background calculation", "1000");
     constants->add(*constant);
     constant = new RooStringVar("maxChannel", " # right fit channel", "4000");
     constants->add(*constant);
