@@ -85,7 +85,7 @@ Double_t ExpPdf::analyticalIntegral(Int_t code, const char* rangeName) const {
         Double_t x1 = t.min(rangeName);
         Double_t x2 = t.max(rangeName);
         
-//        std::cout << "range(" << x1 << ", " << x2 << ")" << std::endl;
+        std::cout << "range(" << x1 << ", " << x2 << ")" << std::endl;
         
         if (x2 <= 0) return 0;
         x1 = TMath::Max(0.,x1);

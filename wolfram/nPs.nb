@@ -1,0 +1,168 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      4912,        160]
+NotebookOptionsPosition[      4571,        143]
+NotebookOutlinePosition[      4940,        159]
+CellTagsIndexPosition[      4897,        156]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Clear", "[", "\"\<Global`*\>\"", "]"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"$Assumptions", ":=", 
+  RowBox[{
+   RowBox[{"t", ">", "0"}], "&&", 
+   RowBox[{"t", "\[Element]", "Reals"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{"$Assumptions", ":=", 
+  RowBox[{
+   RowBox[{"L", ">", "0"}], "&&", 
+   RowBox[{"L", "\[Element]", "Reals"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{"$Assumptions", ":=", 
+  RowBox[{
+   RowBox[{"PPs", ">", "0"}], "&&", 
+   RowBox[{"PPs", "<", "1"}], "&&", 
+   RowBox[{"PPs", "\[Element]", "Reals"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{"$Assumptions", ":=", 
+  RowBox[{
+   RowBox[{"lPs", ">", "0"}], "&&", 
+   RowBox[{"lPs", "\[Element]", "Reals"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"$Assumptions", ":=", 
+   RowBox[{
+    RowBox[{"lJ", ">", "0"}], "&&", 
+    RowBox[{"lJ", "\[Element]", "Reals"}]}]}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"iter", ":=", "5"}], "\[IndentingNewLine]", 
+ RowBox[{"DPs", ":=", 
+  RowBox[{"1", "^", "7"}]}], "\[IndentingNewLine]", 
+ RowBox[{"lJ", ":=", 
+  RowBox[{"Pi", "*", "Pi", "*", 
+   RowBox[{
+    RowBox[{"DPs", "/", "L"}], "/", "L"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"J", "[", "t_", "]"}], ":=", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"6", "/", "Pi"}], "/", "Pi"}], "*", 
+   RowBox[{"Exp", "[", 
+    RowBox[{
+     RowBox[{"-", "lPs"}], "*", "t"}], "]"}], "*", "lJ", "*", 
+   RowBox[{"Sum", "[", 
+    RowBox[{
+     RowBox[{"Exp", "[", 
+      RowBox[{
+       RowBox[{"-", "lJ"}], "*", "m", "*", "m", "*", "t"}], "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"m", ",", "1", ",", "iter"}], "}"}]}], 
+    "]"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"nPs", "[", "t_", "]"}], "=", 
+  RowBox[{"Pps", "*", 
+   RowBox[{"Exp", "[", 
+    RowBox[{
+     RowBox[{"-", "lPs"}], "*", "t"}], "]"}], "*", 
+   RowBox[{"(", 
+    RowBox[{"1", "-", 
+     RowBox[{"Integrate", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"J", "[", "tau", "]"}], "*", 
+        RowBox[{"Exp", "[", 
+         RowBox[{"lPs", "*", "tau"}], "]"}]}], ",", " ", 
+       RowBox[{"{", 
+        RowBox[{"tau", ",", " ", "0", ",", "t"}], " ", "}"}]}], "]"}]}], 
+    ")"}]}]}]}], "Input",
+ CellChangeTimes->{{3.7563103019097548`*^9, 3.756310305550045*^9}, {
+  3.7563103386908417`*^9, 3.7563103415350122`*^9}, {3.7563438596770926`*^9, 
+  3.7563439078809543`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  SuperscriptBox["\[ExponentialE]", 
+   RowBox[{
+    RowBox[{"-", "lPs"}], " ", "t"}]], " ", 
+  RowBox[{"(", 
+   RowBox[{"1", "+", 
+    FractionBox[
+     RowBox[{
+      RowBox[{"-", "5269"}], "+", 
+      RowBox[{"144", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{"-", 
+         FractionBox[
+          RowBox[{"25", " ", 
+           SuperscriptBox["\[Pi]", "2"], " ", "t"}], 
+          SuperscriptBox["L", "2"]]}]]}], "+", 
+      RowBox[{"225", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{"-", 
+         FractionBox[
+          RowBox[{"16", " ", 
+           SuperscriptBox["\[Pi]", "2"], " ", "t"}], 
+          SuperscriptBox["L", "2"]]}]]}], "+", 
+      RowBox[{"400", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{"-", 
+         FractionBox[
+          RowBox[{"9", " ", 
+           SuperscriptBox["\[Pi]", "2"], " ", "t"}], 
+          SuperscriptBox["L", "2"]]}]]}], "+", 
+      RowBox[{"900", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{"-", 
+         FractionBox[
+          RowBox[{"4", " ", 
+           SuperscriptBox["\[Pi]", "2"], " ", "t"}], 
+          SuperscriptBox["L", "2"]]}]]}], "+", 
+      RowBox[{"3600", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{"-", 
+         FractionBox[
+          RowBox[{
+           SuperscriptBox["\[Pi]", "2"], " ", "t"}], 
+          SuperscriptBox["L", "2"]]}]]}]}], 
+     RowBox[{"600", " ", 
+      SuperscriptBox["\[Pi]", "2"]}]]}], ")"}], " ", "Pps"}]], "Output",
+ CellChangeTimes->{3.7563439200673847`*^9}]
+}, Open  ]]
+},
+WindowSize->{840, 668},
+WindowMargins->{{Automatic, -3}, {Automatic, 100}},
+Magnification->1.25,
+FrontEndVersion->"11.0 for Microsoft Windows (64-bit) (September 21, 2016)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 2398, 69, 350, "Input"],
+Cell[2981, 93, 1574, 47, 121, "Output"]
+}, Open  ]]
+}
+]
+*)
+

@@ -17,6 +17,7 @@
 #include "providers/ThreeGaussProvider.h"
 #include "providers/ExpProvider.h"
 #include "providers/GrainProvider.h"
+#include "providers/PowderProvider.h"
 #include "providers/TrappingProvider.h"
 
 PdfServer::PdfServer(){}
@@ -29,6 +30,7 @@ PdfHashNames PdfServer::hashPdfName(const char* pdfName) {
     if (name == "exp") return kExponentPdf;
     if (name == "trapping") return kTrappingPdf;
     if (name == "grain") return kGrainPdf;
+    if (name == "powder") return kPowderPdf;    
     return kExponentPdf;
 }
 
@@ -57,12 +59,10 @@ RooAbsPdf* PdfServer::getPdf(const char* name, RooRealVar* observable) {
 	    break;
 	case kExponentPdf:
 	    {
-		std::cout << "------------*******" << std::endl;
 		ExpProvider* ep = new ExpProvider(observable);
 		RooAbsPdf* a = ep->getPdf(pdfIndexes[kExponentPdf]);
-		a->Print("v");
+//		a->Print("v");
 		return a;
-
 	    }
 	case kTrappingPdf:
 	    {
@@ -76,6 +76,12 @@ RooAbsPdf* PdfServer::getPdf(const char* name, RooRealVar* observable) {
 		return gp->getPdf(pdfIndexes[kGrainPdf]);
 	    }	
 	    break;	    
+	case kPowderPdf:
+	    {
+		PowderProvider* pp = new PowderProvider(observable);
+		return pp->getPdf(pdfIndexes[kPowderPdf]);
+	    }	
+	    break;
 	default: 
 	    return NULL;
     }

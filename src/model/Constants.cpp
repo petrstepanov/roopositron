@@ -58,7 +58,7 @@ RooArgList* Constants::initDefaultValues() {
     constants->add(*constant);
     constant = new RooStringVar("skipLines", " # spectrum header lines", "12");
     constants->add(*constant);
-    constant = new RooStringVar("minChannel", " # left fit channel; allow 200 left bins for background calculation", "1000");
+    constant = new RooStringVar("minChannel", " # left fit channel; allow 200 left bins for background calculation", "600");
     constants->add(*constant);
     constant = new RooStringVar("maxChannel", " # right fit channel", "4000");
     constants->add(*constant);
@@ -66,7 +66,7 @@ RooArgList* Constants::initDefaultValues() {
     constants->add(*constant);
     constant = new RooStringVar("excludeMaxChannel", " # right exclude channel", "0");
     constants->add(*constant);
-    constant = new RooStringVar("decayModel", " # comma-separated names \"exp\", \"trapping\", \"grain\"", "exp");
+    constant = new RooStringVar("decayModel", " # comma-separated names \"exp\", \"trapping\", \"grain\", \"powder\"", "exp");
     constants->add(*constant);
     constant = new RooStringVar("resolutionFunction", " # \"2gauss\" or \"3gauss\"", "2gauss");
     constants->add(*constant);
