@@ -34,7 +34,7 @@ public:
             RooAbsReal& _lv,           // Annihilation rate in vacancy
             RooAbsReal& _lPs,          // Annihilation rate of Ps atom	    
             RooAbsReal& _Mr,           // Powder mass to e+ mass ratio ~1E5?
-            RooAbsReal& _mu            // Probability of o-Ps -> p-Ps conversion due to paramagnetic O2 
+            RooAbsReal& _mu            // Probability of o-Ps -> p-Ps conversion due to paramagnetic O2
             );
     PowderPdf(const PowderPdf& other, const char* name = 0);
     virtual TObject* clone(const char* newname) const { return new PowderPdf(*this, newname); }
@@ -57,6 +57,7 @@ protected:
     Double_t evaluate() const;
     Double_t sum(Double_t a) const;     
     Double_t Power(Double_t a, Double_t b) const;
+    Double_t Sqrt(Double_t a) const;    
 //    Double_t indefiniteIntegral(Double_t y) const; 
     
 private:
