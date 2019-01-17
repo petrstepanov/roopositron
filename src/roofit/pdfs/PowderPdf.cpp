@@ -76,7 +76,7 @@ chW*Power(E,chW*(-kv-lb)*t)*lb*(1-Pps)+(chW*(-Power(E,chW*(-kv-lb)*t)+Power(E,-(
 (0.2663171578205889*Sqrt(Power(L,2)/(chW*t)))/
 (1+(19*chW*Power(Pi,2)*t)/Power(L,2)+(112*Power(chW,2)*Power(Pi,4)*Power(t,2))/Power(L,4))))/
 (2.*Power(E,chW*lPs*t)*Power(L,2))+(9*Power(E,
-(-6.64*chW*t)/L-chW*l3g*t+(-((mu*t*Vth)/L)-
+(-6.64*chW*t)/L-chW*l3g*t+(-((chW*mu*t*Vth)/L)-
 Mr*mu*Log((1-(V0-Vth)/(Power(E,(2*chW*t*Vth)/(L*Mr))*(V0+Vth)))/(1-(V0-Vth)/(V0+Vth))))/4.)*Pps*
 ((6.64*chW)/L+chW*l3g+(chW*mu*Vth*(1+(V0-Vth)/(Power(E,(2*chW*t*Vth)/(L*Mr))*(V0+Vth))))/
 (4.*L*(1-(V0-Vth)/(Power(E,(2*chW*t*Vth)/(L*Mr))*(V0+Vth)))))*(-1+L*Sqrt(lPs)*Coth(L*Sqrt(lPs))))/

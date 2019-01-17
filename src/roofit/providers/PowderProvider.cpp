@@ -34,7 +34,7 @@ RooAbsPdf* PowderProvider::initPdf(int i) {
 //    Mr("Mr", this, other.Mr),
 //    mu("mu", this, other.mu)
 
-    RooRealVar* l2g = new RooRealVar("l3g", "Three-gamma annihilation rate", 8, "1/ns");
+    RooRealVar* l2g = new RooRealVar("l2g", "Two-gamma annihilation rate", 8, "1/ns");
     l2g->setConstant(kTRUE);       
     RooRealVar* l3g = new RooRealVar("l3g", "Three-gamma annihilation rate", 0.007, "1/ns");
     l3g->setConstant(kTRUE);
