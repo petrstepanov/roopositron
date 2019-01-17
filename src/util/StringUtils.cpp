@@ -150,3 +150,12 @@ std::string StringUtils::ordinal(const char* name, int index) {
     s += name;
     return s;
 }
+
+bool StringUtils::isEmpty(const char* string) {
+    std::string s = string;
+    for (unsigned i=0; i<s.length(); ++i){
+      if (s.at(i)!=' ') return false;
+    }
+    return true;
+}
+

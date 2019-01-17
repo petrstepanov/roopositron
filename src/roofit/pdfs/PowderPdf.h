@@ -35,6 +35,10 @@ public:
             RooAbsReal& _lPs,          // Annihilation rate of Ps atom	    
             RooAbsReal& _Mr,           // Powder mass to e+ mass ratio ~1E5?
             RooAbsReal& _mu,           // Probability of o-Ps -> p-Ps conversion due to paramagnetic O2
+            RooAbsReal& _l2g,          // Two-gamma annihilation rate
+            RooAbsReal& _l3g,          // Three-gamma annihilation rate
+            RooAbsReal& _V0,          // Two-gamma annihilation rate
+            RooAbsReal& _Vth,          // Three-gamma annihilation rate	    
 	    Double_t chW
             );
     PowderPdf(const PowderPdf& other, const char* name = 0);
@@ -54,7 +58,11 @@ protected:
     RooRealProxy lPs;
     RooRealProxy Mr;
     RooRealProxy mu;
-
+    RooRealProxy l2g;
+    RooRealProxy l3g;  
+    RooRealProxy V0;
+    RooRealProxy Vth;      
+    
     Double_t chW;
     Double_t evaluate() const;
     Double_t sum(Double_t a) const;     
@@ -62,7 +70,8 @@ protected:
     Double_t Sqrt(Double_t a) const;    
     Double_t ArcTan(Double_t a) const;
     Double_t Coth(Double_t a) const;
-//    Double_t indefiniteIntegral(Double_t y) const; 
+    Double_t Log(Double_t a) const;
+    //    Double_t indefiniteIntegral(Double_t y) const; 
     
 private:
     // ClassDef(PowderPdf, 1) // Your description goes here...

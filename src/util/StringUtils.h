@@ -31,6 +31,7 @@ public:
     static std::string underscoreSuffix(const char*, const char*);
     static std::string suffix(const char* name, int index, const char* nameSuffix = "");
     static std::string ordinal(const char*, int index);
+    static bool isEmpty(const char*);
 };
 
 #endif /* STRINGUTILS_H */

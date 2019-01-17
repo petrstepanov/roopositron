@@ -194,7 +194,8 @@ Bool_t ParametersPool::save(RooArgSet* modelParameters){
 	if(parameter){
 	    std::string freeOrFixed = parameter->isConstant() ? "fixed" : "free";
 	    // https://stackoverflow.com/questions/23776824/what-is-the-meaning-of-s-in-a-printf-format-string/23777065
-	    fprintf(pFile, "%-*s%-*f%-*f%-*f%-*f%-*s%-*s%s\n", tab, parameter->GetName(), tab, parameter->getVal(), tab, parameter->getMin(), tab, parameter->getMax(), tab, parameter->getError(), tab, parameter->getUnit(), tab, freeOrFixed.c_str(), parameter->GetTitle());
+	    std::string safeUnit = StringUtils::isEmpty(parameter->getUnit())?"-":parameter->getUnit();
+	    fprintf(pFile, "%-*s%-*f%-*f%-*f%-*f%-*s%-*s%s\n", tab, parameter->GetName(), tab, parameter->getVal(), tab, parameter->getMin(), tab, parameter->getMax(), tab, parameter->getError(), tab, safeUnit.c_str(), tab, freeOrFixed.c_str(), parameter->GetTitle());
 	}
     }
     

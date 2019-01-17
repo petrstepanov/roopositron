@@ -23,6 +23,10 @@ PowderPdf::PowderPdf(const char *name, const char *title,
     RooAbsReal& _lPs,
     RooAbsReal& _Mr,
     RooAbsReal& _mu,
+    RooAbsReal& _l2g,
+    RooAbsReal& _l3g,	
+    RooAbsReal& _V0,
+    RooAbsReal& _Vth,
     Double_t _chW
     ) :
     RooAbsPdf(name, title),
@@ -35,6 +39,10 @@ PowderPdf::PowderPdf(const char *name, const char *title,
     lPs("lPs", "lPs", this, _lPs),
     Mr("Mr", "Mr", this, _Mr),
     mu("mu", "mu", this, _mu),
+    l2g("l2g", "l2g", this, _l2g),
+    l3g("l3g", "l3g", this, _l3g),
+    V0("V0", "V0", this, _V0),
+    Vth("Vth", "Vth", this, _Vth),
     chW(_chW) {
 }
 
@@ -49,6 +57,10 @@ lv("lv", this, other.lv),
 lPs("lPs", this, other.lPs),
 Mr("Mr", this, other.Mr),
 mu("mu", this, other.mu),
+l2g("l2g", this, other.l2g),
+l3g("l3g", this, other.l3g),	
+V0("V0", this, other.V0),
+Vth("Vth", this, other.Vth),
 chW(other.chW){
 }
 
@@ -57,16 +69,18 @@ Double_t PowderPdf::evaluate() const {
     Double_t E = TMath::E();
     Double_t Pi = TMath::Pi();
     Double_t val = 
-(chW*(1-kv)*lb*(1-Pps))/Power(E,lb*t)+(chW*kv*lv*(1-Pps))/Power(E,lv*t)+
-(chW*(0.61/Power(E,(chW*Power(Pi,2)*t)/Power(L,2))+
-0.39/Power(E,10.273007977238624*Sqrt((chW*t)/Power(L,2))))*lPs*Pps)/
-Power(E,chW*lPs*t)+(9*Power(E,-0.007*chW*t-(6.64*chW*t)/L-
-(200000*(1+0.7611940298507462/Power(E,(1600000*chW*t)/(L*Mr)))*mu*t)/
-((1-0.7611940298507462/Power(E,(1600000*chW*t)/(L*Mr)))*L))*
-(0.007*chW+(6.64*chW)/L+(200000*
-(1+0.7611940298507462/Power(E,(1600000*chW*t)/(L*Mr)))*mu)/
-((1-0.7611940298507462/Power(E,(1600000*chW*t)/(L*Mr)))*L))*Pps*
-(-1+L*Sqrt(lPs)*Coth(L*Sqrt(lPs))))/(4.*Power(L,2)*lPs);
+chW*Power(E,chW*(-kv-lb)*t)*lb*(1-Pps)+(chW*(-Power(E,chW*(-kv-lb)*t)+Power(E,-(chW*lv*t)))*kv*lv*(1-Pps))/
+(kv+lb-lv)+(chW*(0.61/Power(E,(chW*Power(Pi,2)*t)/Power(L,2))+
+0.39/Power(E,10.273007977238624*Sqrt((chW*t)/Power(L,2))))*lPs*Pps)/Power(E,chW*lPs*t)+
+(3*chW*Pps*(Power(E,(-4*chW*Power(Pi,2)*t)/Power(L,2))+Power(E,-(chW*Power(Pi,2)*t)/Power(L,2))+
+(0.2663171578205889*Sqrt(Power(L,2)/(chW*t)))/
+(1+(19*chW*Power(Pi,2)*t)/Power(L,2)+(112*Power(chW,2)*Power(Pi,4)*Power(t,2))/Power(L,4))))/
+(2.*Power(E,chW*lPs*t)*Power(L,2))+(9*Power(E,
+(-6.64*chW*t)/L-chW*l3g*t+(-((mu*t*Vth)/L)-
+Mr*mu*Log((1-(V0-Vth)/(Power(E,(2*chW*t*Vth)/(L*Mr))*(V0+Vth)))/(1-(V0-Vth)/(V0+Vth))))/4.)*Pps*
+((6.64*chW)/L+chW*l3g+(chW*mu*Vth*(1+(V0-Vth)/(Power(E,(2*chW*t*Vth)/(L*Mr))*(V0+Vth))))/
+(4.*L*(1-(V0-Vth)/(Power(E,(2*chW*t*Vth)/(L*Mr))*(V0+Vth)))))*(-1+L*Sqrt(lPs)*Coth(L*Sqrt(lPs))))/
+(4.*Power(L,2)*lPs);
     
 //    std::cout << "powder(" << t << ") = " << val << std::endl;
     return val;
@@ -86,6 +100,10 @@ Double_t PowderPdf::ArcTan(Double_t a) const{
 
 Double_t PowderPdf::Coth(Double_t a) const{
     return 1/TMath::TanH(a);
+}
+
+Double_t PowderPdf::Log(Double_t a) const{
+    return TMath::Log(a);
 }
 
 // Indefinite integral
