@@ -21,7 +21,7 @@
 
 ParametersPool::ParametersPool(std::string ioPath){
     filePathName = (ioPath == "") ? DEFAULT_FILENAME : ioPath + "/" + DEFAULT_FILENAME;
-    parametersPool = readPoolParametersFromFile(filePathName.c_str());
+    parametersPool = readPoolParametersFromFile();
     constructExcludedParametersList();
 }
 
@@ -42,13 +42,14 @@ void ParametersPool::constructExcludedParametersList(){
 
 }
 
-RooArgSet* ParametersPool::readPoolParametersFromFile(const char* filename){
-    std::cout << std::endl << "Reading parameters pool from hard drive." << std::endl;
+RooArgSet* ParametersPool::readPoolParametersFromFile(){
+    std::cout << "ParametersPool::readPoolParametersFromFile" << std::endl;
+    std::cout << std::endl << "Reading parameters pool from hard drive (" << filePathName.c_str() << ")." << std::endl;
     RooArgSet* parametersPool = new RooArgSet();   
     FILE * pFile;
-    pFile = fopen(filename, "r");
+    pFile = fopen(filePathName.c_str(), "r");
     if (pFile == NULL) {
-	std::cout << "\"" << filename << "\" file not found." << std::endl; 	
+	std::cout << "\"" << filePathName.c_str() << "\" file not found." << std::endl; 	
         return parametersPool;
     }
     char* name = new char[tab+1];
@@ -76,7 +77,7 @@ RooArgSet* ParametersPool::readPoolParametersFromFile(const char* filename){
     }
     fclose(pFile);  
     
-    std::cout << "\"" << filename << "\" found. Successfully read " << parametersPool->getSize() << " values." << std::endl;
+    std::cout << "\"" << filePathName.c_str() << "\" found. Successfully read " << parametersPool->getSize() << " values." << std::endl;
     return parametersPool;
 }
 
@@ -94,10 +95,10 @@ void ParametersPool::updateModelParametersValuesFromPool(RooArgSet* modelParamet
 	    RooRealVar* poolParameter = (RooRealVar*) parametersPool->find(name);
 	    // Either set model parameter value, error etc
 	    if (poolParameter){
-		std::cout << "Parameter" << poolParameter->GetName() << " found" << std::endl;
+		std::cout << "Parameter " << poolParameter->GetName() << " found" << std::endl;
 		// Fix: roofit can't set min larger than current max and vice versa
-		parameter->setMin(0);
-		parameter->setMax(100);	
+		parameter->setMin(std::numeric_limits<double>::min());
+		parameter->setMax(std::numeric_limits<double>::max());	
 		parameter->setMin(poolParameter->getMin());
 		parameter->setMax(poolParameter->getMax());
 		parameter->setVal(poolParameter->getVal());
@@ -178,7 +179,8 @@ Bool_t ParametersPool::save(RooArgSet* modelParameters){
 	}
     }
     
-    std::cout << std::endl << "Saving parameters pool to hard drive." << std::endl;    
+    std::cout << "ParametersPool::readPoolParametersFromFile" << std::endl;
+    std::cout << std::endl << "Saving parameters pool to hard drive (" << filePathName.c_str() << ")." << std::endl;    
     FILE* pFile = fopen(filePathName.c_str(), "w");
     if (pFile == NULL) {
 	std::cout << "Error writing to file \"" << filePathName << "\"." << std::endl; 

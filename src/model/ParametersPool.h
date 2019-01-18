@@ -40,7 +40,7 @@ private:
     
     void constructExcludedParametersList();
     Bool_t addParameterToPool(RooRealVar *);
-    RooArgSet* readPoolParametersFromFile(const char*);   
+    RooArgSet* readPoolParametersFromFile();   
     void userInput(RooRealVar* parameter);
 };
 

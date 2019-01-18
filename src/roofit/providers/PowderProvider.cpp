@@ -44,10 +44,7 @@ RooAbsPdf* PowderProvider::initPdf(int i) {
     RooRealVar* Vth = new RooRealVar("Vth", "Thermalized Ps speed ", 8E5, "A/ns");
     Vth->setConstant(kTRUE);
     
-//    RooRealVar* lpo = new RooRealVar("l3g", "Three-gamma annihilation rate", 2*2*sigmaTE/l, "1/ns");
-    
     RooRealVar* L = new RooRealVar("L", "Powder diameter", 500, 10, 50000, "A"); // 10A - 50mkm
-//    RooRealVar* l = new RooRealVar("l", "Distance between powders", 500, 10, 50000, "A"); // 10A - 50mkm
     
     RooRealVar* pPs = new RooRealVar("pPs", "Probability of forming qf-Ps", 0.5, 0, 1, "");
     
@@ -64,7 +61,7 @@ RooAbsPdf* PowderProvider::initPdf(int i) {
 //    RooFormulaVar* lambdaPs = new RooFormulaVar("lambdaPs", "1/@0", *tauPs);
 
     RooRealVar* Mratio = new RooRealVar("Mratio", "Powder mass to positron mass ratio", 1E5, 1E2, 1E7, "");   
-    RooRealVar* mu = new RooRealVar("mu", "Probability of ortho-para conversion close to powder surface", 1E-5, 0, 1E-3, "");
+    RooRealVar* mu = new RooRealVar("mu", "Probability of o-p conversion near surface", 1E-5, 0, 1E-3, "");
 
     return new PowderPdf("powder", "Powder model", *observable, *L, *kappaVac, *pPs, *lambdaBulk, *lambdaVac, *lambdaBulk/* *lambdaPs*/, *Mratio, *mu, *l2g, *l3g, *V0, *Vth, channelWidth->getValV());
 }

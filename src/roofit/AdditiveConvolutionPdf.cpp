@@ -20,8 +20,17 @@
 #include "../model/Constants.h"
 #include <RooFFTConvPdf.h>
 #include <RooAddPdf.h>
+#include <RooAbsReal.h>
+#include <RooNumIntConfig.h>
 
 AdditiveConvolutionPdf::AdditiveConvolutionPdf(std::vector<std::string> componentIds, const char* resolutionId, int sourceComponents, RooRealVar* observable) {
+    std::cout << "AdditiveConvolutionPdf::AdditiveConvolutionPdf" << std::endl;
+    
+    // https://root.cern.ch/root/html/tutorials/roofit/rf901_numintconfig.C.html
+    // WARNING:Integration -- RooIntegrator1D::integral: integral of ... over range (-240,2641) did not converge after 20 steps
+    RooAbsReal::defaultIntegratorConfig()->Print("v") ;
+    RooAbsReal::defaultIntegratorConfig()->getConfigSection("RooIntegrator1D").setRealValue("maxSteps", 30); // default 20
+    
     pdfServer = new PdfServer();
     componentsNumber = componentIds.size();
     sourceComponentsNumber = sourceComponents;

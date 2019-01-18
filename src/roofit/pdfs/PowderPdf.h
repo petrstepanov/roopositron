@@ -71,7 +71,7 @@ protected:
     Double_t ArcTan(Double_t a) const;
     Double_t Coth(Double_t a) const;
     Double_t Log(Double_t a) const;
-    //    Double_t indefiniteIntegral(Double_t y) const; 
+//    Double_t indefiniteIntegral(Double_t y) const; 
     
 private:
     // ClassDef(PowderPdf, 1) // Your description goes here...
