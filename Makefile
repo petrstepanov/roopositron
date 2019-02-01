@@ -12,7 +12,7 @@ OBJ_DIR=build
 BIN_DIR=dist
 
 # Replace with your application name
-APP_NAME=positronit
+APP_NAME=positronfit
 
 DICT_NAME=$(APP_NAME)-dictionary
 DICT_FILENAME=$(DICT_NAME).cxx             # app-dictionary.cxx
