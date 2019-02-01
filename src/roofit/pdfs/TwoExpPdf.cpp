@@ -13,6 +13,8 @@
 
 #include "TwoExpPdf.h"
 
+ClassImp(TwoExpPdf);
+
 TwoExpPdf::TwoExpPdf(const char *name, const char *title,
 	RooAbsReal& _t,
 	RooAbsReal& _tau1,

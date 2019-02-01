@@ -74,7 +74,7 @@ protected:
 //    Double_t indefiniteIntegral(Double_t y) const; 
     
 private:
-    // ClassDef(PowderPdf, 1) // Your description goes here...
+    ClassDef(PowderPdf, 1)
 };
 
 #endif /* MY_POWDERPDF */

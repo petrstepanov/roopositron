@@ -45,7 +45,7 @@ protected:
     Double_t indefiniteIntegral(Double_t y) const;
     
 private:
-    // ClassDef(TrapPdf, 1) // Your description goes here...
+    ClassDef(TrapPdf, 1)
 };
 
 #endif /* MY_TRAPPDF */

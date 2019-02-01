@@ -13,6 +13,8 @@
 
 #include "GrainPdf.h"
 
+ClassImp(GrainPdf);
+
 GrainPdf::GrainPdf(const char *name, const char *title,
     RooAbsReal& _t,
     RooAbsReal& _lambdaJ,

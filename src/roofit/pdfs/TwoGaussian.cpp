@@ -13,6 +13,8 @@
 
 #include "TwoGaussian.h"
 
+ClassImp(TwoGaussian);
+
 TwoGaussian::TwoGaussian(const char *name, const char *title,
 	RooAbsReal& _x,
 	RooAbsReal& _mean1,

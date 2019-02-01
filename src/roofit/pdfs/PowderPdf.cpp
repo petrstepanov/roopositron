@@ -13,6 +13,8 @@
 
 #include "PowderPdf.h"
 
+ClassImp(PowderPdf);
+
 PowderPdf::PowderPdf(const char *name, const char *title,
     RooAbsReal& _t,
     RooAbsReal& _L,

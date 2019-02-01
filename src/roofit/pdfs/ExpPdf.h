@@ -41,7 +41,7 @@ protected:
     Double_t indefiniteIntegral(Double_t y) const;
 private:
 
-	// ClassDef(ExpPdf, 1) // Your description goes here...
+	ClassDef(ExpPdf, 1)
 };
 
 #endif /* MY_EXPPDF */

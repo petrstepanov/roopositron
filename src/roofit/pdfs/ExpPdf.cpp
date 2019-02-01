@@ -14,6 +14,8 @@
 #include "ExpPdf.h"
 //#include <iostream>
 
+ClassImp(ExpPdf);
+
 ExpPdf::ExpPdf(const char *name, const char *title, RooAbsReal& _t, RooAbsReal& _tau) :
     RooAbsPdf(name, title),
     t("t", "t", this, _t),

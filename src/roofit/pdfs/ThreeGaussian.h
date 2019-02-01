@@ -47,7 +47,7 @@ protected:
     Double_t indefiniteIntegral(Double_t y) const;    
 
 private:
-//    ClassDef(ThreeGaussian, 1)           
+    ClassDef(ThreeGaussian, 1)
 };
 
 #endif /* MY_TWOGAUSSIAN */

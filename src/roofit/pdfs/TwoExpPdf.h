@@ -46,7 +46,7 @@ protected:
     Double_t indefiniteIntegral(Double_t y) const;
 private:
 
-	// ClassDef(TwoExpPdf, 1) // Your description goes here...
+	ClassDef(TwoExpPdf, 1)
 };
 
 #endif /* MY_TWOEXPPDF */

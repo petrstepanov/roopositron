@@ -13,6 +13,8 @@
 
 #include "ThreeGaussian.h"
 
+ClassImp(ThreeGaussian);
+
 ThreeGaussian::ThreeGaussian(const char *name, const char *title,
     RooAbsReal& _x,
     RooAbsReal& _mean1,

@@ -54,7 +54,7 @@ protected:
     Double_t indefiniteIntegral(Double_t y) const; 
     
 private:
-    // ClassDef(GrainPdf, 1) // Your description goes here...
+    ClassDef(GrainPdf, 1)
 };
 
 #endif /* MY_GRAINPDF */

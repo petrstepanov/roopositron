@@ -13,6 +13,8 @@
 
 #include "TrapPdf.h"
 
+ClassImp(TrapPdf);
+
 TrapPdf::TrapPdf(const char *name, const char *title,
 	RooAbsReal& _t,
 	RooAbsReal& _tauBulk,

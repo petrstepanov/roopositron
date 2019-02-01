@@ -13,6 +13,8 @@
 
 #include "ThreeExpPdf.h"
 
+ClassImp(ThreeExpPdf);
+
 ThreeExpPdf::ThreeExpPdf(const char *name, const char *title,
 	RooAbsReal& _t,
 	RooAbsReal& _tau1,

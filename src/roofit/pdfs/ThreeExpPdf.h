@@ -50,7 +50,7 @@ protected:
     Double_t indefiniteIntegral(Double_t y) const;
 private:
 
-	// ClassDef(ThreeExpPdf, 1) // Your description goes here...
+	ClassDef(ThreeExpPdf, 1)
 };
 
 #endif /* MY_THREEEXPPDF */
