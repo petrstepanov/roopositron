@@ -459,7 +459,19 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE){
             }
 
             //                std::string legendLabel = constants->getDecayModel() + " model parameters";
+//                        graphFrame[i]->getAttText()->SetTextFont()  // TextSize(0.02);
+
+            // Draw legend
             decay_model[i]->paramOn(graphFrame[i], RooFit::Layout(0.78, 0.99, 0.9), RooFit::Format("NEU", RooFit::AutoPrecision(3)), RooFit::ShowConstants(kTRUE));// , Label(legendLabel.c_str()) Parameters(decay_model_with_source_bg[i] -> getParameters(histSpectrum[i]);
+
+            // If legend height exceeds the plot height - scale the legend
+            TString legendName = Form("%s_paramBox", decay_model[i]->GetName());
+            TObject* temp = graphFrame[i]->findObject(legendName);
+            TPaveText* legend = dynamic_cast<TPaveText*>(temp);
+            if (legend->GetY1() < 0.03) {
+            	legend->SetY1(0.03);
+            	legend->AddText("");
+            }
 
             graphFrame[i]->Print("V");
 	}

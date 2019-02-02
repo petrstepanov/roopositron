@@ -22,59 +22,63 @@
 #include "TAxis.h"
 #include "TMath.h"
 
-class PowderPdf : public RooAbsPdf {
+class PowderPdf: public RooAbsPdf {
 public:
-    PowderPdf() {};
-    PowderPdf(const char *name, const char *title,
-            RooAbsReal& _t,
-            RooAbsReal& _L,            // Diameter of the powder
-            RooAbsReal& _kv,           // Probability of capturing into vacancy
-            RooAbsReal& _Pps,          // Probability of forming qf-Ps  
-            RooAbsReal& _lb,           // Annihilation rate in bulk
-            RooAbsReal& _lv,           // Annihilation rate in vacancy
-            RooAbsReal& _lPs,          // Annihilation rate of Ps atom	    
-            RooAbsReal& _Mr,           // Powder mass to e+ mass ratio ~1E5?
-            RooAbsReal& _mu,           // Probability of o-Ps -> p-Ps conversion due to paramagnetic O2
-            RooAbsReal& _l2g,          // Two-gamma annihilation rate
-            RooAbsReal& _l3g,          // Three-gamma annihilation rate
-            RooAbsReal& _V0,          // Two-gamma annihilation rate
-            RooAbsReal& _Vth,          // Three-gamma annihilation rate	    
-	    Double_t chW
-            );
-    PowderPdf(const PowderPdf& other, const char* name = 0);
-    virtual TObject* clone(const char* newname) const { return new PowderPdf(*this, newname); }
-    inline virtual ~PowderPdf() { }     
+	PowderPdf() {
+	}
+	;
+	PowderPdf(const char *name, const char *title, RooAbsReal& _t,
+			RooAbsReal& _L,            // Diameter of the powder
+			RooAbsReal& _kv,           // Probability of capturing into vacancy
+			RooAbsReal& _Pps,          // Probability of forming qf-Ps
+			RooAbsReal& _lb,           // Annihilation rate in bulk
+			RooAbsReal& _lv,           // Annihilation rate in vacancy
+			RooAbsReal& _lPs,          // Annihilation rate of Ps atom
+			RooAbsReal& _Mr,           // Powder mass to e+ mass ratio ~1E5?
+			RooAbsReal& _mu, // Probability of o-Ps -> p-Ps conversion due to paramagnetic O2
+			RooAbsReal& _l2g,          // Two-gamma annihilation rate
+			RooAbsReal& _l3g,          // Three-gamma annihilation rate
+			RooAbsReal& _V0,          // Two-gamma annihilation rate
+			RooAbsReal& _Vth,          // Three-gamma annihilation rate
+			Double_t chW);
+	PowderPdf(const PowderPdf& other, const char* name = 0);
+	virtual TObject* clone(const char* newname) const {
+		return new PowderPdf(*this, newname);
+	}
+	inline virtual ~PowderPdf() {
+	}
 
-    Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const ;
-    Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const ;
-    
+	Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars,
+			const char* rangeName = 0) const;
+	Double_t analyticalIntegral(Int_t code, const char* rangeName = 0) const;
+
 protected:
-    RooRealProxy t;
-    RooRealProxy L;
-    RooRealProxy kv;
-    RooRealProxy Pps;
-    RooRealProxy lb;
-    RooRealProxy lv;
-    RooRealProxy lPs;
-    RooRealProxy Mr;
-    RooRealProxy mu;
-    RooRealProxy l2g;
-    RooRealProxy l3g;  
-    RooRealProxy V0;
-    RooRealProxy Vth;      
-    
-    Double_t chW;
-    Double_t evaluate() const;
-    Double_t sum(Double_t a) const;     
-    Double_t Power(Double_t a, Double_t b) const;
-    Double_t Sqrt(Double_t a) const;    
-    Double_t ArcTan(Double_t a) const;
-    Double_t Coth(Double_t a) const;
-    Double_t Log(Double_t a) const;
-    Double_t indefiniteIntegral(Double_t y) const;
-    
+	RooRealProxy t;
+	RooRealProxy L;
+	RooRealProxy kv;
+	RooRealProxy Pps;
+	RooRealProxy lb;
+	RooRealProxy lv;
+	RooRealProxy lPs;
+	RooRealProxy Mr;
+	RooRealProxy mu;
+	RooRealProxy l2g;
+	RooRealProxy l3g;
+	RooRealProxy V0;
+	RooRealProxy Vth;
+
+	Double_t chW = 0;
+	Double_t evaluate() const;
+	Double_t sum(Double_t a) const;
+	Double_t Power(Double_t a, Double_t b) const;
+	Double_t Sqrt(Double_t a) const;
+	Double_t ArcTan(Double_t a) const;
+	Double_t Coth(Double_t a) const;
+	Double_t Log(Double_t a) const;
+	Double_t indefiniteIntegral(Double_t y) const;
+
 private:
-    ClassDef(PowderPdf, 1)
+ClassDef(PowderPdf, 1)
 };
 
 #endif /* MY_POWDERPDF */
