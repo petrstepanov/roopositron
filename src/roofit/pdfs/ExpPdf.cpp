@@ -83,11 +83,10 @@ Double_t ExpPdf::analyticalIntegral(Int_t code, const char* rangeName) const {
     assert(code == 1);
 
     if (code==1){
-        // Range always called [AXIS_MIN-100, AXIS_MAX+100] : (-100; 2100) if 2000 bins
         Double_t x1 = t.min(rangeName);
         Double_t x2 = t.max(rangeName);
         
-        std::cout << "range(" << x1 << ", " << x2 << ")" << std::endl;
+//        std::cout << "range(" << x1 << ", " << x2 << ")" << std::endl;
         
         if (x2 <= 0) return 0;
         x1 = TMath::Max(0.,x1);

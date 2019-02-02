@@ -75,25 +75,17 @@ Double_t PowderPdf::evaluate() const {
     Double_t lJ=Pi*Pi*DPs/L/L;
     Double_t l = L;
     
-    Double_t val =
-Power(E,chW*(-kv - lb)*t)*lb*(1 - Pps) + 
+    return
+Power(E,chW*(-kv - lb)*t)*lb*(1 - Pps) +
    ((-Power(E,chW*(-kv - lb)*t) + Power(E,-(chW*lv*t)))*kv*lv*(1 - Pps))/
-    (kv + lb - lv) + ((0.61/Power(E,chW*lJ*t) + 0.39/Power(E,3.27*Sqrt(chW*lJ*t)))*
-      lPs*Pps)/Power(E,chW*lPs*t) + 
-   (3*lJ*Pps*(Power(E,-4*chW*lJ*t) + Power(E,-(chW*lJ*t)) + 
-        (0.8366600265340756*Sqrt(1/(chW*lJ*t)))/
-         (1 + 19*chW*lJ*t + 112*Power(chW,2)*Power(lJ,2)*Power(t,2))))/
-    (2.*Power(E,chW*lPs*t)*Power(Pi,2)) + 
-   (9*Power(E,(-6.64*chW*t)/l - chW*l3g*t + 
-        (-((chW*mu*t*Vth)/l) - Mr*mu*
-            Log((1 - (V0 - Vth)/(Power(E,(2*t*Vth)/(l*Mr))*(V0 + Vth)))/
-              (1 - (V0 - Vth)/(V0 + Vth))))/4.)*Sqrt(lJ/lPs)*Pps*
-      (6.64/l + l3g + (mu*Vth*(1 + 
-             (V0 - Vth)/(Power(E,(2*chW*t*Vth)/(l*Mr))*(V0 + Vth))))/
-         (4.*l*(1 - (V0 - Vth)/(Power(E,(2*chW*t*Vth)/(l*Mr))*(V0 + Vth)))))*
-      (-Sqrt(lJ/lPs) + Pi*Coth(Pi/Sqrt(lJ/lPs))))/(4.*Power(Pi,2));
+	(kv + lb - lv) + (l2g*Pps)/(4.*Power(E,chW*l2g*t)) +
+   (3*Power(E,(-((chW*mu*t*Vth)/l) -
+		  Mr*mu*Log((1 - (V0 - Vth)/(Power(E,(2*chW*t*Vth)/(l*Mr))*(V0 + Vth)))/
+			 (1 - (V0 - Vth)/(V0 + Vth))))/4.)*mu*Pps*Vth*
+	  (1 + (V0 - Vth)/(Power(E,(2*chW*t*Vth)/(l*Mr))*(V0 + Vth))))/
+	(16.*l*(1 - (V0 - Vth)/(Power(E,(2*chW*t*Vth)/(l*Mr))*(V0 + Vth))))
+				;
     
-    return val;
 }
 
 Double_t PowderPdf::Power(Double_t a, Double_t b) const{
@@ -116,34 +108,42 @@ Double_t PowderPdf::Log(Double_t a) const{
     return TMath::Log(a);
 }
 
-//Double_t PowderPdf::indefiniteIntegral(Double_t y) const {   
-//    if (y < 0) return 0.;    
-//    if (y == 0) return -1*lb;
-//    return -exp(-y*lb)/lb;
-//}
-//
-//Int_t PowderPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName) const {
-//   if (matchArgs(allVars,analVars,t)) return 1;
-//   return 0;
-//}
-//
-//Double_t PowderPdf::analyticalIntegral(Int_t code, const char* rangeName) const {
-//    assert(code == 1);
-//
-//    if (code==1){
-//        // Range always called [AXIS_MIN-100, AXIS_MAX+100] : (-100; 2100) if 2000 bins
-//        Double_t t1 = t.min(rangeName);
-//        Double_t t2 = t.max(rangeName);
-//        
+
+Int_t PowderPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName) const {
+   if (matchArgs(allVars,analVars,t)) return 1;
+   return 0;
+}
+
+Double_t PowderPdf::indefiniteIntegral(Double_t y) const{
+    Double_t l = L;
+	Double_t E = TMath::E();
+	return
+((4*kv*(-1 + Pps))/(Power(E,chW*lv*y)*(kv + lb - lv)) +
+	 (4*(lb - lv)*(-1 + Pps))/(Power(E,chW*(kv + lb)*y)*(kv + lb - lv)) -
+	 Pps/Power(E,chW*l2g*y) - (3*Power(2,(Mr*mu)/4.)*Pps)/
+	  (Power(E,(chW*mu*Vth*y)/(4.*l))*
+		Power(((V0 + Vth)*(1 + (-V0 + Vth)/
+			   (Power(E,(2*chW*Vth*y)/(l*Mr))*(V0 + Vth))))/Vth,(Mr*mu)/4.)))/(4.*chW)
+			;
+}
+
+Double_t PowderPdf::analyticalIntegral(Int_t code, const char* rangeName) const {
+    assert(code == 1);
+
+    if (code==1){
+        // Range always called [AXIS_MIN-100, AXIS_MAX+100] : (-100; 2100) if 2000 bins
+        Double_t t1 = t.min(rangeName);
+        Double_t t2 = t.max(rangeName);
+
 //        std::cout << "range(" << t1 << ", " << t2 << ")" << std::endl;
-//        
-//        if (t2 <= 0) return 0;
-//        t1 = TMath::Max(0.,t1);
-//        Double_t ret = indefiniteIntegral(t2)-indefiniteIntegral(t1);
-//        return ret;
-//    }
-//    else {
-//        std::cout << "Error in PowderPdf::analyticalIntegral" << std::endl;
-//    }
-//    return 0;
-//}
+
+        if (t2 <= 0) return 0;
+        t1 = TMath::Max(0.,t1);
+        Double_t ret = indefiniteIntegral(t2)-indefiniteIntegral(t1);
+        return ret;
+    }
+    else {
+        std::cout << "Error in PowderPdf::analyticalIntegral" << std::endl;
+    }
+    return 0;
+}

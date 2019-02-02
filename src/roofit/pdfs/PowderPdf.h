@@ -45,8 +45,8 @@ public:
     virtual TObject* clone(const char* newname) const { return new PowderPdf(*this, newname); }
     inline virtual ~PowderPdf() { }     
 
-//    Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const ;
-//    Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const ;
+    Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const ;
+    Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const ;
     
 protected:
     RooRealProxy t;
@@ -71,7 +71,7 @@ protected:
     Double_t ArcTan(Double_t a) const;
     Double_t Coth(Double_t a) const;
     Double_t Log(Double_t a) const;
-//    Double_t indefiniteIntegral(Double_t y) const; 
+    Double_t indefiniteIntegral(Double_t y) const;
     
 private:
     ClassDef(PowderPdf, 1)
