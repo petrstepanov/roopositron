@@ -18,6 +18,20 @@
 #include <RooRealVar.h>
 #include <iostream>
 
+const Double_t GraphicsHelper::FONT_SIZE_NORMAL = 0.05;
+const Double_t GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT = 0.35;
+
+Double_t GraphicsHelper::getSpectrumPadFontFactor(){
+	return 0.5/(1-RESIDUALS_PAD_RELATIVE_HEIGHT);
+}
+
+Double_t GraphicsHelper::getResidualsPadFontFactor(){
+	// Pad's font size depends on its height. Uneven pad heights result in different font sizes.
+	// This function fives a coefficient that evens the font size out
+	return 0.5/RESIDUALS_PAD_RELATIVE_HEIGHT;
+}
+
+
 void GraphicsHelper::drawRegion(RooPlot* frame, Int_t xMin, Int_t xMax) {
 	Double_t yMin = frame->GetMinimum(); // frame->GetYaxis()->GetXmin();
 	Double_t yMax = frame->GetMaximum(); // frame->GetYaxis()->GetXmax();
@@ -105,7 +119,7 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Int_t sigDigits
 	box->AddText("");
 	currentLine++;
 
-	while (RooRealVar* var = findRooRealVarInList(paramsList, "Source")) {
+	while (RooRealVar* var = findRooRealVarInList(paramsList, "ource")) {
 		TString *formatted = var->format(3, options);
 		box->AddText(formatted->Data());
 		paramsList->remove(*var);

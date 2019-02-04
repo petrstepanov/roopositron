@@ -32,6 +32,7 @@
 #include <TPaveStats.h>
 #include <TLegend.h>
 #include <TPaveText.h>
+#include <TGaxis.h>
 
 #include "RooWorkspace.h"
 
@@ -450,7 +451,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 //            resFuncPlusBg->plotOn(graphFrame[i], RooFit::LineStyle(3), RooFit::LineColor(kGray + 3), RooFit::LineWidth(1), RooFit::Name("resolution"));
 
 		// Draw Resolution Function
-		res_funct[i]->plotOn(graphFrame[i], RooFit::LineStyle(3), RooFit::LineColor(kGray + 3), RooFit::LineWidth(1), RooFit::Name("resolution"));
+		res_funct[i]->plotOn(graphFrame[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kGray + 3), RooFit::LineWidth(1), RooFit::Name("resolution"));
 
 		// Draw complete fit, dont't forget the ranges option
 		// https://root-forum.cern.ch/t/excluding-regions-in-a-fit/9109
@@ -541,29 +542,60 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 //		pad1->
 
 		// Draw Legend
-		RooArgSet* parameters = decay_model[i]->getParameters(graphFrame[i]->getNormVars());
-		TPaveText* pt = GraphicsHelper::makePaveText(*parameters, 3, 0.78, 0.99, 0.9);
-		graphFrame[i]->addObject(pt);
+		{
+			RooArgSet* parameters = decay_model[i]->getParameters(graphFrame[i]->getNormVars());
+			TPaveText* pt = GraphicsHelper::makePaveText(*parameters, 3, 0.7, 0.99, 0.9);
+			graphFrame[i]->addObject(pt);
+		}
 
+		// Draw second Axis
+		{
+			TVirtualPad* pad = canvas[i]->cd(1);
+			RooAbsArg* rooAbsArg = decay_model[i]->getParameters(graphFrame[i]->getNormVars())->find("gaussMean");
+			if (RooRealVar* rooRealVar = dynamic_cast<RooRealVar*>(rooAbsArg)){
+				Double_t zeroChannel = rooRealVar->getVal();
+				Double_t channelWidth = Constants::getInstance()->getChannelWidth();
+				Double_t timeMin = -channelWidth*zeroChannel;
+				Double_t timeMax = (rChannels->getMax() - zeroChannel)*channelWidth;
+//				std::cout << "time axis (" << timeMin << ", " << timeMax << std::endl;
+//				std::cout << "gPad->GetUxmin(): " << gPad->GetUxmin() << std::endl;
+//				std::cout << "gPad->GetUxmax(): " << gPad->GetUxmax() << std::endl;
+//				std::cout << "gPad->GetUymin(): " << gPad->GetUymin() << std::endl;
+//				std::cout << "gPad->GetUymax(): " << gPad->GetUymax() << std::endl;
+				TGaxis *timeAxis = new TGaxis(0,1,rChannels->getMax(), 1, timeMin, timeMax, 510, "+L");
+//				timeAxis->SetTickLength(0.03);
+				timeAxis->SetTitleSize(GraphicsHelper::getSpectrumPadFontFactor()*GraphicsHelper::FONT_SIZE_NORMAL);
+				timeAxis->SetTitleOffset(0.025);
+				timeAxis->SetTextFont(42);
+				timeAxis->SetTitle("Time axis (ns)");
+				timeAxis->SetTitleSize(GraphicsHelper::getSpectrumPadFontFactor()*GraphicsHelper::FONT_SIZE_NORMAL);
+				timeAxis->SetLabelSize(GraphicsHelper::getSpectrumPadFontFactor()*GraphicsHelper::FONT_SIZE_NORMAL);
+				timeAxis->SetLabelOffset(0.025);
+				timeAxis->SetLabelFont(42);
+				graphFrame[i]->addObject(timeAxis);
+			}
+		}
 
-		// Bottom pad
-		Double_t ratio = 0.3;
-		canvas[i]->cd(1)->SetPad(0, ratio, 1, 1); // xlow ylow xup yup
-		canvas[i]->cd(1)->SetMargin(0.055, 0.01, 0.03, 0.1); // left right bottom top
+		canvas[i]->cd(1)->SetPad(0, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT, 1, 1); // xlow ylow xup yup
+		canvas[i]->cd(1)->SetGridx();
+		canvas[i]->cd(1)->SetGridy();
+		canvas[i]->cd(1)->SetMargin(0.055, 0.01, 0.10, 0.1); // left right bottom top
 		canvas[i]->cd(1)->SetLogy();
+
 
 		// Pad text size is proportionsl to its heght. Here we revert the font size back.
 		// https://root.cern.ch/doc/master/classTAttText.html#T4
 //		canvas[i]->cd(1)->SetAttTextPS(gStyle->GetTextAlign(), gStyle->GetTextAngle(), gStyle->GetTextColor(), gStyle->GetTextFont(), gStyle->GetTextSize()*0.5/(1-ratio));
 
-		Double_t fontSize = 0.06;
-		Double_t graphFrameFontFactor = 0.5/(1-ratio);
+		Double_t spectrumFontFactor = GraphicsHelper::getSpectrumPadFontFactor();
 		graphFrame[i]->GetXaxis()->SetLabelColor(0);
 		graphFrame[i]->GetXaxis()->SetTitleSize(0);
-		graphFrame[i]->GetYaxis()->SetLabelSize(graphFrameFontFactor*(fontSize - 0.01));
+		graphFrame[i]->GetXaxis()->SetTickLength(0);
+
+		graphFrame[i]->GetYaxis()->SetLabelSize(spectrumFontFactor*(GraphicsHelper::FONT_SIZE_NORMAL));
 		graphFrame[i]->GetYaxis()->SetRangeUser(1, iUpperLimit[i]);
-		graphFrame[i]->GetYaxis()->SetTitleSize(graphFrameFontFactor*fontSize);
-		graphFrame[i]->GetYaxis()->SetTitleOffset(0.5);
+		graphFrame[i]->GetYaxis()->SetTitleSize(spectrumFontFactor*GraphicsHelper::FONT_SIZE_NORMAL);
+		graphFrame[i]->GetYaxis()->SetTitleOffset(0.7);
 
 		if (doRange) {
 			GraphicsHelper::drawRegion(graphFrame[i], EXCLUDE_MIN_CHANNEL, EXCLUDE_MAX_CHANNEL);
@@ -572,17 +604,21 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		// Font size correction (compensate on the Pads uneven heights)
 		graphFrame[i]->Draw(); // Draw frame on current canvas (pad)
 
-        canvas[i]->cd(2)->SetPad(0, 0, 1, ratio);
-		canvas[i]->cd(2)->SetMargin(0.055, 0.01, 0.25, 0.05); // left right bottom top - margin for bottom title space
+        canvas[i]->cd(2)->SetPad(0, 0, 1, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT);
+		canvas[i]->cd(2)->SetMargin(0.055, 0.01, 0.35, 0.05); // left right bottom top - margin for bottom title space
 //		canvas[i]->cd(2)->SetAttTextPS(gStyle->GetTextAlign(), gStyle->GetTextAngle(), gStyle->GetTextColor(), gStyle->GetTextFont(), 0.1);
+		canvas[i]->cd(2)->SetGridx();
 
-		Double_t chiFrameFontFactor = 0.5/(ratio);
-		chiFrame[i]->GetXaxis()->SetLabelSize(chiFrameFontFactor*(fontSize - 0.01));
-		chiFrame[i]->GetYaxis()->SetLabelSize(chiFrameFontFactor*(fontSize - 0.01));
+		Double_t residualsFontFactor = GraphicsHelper::getResidualsPadFontFactor();
+		chiFrame[i]->GetYaxis()->SetTitle("Fit residuals");
+		chiFrame[i]->GetYaxis()->SetTitleSize(residualsFontFactor*(GraphicsHelper::FONT_SIZE_NORMAL));
+		chiFrame[i]->GetYaxis()->SetLabelSize(residualsFontFactor*(GraphicsHelper::FONT_SIZE_NORMAL));
 		chiFrame[i]->GetYaxis()->SetLabelOffset(0.01);
-		chiFrame[i]->GetXaxis()->SetLabelOffset(0.04);
-		chiFrame[i]->GetXaxis()->SetTitleSize(chiFrameFontFactor*(fontSize));
+
+		chiFrame[i]->GetXaxis()->SetTitleSize(residualsFontFactor*(GraphicsHelper::FONT_SIZE_NORMAL));
 		chiFrame[i]->GetXaxis()->SetTitleOffset(2);
+		chiFrame[i]->GetXaxis()->SetLabelSize(residualsFontFactor*(GraphicsHelper::FONT_SIZE_NORMAL));
+		chiFrame[i]->GetXaxis()->SetLabelOffset(0.04);
 
 		if (doRange) {
 			GraphicsHelper::drawRegion(chiFrame[i], EXCLUDE_MIN_CHANNEL, EXCLUDE_MAX_CHANNEL);

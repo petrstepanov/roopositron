@@ -111,7 +111,7 @@ void AdditiveConvolutionPdf::initResolutionModel(const char* resolutionId,
 
 void AdditiveConvolutionPdf::initCoefficients() {
 	// Initialize source contribution coefficient
-	sourceContribution = new RooRealVar("SourceCont", "Source contribution", 11, 5, 20, "%");
+	sourceContribution = new RooRealVar("I_source", "Source contribution", 11, 5, 20, "%");
 	sourceContributionNorm = new RooFormulaVar("sourceContributionNorm", "@0/100", *sourceContribution);
 }
 
