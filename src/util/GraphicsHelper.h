@@ -26,6 +26,7 @@ public:
 //    GraphicsHelper(const GraphicsHelper& orig);
 //    virtual ~GraphicsHelper();
 
+	static const Double_t FONT_SIZE_SMALL;
 	static const Double_t FONT_SIZE_NORMAL;
 	static const Double_t RESIDUALS_PAD_RELATIVE_HEIGHT;
 

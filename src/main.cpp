@@ -451,7 +451,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 //            resFuncPlusBg->plotOn(graphFrame[i], RooFit::LineStyle(3), RooFit::LineColor(kGray + 3), RooFit::LineWidth(1), RooFit::Name("resolution"));
 
 		// Draw Resolution Function
-		res_funct[i]->plotOn(graphFrame[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kGray + 3), RooFit::LineWidth(1), RooFit::Name("resolution"));
+		res_funct[i]->plotOn(graphFrame[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kGray + 1), RooFit::LineWidth(1), RooFit::Name("resolution"));
 
 		// Draw complete fit, dont't forget the ranges option
 		// https://root-forum.cern.ch/t/excluding-regions-in-a-fit/9109
@@ -544,7 +544,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		// Draw Legend
 		{
 			RooArgSet* parameters = decay_model[i]->getParameters(graphFrame[i]->getNormVars());
-			TPaveText* pt = GraphicsHelper::makePaveText(*parameters, 3, 0.7, 0.99, 0.9);
+			TPaveText* pt = GraphicsHelper::makePaveText(*parameters, 3, 0.75, 0.99, 0.9);
 			graphFrame[i]->addObject(pt);
 		}
 
@@ -565,12 +565,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 				TGaxis *timeAxis = new TGaxis(0,1,rChannels->getMax(), 1, timeMin, timeMax, 510, "+L");
 //				timeAxis->SetTickLength(0.03);
 				timeAxis->SetTitleSize(GraphicsHelper::getSpectrumPadFontFactor()*GraphicsHelper::FONT_SIZE_NORMAL);
-				timeAxis->SetTitleOffset(0.025);
+				timeAxis->SetTitleOffset(0.68);  // ? 1.7->1.5->1->0.7
 				timeAxis->SetTextFont(42);
-				timeAxis->SetTitle("Time axis (ns)");
+				timeAxis->SetTitle("(ns)");
 				timeAxis->SetTitleSize(GraphicsHelper::getSpectrumPadFontFactor()*GraphicsHelper::FONT_SIZE_NORMAL);
 				timeAxis->SetLabelSize(GraphicsHelper::getSpectrumPadFontFactor()*GraphicsHelper::FONT_SIZE_NORMAL);
-				timeAxis->SetLabelOffset(0.025);
+				timeAxis->SetLabelOffset(0.02);
 				timeAxis->SetLabelFont(42);
 				graphFrame[i]->addObject(timeAxis);
 			}
@@ -579,7 +579,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		canvas[i]->cd(1)->SetPad(0, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT, 1, 1); // xlow ylow xup yup
 		canvas[i]->cd(1)->SetGridx();
 		canvas[i]->cd(1)->SetGridy();
-		canvas[i]->cd(1)->SetMargin(0.055, 0.01, 0.10, 0.1); // left right bottom top
+		canvas[i]->cd(1)->SetMargin(0.07, 0.01, 0.08, 0.1); // left right bottom top
 		canvas[i]->cd(1)->SetLogy();
 
 
@@ -595,7 +595,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		graphFrame[i]->GetYaxis()->SetLabelSize(spectrumFontFactor*(GraphicsHelper::FONT_SIZE_NORMAL));
 		graphFrame[i]->GetYaxis()->SetRangeUser(1, iUpperLimit[i]);
 		graphFrame[i]->GetYaxis()->SetTitleSize(spectrumFontFactor*GraphicsHelper::FONT_SIZE_NORMAL);
-		graphFrame[i]->GetYaxis()->SetTitleOffset(0.7);
+		graphFrame[i]->GetYaxis()->SetTitleOffset(0.9);
 
 		if (doRange) {
 			GraphicsHelper::drawRegion(graphFrame[i], EXCLUDE_MIN_CHANNEL, EXCLUDE_MAX_CHANNEL);
@@ -605,12 +605,13 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		graphFrame[i]->Draw(); // Draw frame on current canvas (pad)
 
         canvas[i]->cd(2)->SetPad(0, 0, 1, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT);
-		canvas[i]->cd(2)->SetMargin(0.055, 0.01, 0.35, 0.05); // left right bottom top - margin for bottom title space
+		canvas[i]->cd(2)->SetMargin(0.07, 0.01, 0.3, 0.05); // left right bottom top - margin for bottom title space
 //		canvas[i]->cd(2)->SetAttTextPS(gStyle->GetTextAlign(), gStyle->GetTextAngle(), gStyle->GetTextColor(), gStyle->GetTextFont(), 0.1);
 		canvas[i]->cd(2)->SetGridx();
 
 		Double_t residualsFontFactor = GraphicsHelper::getResidualsPadFontFactor();
 		chiFrame[i]->GetYaxis()->SetTitle("Fit residuals");
+		chiFrame[i]->GetYaxis()->SetTitleOffset(0.48);
 		chiFrame[i]->GetYaxis()->SetTitleSize(residualsFontFactor*(GraphicsHelper::FONT_SIZE_NORMAL));
 		chiFrame[i]->GetYaxis()->SetLabelSize(residualsFontFactor*(GraphicsHelper::FONT_SIZE_NORMAL));
 		chiFrame[i]->GetYaxis()->SetLabelOffset(0.01);
@@ -632,13 +633,16 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 //            sBox->SetFillColorAlpha(2, 0.2);
 		chiFrame[i]->addObject(hr);
 
-		chiFrame[i]->Draw();
+		TPaveText* leg = new TPaveText(0.75, 0.85, 0.99, 0.95, "BRNDC");  // x1 y1 x2 y2  0.75, 0.99, 0.9
+		leg->AddText(Form("chi^{2} = %.1f / %d = %.3f", chi2[i]->getVal(), n_Degree[i], chi2Value[i]));
+		leg->SetTextSize(residualsFontFactor*GraphicsHelper::FONT_SIZE_SMALL*1.3);
+		leg->SetFillColor(0);
+		leg->SetBorderSize(1);
+		leg->SetTextAlign(12);
+		leg->SetFillStyle(1001);
+		chiFrame[i]->addObject(leg);
 
-		TLegend* leg = new TLegend(0.78, 0.8, 0.97, 0.95 - 0.01);  // x1 y1 x2 y2
-		leg->SetHeader(TString::Format("chi^2 = %.1f / %d = %.3f", chi2[i]->getVal(), n_Degree[i], chi2Value[i]));
-		leg->SetTextSize(0.05);
-		leg->SetLineWidth(0);
-		leg->Draw();
+		chiFrame[i]->Draw();
 
 		//            ps->SetName("mystats");
 

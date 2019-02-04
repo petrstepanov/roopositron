@@ -76,9 +76,9 @@ RooArgList* Constants::initDefaultValues() {
     constants->add(*constant);
     constant = new RooStringVar("bufferFraction", " # set to about 1.5-2 when dealing with larger lifetime components ~5ns", "0.2");
     constants->add(*constant);
-    constant = new RooStringVar("imageWidth", " # output image width", "1280");
+    constant = new RooStringVar("imageWidth", " # output image width", "1000");
     constants->add(*constant);
-    constant = new RooStringVar("imageHeight", " # output image height", "700");
+    constant = new RooStringVar("imageHeight", " # output image height", "800");
     constants->add(*constant);
     return constants;
 }

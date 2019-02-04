@@ -18,6 +18,7 @@
 #include <RooRealVar.h>
 #include <iostream>
 
+const Double_t GraphicsHelper::FONT_SIZE_SMALL = 0.028;
 const Double_t GraphicsHelper::FONT_SIZE_NORMAL = 0.05;
 const Double_t GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT = 0.35;
 
@@ -79,9 +80,9 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Int_t sigDigits
 	box->SetFillColor(0);
 	box->SetBorderSize(1);
 	box->SetTextAlign(12);
-	box->SetTextSize(0.03);
+	box->SetTextSize(FONT_SIZE_SMALL);
 	box->SetFillStyle(1001);
-	box->SetFillColor(0);
+	box->SetFillColorAlpha(0, 0.9);
 	//char buffer[512];
 
 	RooArgList* paramsList = new RooArgList(params);
