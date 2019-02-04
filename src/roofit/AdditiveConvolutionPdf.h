@@ -60,8 +60,8 @@ private:
     RooAbsPdf* convolutedSourcePdf;
     
     // Source contribution coefficients
-    RooRealVar* ISource;
-    RooFormulaVar* ISourceNorm;
+    RooRealVar* sourceContribution;
+    RooFormulaVar* sourceContributionNorm;
     
     Int_t componentsNumber;
     Int_t sourceComponentsNumber;

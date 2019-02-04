@@ -111,8 +111,8 @@ void AdditiveConvolutionPdf::initResolutionModel(const char* resolutionId,
 
 void AdditiveConvolutionPdf::initCoefficients() {
 	// Initialize source contribution coefficient
-	ISource = new RooRealVar("ISource", "Source contribution", 11, 5, 20, "%");
-	ISourceNorm = new RooFormulaVar("ISourceNorm", "@0/100", *ISource);
+	sourceContribution = new RooRealVar("SourceCont", "Source contribution", 11, 5, 20, "%");
+	sourceContributionNorm = new RooFormulaVar("sourceContributionNorm", "@0/100", *sourceContribution);
 }
 
 void AdditiveConvolutionPdf::convoluteComponents(RooRealVar *observable) {
@@ -173,7 +173,7 @@ void AdditiveConvolutionPdf::constructModel() {
 	model = new RooAddPdf("componentsSourceModel",
 			"Components model with source",
 			RooArgList(*sumSourceConvolutedComponents,
-					*sumConvolutedComponents), RooArgList(*ISourceNorm));
+					*sumConvolutedComponents), RooArgList(*sourceContributionNorm));
 }
 
 RooAbsPdf* AdditiveConvolutionPdf::getPdf() {
