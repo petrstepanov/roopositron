@@ -552,32 +552,37 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			graphFrame[i]->addObject(pt);
 		}
 
+		// Set spectrum Y axis limits (tip: only works after canvas was modified and updated)
+		// Y axis minimum is a number of 10^t < background
+		Double_t yMin = pow(10, MathUtil::orderOfMagnitude(spectra[i].averageBackground));
+		// Y axis maximum is default ROOT's gPad value
+		Double_t yMax = graphFrame[i]->GetMaximum();
+		Debug (yMin << " " << yMax);
+		graphFrame[i]->GetYaxis()->SetRangeUser(yMin, yMax);
+
 		// Draw second Axis
-		{
-//			TVirtualPad* pad = canvas[i]->cd(1);
-			RooAbsArg* rooAbsArg = decay_model[i]->getParameters(graphFrame[i]->getNormVars())->find("mean_gauss");
-			if (RooRealVar* rooRealVar = dynamic_cast<RooRealVar*>(rooAbsArg)){
-				Double_t zeroChannel = rooRealVar->getVal();
-				Double_t channelWidth = Constants::getInstance()->getChannelWidth();
-				Double_t timeMin = -channelWidth*zeroChannel;
-				Double_t timeMax = (rChannels->getMax() - zeroChannel)*channelWidth;
+		RooAbsArg* rooAbsArg = decay_model[i]->getParameters(graphFrame[i]->getNormVars())->find("mean_gauss");
+		if (RooRealVar* rooRealVar = dynamic_cast<RooRealVar*>(rooAbsArg)){
+			Double_t zeroChannel = rooRealVar->getVal();
+			Double_t channelWidth = Constants::getInstance()->getChannelWidth();
+			Double_t timeMin = -channelWidth*zeroChannel;
+			Double_t timeMax = (rChannels->getMax() - zeroChannel)*channelWidth;
 //				std::cout << "time axis (" << timeMin << ", " << timeMax << std::endl;
 //				std::cout << "gPad->GetUxmin(): " << gPad->GetUxmin() << std::endl;
 //				std::cout << "gPad->GetUxmax(): " << gPad->GetUxmax() << std::endl;
 //				std::cout << "gPad->GetUymin(): " << gPad->GetUymin() << std::endl;
 //				std::cout << "gPad->GetUymax(): " << gPad->GetUymax() << std::endl;
-				TGaxis *timeAxis = new TGaxis(0,1,rChannels->getMax(), 1, timeMin, timeMax, 510, "+L");
+			TGaxis *timeAxis = new TGaxis(0, yMin, rChannels->getMax(), yMin, timeMin, timeMax, 510, "+L");
 //				timeAxis->SetTickLength(0.03);
-				timeAxis->SetTitleSize(GraphicsHelper::getSpectrumPadFontFactor()*GraphicsHelper::FONT_SIZE_NORMAL);
-				timeAxis->SetTitleOffset(0.68);  // ? 1.7->1.5->1->0.7
-				timeAxis->SetTextFont(42);
-				timeAxis->SetTitle("(ns)");
-				timeAxis->SetTitleSize(GraphicsHelper::getSpectrumPadFontFactor()*GraphicsHelper::FONT_SIZE_NORMAL);
-				timeAxis->SetLabelSize(GraphicsHelper::getSpectrumPadFontFactor()*GraphicsHelper::FONT_SIZE_NORMAL);
-				timeAxis->SetLabelOffset(0.02);
-				timeAxis->SetLabelFont(42);
-				graphFrame[i]->addObject(timeAxis);
-			}
+			timeAxis->SetTitleSize(GraphicsHelper::getSpectrumPadFontFactor()*GraphicsHelper::FONT_SIZE_NORMAL);
+			timeAxis->SetTitleOffset(0.68);  // ? 1.7->1.5->1->0.7
+			timeAxis->SetTextFont(42);
+			timeAxis->SetTitle("(ns)");
+			timeAxis->SetTitleSize(GraphicsHelper::getSpectrumPadFontFactor()*GraphicsHelper::FONT_SIZE_NORMAL);
+			timeAxis->SetLabelSize(GraphicsHelper::getSpectrumPadFontFactor()*GraphicsHelper::FONT_SIZE_NORMAL);
+			timeAxis->SetLabelOffset(0.02);
+			timeAxis->SetLabelFont(42);
+			graphFrame[i]->addObject(timeAxis);
 		}
 
 		canvas[i]->cd(1)->SetPad(0, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT, 1, 1); // xlow ylow xup yup
@@ -595,7 +600,6 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		graphFrame[i]->GetXaxis()->SetTickLength(0);
 
 		graphFrame[i]->GetYaxis()->SetLabelSize(spectrumFontFactor*(GraphicsHelper::FONT_SIZE_NORMAL));
-		graphFrame[i]->GetYaxis()->SetRangeUser(1, iUpperLimit[i]);
 		graphFrame[i]->GetYaxis()->SetTitleSize(spectrumFontFactor*GraphicsHelper::FONT_SIZE_NORMAL);
 		graphFrame[i]->GetYaxis()->SetTitleOffset(0.9);
 
@@ -604,20 +608,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		}
 
 		// Set spectrum Y axis limits (tip: only works after canvas was modified and updated)
-		{
-			Debug (yMin << " " << yMax);
-			graphFrame[i]->GetYaxis()->SetRangeUser(yMin, yMax);
-		}
 		gPad->SetLogy();
-		// Set spectrum Y axis limits (tip: only works after canvas was modified and updated)
-		{
-			// Y axis minimum is a number of 10^t < background
-			Double_t yMin = pow(10, MathUtil::orderOfMagnitude(spectra[i].averageBackground));
-			// Y axis maximum is default ROOT's gPad value
-			Double_t yMax = graphFrame[i]->GetMaximum();
-			Debug (yMin << " " << yMax);
-			graphFrame[i]->GetYaxis()->SetRangeUser(yMin, yMax);
-		}
+
 		// Font size correction (compensate on the Pads uneven heights)
 		graphFrame[i]->Draw(); // Draw frame on current canvas (pad)
 
