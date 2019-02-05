@@ -46,6 +46,6 @@ RooAbsPdf* TwoGaussProvider::initPdf(int i) {
 //	}
 
     // Zero channel start values are assigned later (relative to the MIN_CHANNEL value)
-    RooRealVar* gMean = new RooRealVar("mean_gauss", "Resolution function mean", 300, 250, 350, "ch");
+    RooRealVar* gMean = new RooRealVar("mean_gauss", "Resolution function mean", 1, "ch");
     return new TwoGaussian("twoGauss", "Two gauss model", *observable, *gMean, *g1Dispersion, *gMean, *g2Dispersion, *g2FractionNorm);	
 }

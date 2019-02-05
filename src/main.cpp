@@ -55,26 +55,17 @@
 #include "util/RootHelper.h"
 #include "util/Debug.h"
 
-//#include "temp/MyPdfCache.h"
-//#include "temp/MyPdf.h"
-//#include "temp/ConvPdf.h"
-//#include "temp/ChannelConvolutionPdf.h"
-//#include <unistd.h>
-
 #include <iostream>
 #include <sstream>
-
-//using namespace RooFit;
-//using namespace TMath;
 
 // Declare Map Container to perform simultaneous fit
 typedef std::map<std::string, RooDataHist*> dhistMap;
 typedef std::pair<std::string, RooDataHist*> dhistPair;
 
-// TODO: make FileUtils output spectrums
 struct Spectrum {
-	TH1F* histogram;              // ROOT histogram
 	TString filename;
+	TH1F* histogram;              // ROOT histogram
+	RooDataHist* dataHistogram;   // RooFit histogram
 	Double_t integral;            // total counts
 	Int_t numberOfBins;
 	Int_t binWithMinimumCount;    // bin number with minimum value in the range
@@ -82,6 +73,8 @@ struct Spectrum {
 	Double_t minimumCount;        // minimum count across all bins
 	Double_t maximumCount;        // maximum count across all bins
 	Double_t averageBackground;
+	RooAbsPdf* model;
+	RooAbsPdf* resolutionFunction;
 };
 
 // ASCII font generator is here: http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Resolution%0AFunction
@@ -89,131 +82,77 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	// Start timer to track performance
 	RootHelper::startTimer();
 
-	// Construct a list of .Spe files from current directory
-	std::vector<std::string> filenames = FileUtils::getFilenamesInCurrentDrectory(".Spe");
-
-	// Construct a list of Spectrum structs to store individual spectra information
-	std::vector<Spectrum> spectra;
-	for (unsigned i = 0; i < filenames.size(); i++) {
-		Spectrum s;
-		s.histogram = FileUtils::importTH1F(filenames[i], i);
-		s.filename = filenames[i].c_str();
-		s.numberOfBins = s.histogram->GetXaxis()->GetNbins();
-		s.integral = s.histogram->Integral();
-		s.binWithMinimumCount = s.histogram->GetMinimumBin();
-		s.binWithMinimumCount = s.histogram->GetMaximumBin();
-		s.minimumCount = s.histogram->GetBinContent(s.binWithMinimumCount);
-		s.maximumCount = s.histogram->GetBinContent(s.binWithMaximumCount);
-		s.averageBackground = HistProcessor::getAverageBackground(s.histogram);
-		spectra.push_back(s);
-	}
-
 	// Create constants object that stores values from "constants.txt" file
 	Constants* constants = Constants::getInstance();
 
 	// Define some global app constants
 	const Int_t BINS = constants->getMaxChannel() - constants->getMinChannel() + 1;
-	const Bool_t doRange = constants->getExcludeMinChannel() > 1 && constants->getExcludeMinChannel() < constants->getExcludeMaxChannel() && constants->getExcludeMaxChannel() < BINS ? kTRUE : kFALSE;
-
-	// Define number of spectrums
-	const int iNumberOfFiles = filenames.size();
-	std::cout << "Found " << iNumberOfFiles << " files.\n" << std::endl;
-
-	// Exit if no spectra found
-	if (iNumberOfFiles < 1) {
-		std::cout << "No Maestro `.Spe` files found in current directory. Press CTRL+C." << std::endl;
-		return 0;
-	}
-
-	// Convert list to array of strings
-	const char** array = new const char*[filenames.size()];
-	unsigned index = 0;
-	std::string* sFileNames = new std::string[filenames.size()];
-	for (std::vector<std::string>::iterator it = filenames.begin(); it != filenames.end(); ++it) {
-		sFileNames[index] = ((std::string) *it).c_str();
-		index++;
-	}
-
-	TH1F** fullTH1F = new TH1F*[iNumberOfFiles];
-
-	// Channels (bins) with maximum and minimum count
-	Int_t* iTopChannel = new Int_t[iNumberOfFiles];
-	Int_t* iLowChannel = new Int_t[iNumberOfFiles];
-
-//	// Y axis plotting range
-	Int_t* iUpperLimit = new Int_t[iNumberOfFiles];
-	Int_t* iLowerLimit = new Int_t[iNumberOfFiles];
-
-	// TODO: drop these variables in favor of histogram struct
-
-//        const Int_t CHANNELS = constants->getNumberOfChannels();
-	const Double_t CHANNEL_WIDTH = constants->getChannelWidth();
-	const Int_t SKIP_LINES = constants->getSkipLines();
-
-	for (unsigned i = 0; i < iNumberOfFiles; i++) {
-		// Import Data
-		fullTH1F[i] = new TH1F(TString::Format("fullTH1F_%d", i + 1), TString::Format("fullTH1F_%d", i + 1), BINS, 0, BINS);
-		// Open File
-		std::cout << std::endl << "Spectrum " << i + 1 << " filename is \"" << sFileNames[i] << "\"" << std::endl;
-		std::string path = sFileNames[i];
-		fullTH1F[i] = FileUtils::importTH1F(path, i);
-
-		iTopChannel[i] = fullTH1F[i]->GetMaximumBin();
-		iLowChannel[i] = fullTH1F[i]->GetMinimumBin();
-		std::cout << "  Top Channel is " << iTopChannel[i] << std::endl;
-		std::cout << "  Low Channel is " << iLowChannel[i] << std::endl;
-
-		Int_t iMaxCount = fullTH1F[i]->GetBinContent(iTopChannel[i]);
-		Int_t iMinCount = fullTH1F[i]->GetBinContent(iLowChannel[i]);
-		std::cout << "  Maximum count is: " << iMaxCount << std::endl;
-		std::cout << "  Minimum count is: " << iMinCount << std::endl;
-
-		std::cout << "  Total number of events:" << fullTH1F[i]->Integral() << std::endl;
-
-		// Evaluate counts axis limits (for graphical output)
-		iUpperLimit[i] = 2 * iMaxCount;
-		iLowerLimit[i] = iMinCount / 2;
-	}
+	const Bool_t DO_RANGE = constants->getExcludeMinChannel() > 1 && constants->getExcludeMinChannel() < constants->getExcludeMaxChannel() && constants->getExcludeMaxChannel() < BINS ? kTRUE : kFALSE;
 
 	// Define Channels Observable
-	RooRealVar* rChannels = new RooRealVar("rChannels", "Channels axis", 0, BINS, "ch");
+	RooRealVar* channels = new RooRealVar("channels", "Channels axis", 0, BINS, "ch");
 
 	// Set convolution bins same as real number of axis bins (notices it works nice)
-	rChannels->setBins(BINS);
-	rChannels->setBins(BINS, "cache");
+	channels->setBins(BINS);
+	channels->setBins(BINS, "cache");
 
-	// Convert TH1F spectra to RooDataHist
-	RooDataHist** histSpectrum = new RooDataHist*[iNumberOfFiles];
-	for (unsigned i = 0; i < iNumberOfFiles; i++) {
-		histSpectrum[i] = new RooDataHist(TString::Format("histSpectrum_%d", i + 1), sFileNames[i].c_str(), RooArgSet(*rChannels), RooFit::Import(*fullTH1F[i]));
+	// Scan current directory for '.Spe' files; exit if nothing found
+	const std::vector<std::string> filenames = FileUtils::getFilenamesInCurrentDrectory(".Spe");
+	if (filenames.size() < 1) {
+		std::cout << "No Maestro '.Spe' files found in current directory. Press CTRL+C." << std::endl;
+		return 0;
+	}
+	Debug("[main] Found " << filenames.size() << " spectra.");
+
+	// Construct a list of Spectrum structs to store individual spectra information
+	std::vector<Spectrum> spectra;
+	for (unsigned i = 0; i < filenames.size(); i++) {
+		Spectrum s;
+		s.filename = TString(filenames[i].c_str());
+		s.histogram = FileUtils::importTH1F(filenames[i], i);
+		s.dataHistogram = new RooDataHist(Form("dataHistogram_%d", i + 1), s.filename.Data(), RooArgSet(*channels), RooFit::Import(*(s.histogram)));
+		s.numberOfBins = s.histogram->GetXaxis()->GetNbins();
+		s.integral = s.histogram->Integral();
+		s.binWithMinimumCount = s.histogram->GetMinimumBin();
+		s.binWithMaximumCount = s.histogram->GetMaximumBin();
+		s.minimumCount = s.histogram->GetBinContent(s.binWithMinimumCount);
+		s.maximumCount = s.histogram->GetBinContent(s.binWithMaximumCount);
+		s.averageBackground = HistProcessor::getAverageBackground(s.histogram);
+		spectra.push_back(s);
+		Debug("Spectrum " << i+1 << " file is \"" << s.filename << "\"");
+		Debug("  bins: " << s.numberOfBins);
+		Debug("  integral: " << s.integral);
+		Debug("  bin with minimum count: " << s.binWithMinimumCount);
+		Debug("  bin with maximum count: " << s.binWithMaximumCount);
+		Debug("  minimum count: " << s.minimumCount);
+		Debug("  maximum count: " << s.maximumCount);
+		Debug("  average background: " << s.averageBackground);
 	}
 
 	// Construct additive decay models
-	RooAbsPdf** decay_model = new RooAbsPdf*[iNumberOfFiles];
-	RooAbsPdf** res_funct = new RooAbsPdf*[iNumberOfFiles];
-
 	RooWorkspace* w = new RooWorkspace("w", "w");
-	for (unsigned i = 0; i < iNumberOfFiles; i++) {
-		AdditiveConvolutionPdf* acp = new AdditiveConvolutionPdf(constants->getDecayModels(), constants->getResolutionFunctionModel(), constants->getSourceComponentsNumber(), rChannels);
+	for (unsigned i = 0; i < spectra.size(); i++) {
+		AdditiveConvolutionPdf* acp = new AdditiveConvolutionPdf(constants->getDecayModels(), constants->getResolutionFunctionModel(), constants->getSourceComponentsNumber(), channels);
 		RooAbsPdf* pdf = acp->getPdf();
 
 		// Set mean gauss values
-		RooRealVar* gaussMean = (RooRealVar*) (pdf->getParameters(*rChannels))->find("mean_gauss");
-		if (gaussMean) {
-			gaussMean->setMin(iTopChannel[i] - 100);
-			gaussMean->setMax(iTopChannel[i] + 100);
-			gaussMean->setVal(iTopChannel[i]);
+		if (RooRealVar* gaussMean = (RooRealVar*) (pdf->getParameters(*channels))->find("mean_gauss")) {
+			gaussMean->setConstant(kFALSE);
+			gaussMean->setMin(spectra[i].binWithMaximumCount - 100);
+			gaussMean->setMax(spectra[i].binWithMaximumCount + 100);
+			gaussMean->setVal(spectra[i].binWithMaximumCount);
 		}
 
 		// Initialize background here
-		RooPolynomial* bg = new RooPolynomial("bg", "y=1", *rChannels, RooArgSet());
+		RooPolynomial* bg = new RooPolynomial("bg", "y=1", *channels, RooArgSet());
+
 		// Parameterize background as counts, not as fraction (intentionally RooRealVar, not RooConst)
 		RooRealVar* bgCount = new RooRealVar("background", "Background level counts", spectra[i].averageBackground, spectra[i].averageBackground / 2, spectra[i].averageBackground * 2, "counts");
 		bgCount->setConstant(kTRUE);
-		Int_t b = fullTH1F[i]->GetXaxis()->GetNbins();
-		RooRealVar* bins = new RooRealVar("bins", "Histogram bins", b, b - 1, b + 1);
+		Int_t b = spectra[i].numberOfBins;
+		RooRealVar* bins = new RooRealVar("bins", "Histogram bins", b, b, b);
 		bins->setConstant(kTRUE);
-		RooRealVar* fullIntegral = new RooRealVar("integral", "Full histogram integral", fullTH1F[i]->Integral(1, b), fullTH1F[i]->Integral(1, b) - 1, fullTH1F[i]->Integral(1, b) + 1);
+		RooRealVar* fullIntegral = new RooRealVar("integral", "Full histogram integral", spectra[i].integral, spectra[i].integral, spectra[i].integral);
 		fullIntegral->setConstant(kTRUE);
 		RooFormulaVar* IBg = new RooFormulaVar("IBg", "@0*@1/@2", RooArgList(*bgCount, *bins, *fullIntegral));
 
@@ -223,65 +162,52 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		// Rename PDF parameters via RooWorkspace
 		if (i == 0) {
 			w->import(*pdfWithBg);
-			decay_model[i] = w->pdf("pdf");
+			spectra[i].model = w->pdf("pdf");
 		} else {
 			std::string suffix = std::to_string(i + 1);
-			w->import(*pdfWithBg, RooFit::RenameAllVariablesExcept(suffix.c_str(), rChannels->GetName()), RooFit::RenameAllNodes(suffix.c_str()));
-			decay_model[i] = w->pdf(Form("pdf_%d", i + 1));
+			w->import(*pdfWithBg, RooFit::RenameAllVariablesExcept(suffix.c_str(), channels->GetName()), RooFit::RenameAllNodes(suffix.c_str()));
+			spectra[i].model = w->pdf(Form("pdf_%d", i + 1));
 		}
-//	    components[i] = acp->getAllComponents();
-//	    convolutedComponents[i] = acp->getConvolutedComponents();
-//	    decay_model[i] = pdfWithBg;
-		res_funct[i] = acp->getResolutionFunction();
-//	    source_component[i] = acp->getSourceCompoment();
-//	    source_component_convoluted[i] = acp->getConvolutedSourceComponent();
-		// from workspace
 
-		// Run namer, add "_#" to every parameter and model name
-//	    simultaneousNamer->fixUniquePdfAndParameterNames(decay_model[i], rChannels);
-//	    ObjectNamer::suffixAllModelParameters(decay_model[i], rChannels, i+1);
+		// Save resolution function
+		spectra[i].resolutionFunction = acp->getResolutionFunction();
 	}
 
+#ifdef USEDEBUG
 	w->Print();
+#endif
 
 	// Introduce common parameters if more than one spectrum (simultaneous fit).
-	if (iNumberOfFiles > 1) {
+	if (spectra.size() > 1) {
 		// Initialize commonizer, read parameters from the first spectrum
-		ModelCommonizer* commonizer = new ModelCommonizer(decay_model[0], rChannels, constants->getCommonParameters());
+		ModelCommonizer* commonizer = new ModelCommonizer(spectra[0].model, channels, constants->getCommonParameters());
 		// All other spectra
 
-		for (unsigned i = 1; i < iNumberOfFiles; i++) {
-			RooAbsPdf* newPdf = commonizer->replaceParametersWithCommon(decay_model[i]);
-			decay_model[i] = newPdf;
+		for (unsigned i = 1; i < spectra.size(); i++) {
+			RooAbsPdf* newPdf = commonizer->replaceParametersWithCommon(spectra[i].model);
+			spectra[i].model = newPdf;
 		}
 	}
 
 	// Output
-	std::cout << std::endl << "Constructed following models" << std::endl;
-	for (unsigned i = 0; i < iNumberOfFiles; i++) {
-//	    std::cout << std::endl << "Model " << i+1 << ": " << decay_model[i]->GetName() << std::endl;
-		RootHelper::printPdfCoefficientNames(decay_model[i], rChannels);
-//	    decay_model[i]->Print();
+	Debug("[main] Constructed following models:");
+	for (unsigned i = 0; i < spectra.size(); i++) {
+#ifdef USEDEBUG
+		spectra[i].model->Print();
 	}
+#endif
 
 	// Create output folder out of model components' names and resolution function name, e.g. "exp-exp-2gauss"
 	std::string outputPath = StringUtils::joinStrings(constants->getDecayModels()) + "-" + constants->getResolutionFunctionModel();
 	FileUtils::createDirectory(outputPath);
 
-	// Read models' parameters from the pool.
-	// User input parameter values from keyboard if not found in the pool
-//	ParametersPool* storage = new ParametersPool(outputPath);
-//	for (unsigned i = 0; i < iNumberOfFiles; i++) {
-//		storage->updateModelParametersValuesFromPool(decay_model[i]->getParameters(*rChannels));
-//	}
-
 	// Obtain and store number of free parameters for every model (why?)
-	RooArgSet** floatPars = new RooArgSet*[iNumberOfFiles];
-	RooAbsCollection** floatPars1 = new RooAbsCollection*[iNumberOfFiles];
-	Int_t* np = new Int_t[iNumberOfFiles];
+	RooArgSet** floatPars = new RooArgSet*[spectra.size()];
+	RooAbsCollection** floatPars1 = new RooAbsCollection*[spectra.size()];
+	Int_t* np = new Int_t[spectra.size()];
 
-	for (unsigned i = 0; i < iNumberOfFiles; i++) {
-		floatPars[i] = decay_model[i]->getParameters(histSpectrum[i]);
+	for (unsigned i = 0; i < spectra.size(); i++) {
+		floatPars[i] = spectra[i].model->getParameters(spectra[i].dataHistogram);
 		floatPars1[i] = floatPars[i]->selectByAttrib("Constant", kFALSE);
 		np[i] = floatPars1[i]->getSize();
 	}
@@ -297,72 +223,45 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	 */
 
 	// Make array of category names
-	TString* types = new TString[iNumberOfFiles];
-	for (unsigned i = 0; i < iNumberOfFiles; i++)
-		types[i] = TString::Format("spectrum_%d", i);
+	TString* types = new TString[spectra.size()];
+	for (unsigned i = 0; i < spectra.size(); i++)
+		types[i] = Form("spectrum_%d", i);
 
 	// Define category and map with spectra
 	RooCategory* category = new RooCategory("category", "sample");
 	std::map<std::string, RooDataHist*> histogramsMap;
-	for (unsigned i = 0; i < iNumberOfFiles; i++) {
+	for (unsigned i = 0; i < spectra.size(); i++) {
 		std::string type = types[i].Data();
 		category->defineType(type.c_str());
-		histogramsMap.insert(dhistPair(type, histSpectrum[i]));
+		histogramsMap.insert(dhistPair(type, spectra[i].dataHistogram));
 	}
 
 	// Construct combined dataset
-	RooDataHist* combinedData = new RooDataHist("combData", "combined data", *rChannels, *category, histogramsMap);
+	RooDataHist* combinedData = new RooDataHist("combData", "combined data", *channels, *category, histogramsMap);
 
 	// Construct combined model and add
 	RooSimultaneous* simPdf = new RooSimultaneous("simPdf", "Simultaneous PDF", *category);
-	for (unsigned i = 0; i < iNumberOfFiles; i++) {
-		simPdf->addPdf(*decay_model[i], types[i].Data());
+	for (unsigned i = 0; i < spectra.size(); i++) {
+		simPdf->addPdf(*spectra[i].model, types[i].Data());
 	}
 
 	// Read models' parameters from the pool file.
 	// User input parameter values from keyboard if not found in the pool
 	ParametersPool* storage = new ParametersPool(outputPath);
-	storage->updateModelParametersValuesFromPool(simPdf->getParameters(*rChannels));
+	storage->updateModelParametersValuesFromPool(simPdf->getParameters(*channels));
 
 	// Save storage before fitting to create file with parameters
 	// in case user doesn't want to wait till fitting ends
-	storage->save(simPdf->getParameters(*rChannels));
-
-//	RootHelper::printPdfCoefficientNames(simPdf, rChannels);
-	// simPdf->fitTo(*combData) ;
-	// simPdf->fitTo(*combData, NumCPU(NUM_CPU));
+	storage->save(simPdf->getParameters(*channels));
 
 	// Use RooMinuit interface to minimize chi^2
 
 	RooChi2Var* simChi2;
-	if (doRange) {
-		std::cout << "Doing Ranges!" << std::endl;
-		rChannels->setRange("LEFT", 1, constants->getExcludeMinChannel());
-		rChannels->setRange("RIGHT", constants->getExcludeMaxChannel(), BINS);
+	if (DO_RANGE) {
+		channels->setRange("LEFT", 1, constants->getExcludeMinChannel());
+		channels->setRange("RIGHT", constants->getExcludeMaxChannel(), BINS);
 		Int_t numCpu = RootHelper::getNumCpu();
 		simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::Range("LEFT,RIGHT"), RooFit::NumCPU(numCpu));
-
-		// Define ranges for every spectrum, then use SplitRange... (not worked)
-		// https://root-forum.cern.ch/t/trying-a-simultaneous-fit-in-roofit/3168
-//            for (unsigned i = 0; i < iNumberOfFiles; i++){
-//                TString rangeName = "LEFT";
-//                rangeName += '_';
-//                rangeName += types[i];
-//                rChannels->setRange(rangeName.Data(),1, EXCLUDE_minChannel) ;
-//
-//                rangeName = "RIGHT";
-//                rangeName += '_';
-//                rangeName += types[i];
-//                rChannels->setRange(rangeName.Data(),EXCLUDE_maxChannel, rChannels->getBins()) ;
-//            }
-//             simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::Range("LEFT,RIGHT"), RooFit::SplitRange(kTRUE));
-
-		// Ranges only work with fitTo (not combined ranges)!
-		// TODO: Try SplitRange() https://root-forum.cern.ch/t/trying-a-simultaneous-fit-in-roofit/3168
-//            simPdf->fitTo(*combinedData, RooFit::Range("LEFT,RIGHT"), RooFit::SplitRange(kTRUE)) ;
-//            simPdf->fitTo(*combinedData, RooFit::Range("LEFT,RIGHT")) ;
-//            RooFitResult* r_sb12 = simPdf->fitTo(*combinedData,Range("LEFT,RIGHT",kFALSE),Save()) ;
-
 	} else {
 		Int_t numCpu = RootHelper::getNumCpu();
 		simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::NumCPU(numCpu));
@@ -374,16 +273,10 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	m->setMinimizerType("Minuit");
 	Int_t resultMigrad = m->migrad();
 	Int_t resultHesse = m->hesse();
-	Debug("[main] migrad=" << resultMigrad << ", hesse=" << resultHesse);
-
-	RooArgSet* simFloatPars = simPdf->getParameters(*combinedData);
-	RooAbsCollection* simFloatPars1 = simFloatPars->selectByAttrib("Constant", kFALSE);
-	Int_t simNp = simFloatPars1->getSize();
-
-	Debug("[main] Fitting completed.");
+	Debug("[main] Fitting completed: migrad=" << resultMigrad << ", hesse=" << resultHesse);
 
 	// Save parameters to file
-	storage->save(simPdf->getParameters(*rChannels));
+	storage->save(simPdf->getParameters(*channels));
 
 	/*
 	 ________                    .__    .__
@@ -397,9 +290,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 	// Create canvases and pads first
 	// Otherwise program segfaults when drawing stuff on a RooPlot (when calling AddLine() in TPaveText instance)
-	TCanvas** canvas = new TCanvas*[iNumberOfFiles];
-	for (unsigned i = 0; i < iNumberOfFiles; i++) {
-		canvas[i] = new TCanvas(Form("canvas-%d", i + 1), Form("Spectrum N%d \"%s\"", i + 1, sFileNames[i].c_str()), constants->getImageWidth(), constants->getImageHeight());
+	TCanvas** canvas = new TCanvas*[spectra.size()];
+	for (unsigned i = 0; i < spectra.size(); i++) {
+		canvas[i] = new TCanvas(Form("canvas-%d", i + 1), Form("Spectrum N%d \"%s\"", i + 1, spectra[i].filename.Data()), constants->getImageWidth(), constants->getImageHeight());
 		canvas[i]->SetFillColor(0);
 		canvas[i]->Divide(1, 2);
 
@@ -414,47 +307,47 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	}
 
 	// Draw spectrum plot (top)
-	RooPlot** graphFrame = new RooPlot*[iNumberOfFiles];
-	for (unsigned i = 0; i < iNumberOfFiles; i++) {
-		graphFrame[i] = rChannels->frame();
-		graphFrame[i]->SetName(Form("spectrum_%d", i));
-		graphFrame[i]->SetTitle(Form("Spectrum %d \"%s\"", i + 1, sFileNames[i].c_str()));
-		graphFrame[i]->GetXaxis()->SetRangeUser(0, BINS);
+	RooPlot** spectraPlot = new RooPlot*[spectra.size()];
+	for (unsigned i = 0; i < spectra.size(); i++) {
+		spectraPlot[i] = channels->frame();
+		spectraPlot[i]->SetName(Form("spectrum_%d", i));
+		spectraPlot[i]->SetTitle(Form("Spectrum %d \"%s\"", i + 1, spectra[i].filename.Data()));
+		spectraPlot[i]->GetXaxis()->SetRangeUser(0, BINS);
 
-		histSpectrum[i]->plotOn(graphFrame[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kBlack), RooFit::LineWidth(0), RooFit::MarkerSize(0.2), RooFit::MarkerColor(kBlack), RooFit::Name("data"));
+		spectra[i].dataHistogram->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kBlack), RooFit::LineWidth(0), RooFit::MarkerSize(0.2), RooFit::MarkerColor(kBlack),
+				RooFit::Name("data"));
 
 		// Draw Resolution Function
-		res_funct[i]->plotOn(graphFrame[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kGray + 1), RooFit::LineWidth(1), RooFit::Name("resolution"));
+		spectra[i].resolutionFunction->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kGray + 1), RooFit::LineWidth(1), RooFit::Name("resolution"));
 
 		// Draw complete fit, dont't forget the ranges if needed
 		// https://root-forum.cern.ch/t/excluding-regions-in-a-fit/9109
-		decay_model[i]->plotOn(graphFrame[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kPink - 4), RooFit::LineWidth(2), RooFit::Name("fit"), doRange ? RooFit::Range("LEFT,RIGHT") : NULL);
+		spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kPink - 4), RooFit::LineWidth(2), RooFit::Name("fit"), DO_RANGE ? RooFit::Range("LEFT,RIGHT") : NULL);
 
 		// Add legend with list of model parameters
-		RooArgSet* parameters = decay_model[i]->getParameters(graphFrame[i]->getNormVars());
-		TPaveText* pt = GraphicsHelper::makePaveText(*parameters, 3, 0.75, 0.99, 0.9);
-		graphFrame[i]->addObject(pt);
+		RooArgSet* parameters = spectra[i].model->getParameters(spectraPlot[i]->getNormVars());
+		TPaveText* pt = GraphicsHelper::makePaveText(*parameters, GraphicsHelper::LEGEND_XMIN, 0.99, 0.9);
+		spectraPlot[i]->addObject(pt);
 
 		// Set custom Y axis limits
 		Double_t yMin = pow(10, MathUtil::orderOfMagnitude(spectra[i].averageBackground));  // Minimum is order of magnitude of the average background value
-		Double_t yMax = graphFrame[i]->GetMaximum();  // Maximum is default (whatever ROOT plots)
-		Debug(yMin << " " << yMax);
-		graphFrame[i]->GetYaxis()->SetRangeUser(yMin, yMax);
+		Double_t yMax = spectraPlot[i]->GetMaximum();  // Maximum is default (whatever ROOT plots)
+		spectraPlot[i]->GetYaxis()->SetRangeUser(yMin, yMax);
 
 		// Draw grayed out region excluded from plot
-		if (doRange) {
-			GraphicsHelper::drawRegion(graphFrame[i], constants->getExcludeMinChannel(), constants->getExcludeMaxChannel());
+		if (DO_RANGE) {
+			GraphicsHelper::drawRegion(spectraPlot[i], constants->getExcludeMinChannel(), constants->getExcludeMaxChannel());
 		}
 
 		// Draw nanosecond axis
 		Double_t scaleFactor = GraphicsHelper::getSpectrumPadFontFactor();
-		RooAbsArg* rooAbsArg = decay_model[i]->getParameters(graphFrame[i]->getNormVars())->find("mean_gauss");
+		RooAbsArg* rooAbsArg = spectra[i].model->getParameters(spectraPlot[i]->getNormVars())->find("mean_gauss");
 		if (RooRealVar* rooRealVar = dynamic_cast<RooRealVar*>(rooAbsArg)) {
 			Double_t zeroChannel = rooRealVar->getVal();
 			Double_t channelWidth = Constants::getInstance()->getChannelWidth();
 			Double_t timeMin = -channelWidth * zeroChannel;
-			Double_t timeMax = (rChannels->getMax() - zeroChannel) * channelWidth;
-			TGaxis *timeAxis = new TGaxis(0, yMin, rChannels->getMax(), yMin, timeMin, timeMax, 510, "+L");
+			Double_t timeMax = (channels->getMax() - zeroChannel) * channelWidth;
+			TGaxis *timeAxis = new TGaxis(0, yMin, channels->getMax(), yMin, timeMin, timeMax, 510, "+L");
 			timeAxis->SetTitleSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
 			timeAxis->SetTitleOffset(0.68);
 			timeAxis->SetTitleFont(42);
@@ -463,40 +356,40 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			timeAxis->SetLabelSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
 			timeAxis->SetLabelOffset(0.02);
 			timeAxis->SetLabelFont(42);
-			graphFrame[i]->addObject(timeAxis);
+			spectraPlot[i]->addObject(timeAxis);
 		}
 
 		// Update regular axis
-		graphFrame[i]->GetXaxis()->SetLabelColor(0);
-		graphFrame[i]->GetXaxis()->SetTitleSize(0);
-		graphFrame[i]->GetXaxis()->SetTickLength(0);
+		spectraPlot[i]->GetXaxis()->SetLabelColor(0);
+		spectraPlot[i]->GetXaxis()->SetTitleSize(0);
+		spectraPlot[i]->GetXaxis()->SetTickLength(0);
 
-		graphFrame[i]->GetYaxis()->SetLabelSize(scaleFactor * (GraphicsHelper::FONT_SIZE_NORMAL));
-		graphFrame[i]->GetYaxis()->SetTitleSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
-		graphFrame[i]->GetYaxis()->SetTitleOffset(0.9);
+		spectraPlot[i]->GetYaxis()->SetLabelSize(scaleFactor * (GraphicsHelper::FONT_SIZE_NORMAL));
+		spectraPlot[i]->GetYaxis()->SetTitleSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
+		spectraPlot[i]->GetYaxis()->SetTitleOffset(0.9);
 
 #ifdef USEDEBUG
-		graphFrame[i]->Print("V");
+		spectraPlot[i]->Print("V");
 #endif
 	}
 	Debug("[main] Spectra plots successfully created.");
 
 	// Draw residuals plot (bottom)
-	RooPlot** chiFrame = new RooPlot*[iNumberOfFiles];
-	RooHist** hresid = new RooHist*[iNumberOfFiles];
-	for (unsigned i = 0; i < iNumberOfFiles; i++) {
-		chiFrame[i] = rChannels->frame(RooFit::Title(" "));
-		RooChi2Var* chi2 = new RooChi2Var(Form("#chi^{2}_{%d}", i + 1), "chi-square", *decay_model[i], *histSpectrum[i]);
-		RooAbsCollection* freeParameters = (decay_model[i]->getParameters(*histSpectrum[i]))->selectByAttrib("Constant", kFALSE);
+	RooPlot** chiFrame = new RooPlot*[spectra.size()];
+	RooHist** hresid = new RooHist*[spectra.size()];
+	for (unsigned i = 0; i < spectra.size(); i++) {
+		chiFrame[i] = channels->frame(RooFit::Title(" "));
+		RooChi2Var* chi2 = new RooChi2Var(Form("#chi^{2}_{%d}", i + 1), "chi-square", *spectra[i].model, *spectra[i].dataHistogram);
+		RooAbsCollection* freeParameters = (spectra[i].model->getParameters(*spectra[i].dataHistogram))->selectByAttrib("Constant", kFALSE);
 		Int_t degreesFreedom = spectra[i].numberOfBins - freeParameters->getSize();
 		Double_t chi2Value = chi2->getVal() / degreesFreedom;
 
 		// If doing ranges we have to manually construct chi frames from the curves
 		// https://root-forum.cern.ch/t/pull-histogram-with-multiple-ranges/20935
-		if (doRange) {
-			RooHist* dataHist = (RooHist*) graphFrame[i]->getHist("data");
-			auto curve1 = (RooCurve*) graphFrame[i]->getObject(2);  // 2 is index in the list of RooPlot items (see printout from graphFrame[i]->Print("V")
-			auto curve2 = (RooCurve*) graphFrame[i]->getObject(3);
+		if (DO_RANGE) {
+			RooHist* dataHist = (RooHist*) spectraPlot[i]->getHist("data");
+			auto curve1 = (RooCurve*) spectraPlot[i]->getObject(2);  // 2 is index in the list of RooPlot items (see printout from graphFrame[i]->Print("V")
+			auto curve2 = (RooCurve*) spectraPlot[i]->getObject(3);
 			auto hresid1 = dataHist->makePullHist(*curve1, true);
 			auto hresid2 = dataHist->makePullHist(*curve2, true);
 			hresid1->SetLineWidth(0);
@@ -506,20 +399,20 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			chiFrame[i]->addPlotable(hresid1, "P");
 			chiFrame[i]->addPlotable(hresid2);
 		} else {
-			hresid[i] = graphFrame[i]->pullHist();
+			hresid[i] = spectraPlot[i]->pullHist();
 			hresid[i]->SetLineWidth(0);
 			hresid[i]->SetMarkerSize(0.2);
 			chiFrame[i]->addPlotable(hresid[i]);
 		}
 
 		// Draw region excluded from plot
-		if (doRange) {
+		if (DO_RANGE) {
 			GraphicsHelper::drawRegion(chiFrame[i], constants->getExcludeMinChannel(), constants->getExcludeMaxChannel());
 		}
 
 		// Add legend with chi^2 value
 		Double_t scaleFactor = GraphicsHelper::getResidualsPadFontFactor();
-		TPaveText* leg = new TPaveText(0.75, 0.85, 0.99, 0.95, "BRNDC");  // x1 y1 x2 y2  0.75, 0.99, 0.9
+		TPaveText* leg = new TPaveText(GraphicsHelper::LEGEND_XMIN, 0.85, 0.99, 0.95, "BRNDC");  // x1 y1 x2 y2  0.75, 0.99, 0.9
 		leg->AddText(Form("#chi^{2} = %.1f / %d = %.3f", chi2->getVal(), degreesFreedom, chi2Value));
 		leg->SetTextSize(scaleFactor * GraphicsHelper::FONT_SIZE_SMALL * 1.3);
 		leg->SetBorderSize(1);
@@ -528,7 +421,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		chiFrame[i]->addObject(leg);
 
 		// Draw horizontal line
-		TLine* hr = new TLine(1, 0, rChannels->getBins(), 0);
+		TLine* hr = new TLine(1, 0, channels->getBins(), 0);
 		hr->SetLineStyle(7);
 		hr->SetLineWidth(2);
 		hr->SetLineColor(kPink - 4);
@@ -546,9 +439,6 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		chiFrame[i]->GetXaxis()->SetLabelSize(scaleFactor * (GraphicsHelper::FONT_SIZE_NORMAL));
 		chiFrame[i]->GetXaxis()->SetLabelOffset(0.04);
 
-		// Write RooDataHist statistics on chi frame (to create TPaveStats object)
-		histSpectrum[i]->statOn(chiFrame[i]);
-
 #ifdef USEDEBUG
 		chiFrame[i]->Print("V");
 #endif
@@ -556,10 +446,10 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	Debug("[main] Residual plots successfully created.");
 
 	// Draw plots on the pads
-	for (unsigned i = 0; i < iNumberOfFiles; i++) {
+	for (unsigned i = 0; i < spectra.size(); i++) {
 		// Draw plots on correspondent pads
 		canvas[i]->cd(1);
-		graphFrame[i]->Draw();
+		spectraPlot[i]->Draw();
 		canvas[i]->cd(2);
 		chiFrame[i]->Draw();
 		canvas[i]->Modified();
@@ -587,9 +477,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	 */
 
 	// TODO: move to FileUtils
-	for (unsigned i = 0; i < iNumberOfFiles; i++) {
+	for (unsigned i = 0; i < spectra.size(); i++) {
 		std::ofstream outputFile;
-		TString dataFilename = TString::Format("./%s-%s/data-%s-%s-%d.txt", (StringUtils::joinStrings(constants->getDecayModels())).c_str(), constants->getResolutionFunctionModel(),
+		TString dataFilename = Form("./%s-%s/data-%s-%s-%d.txt", (StringUtils::joinStrings(constants->getDecayModels())).c_str(), constants->getResolutionFunctionModel(),
 				(StringUtils::joinStrings(constants->getDecayModels())).c_str(), constants->getResolutionFunctionModel(), i + 1);
 		outputFile.open(dataFilename.Data());
 
@@ -603,12 +493,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		const Int_t maxChannel = constants->getMaxChannel();
 		for (unsigned j = minChannel; j <= maxChannel; j++) {
 			Double_t time = (double) (j - minChannel) * (constants->getChannelWidth());
-			Double_t count = fullTH1F[i]->GetBinContent(j - minChannel + 1);
-			Double_t error = fullTH1F[i]->GetBinError(j - minChannel + 1);
-			Double_t resolution = graphFrame[i]->getCurve("resolution")->Eval(j - minChannel + 0.5);
-			Double_t fit = graphFrame[i]->getCurve("fit")->Eval(j - minChannel + 0.5);
+			Double_t count = spectra[i].histogram->GetBinContent(j - minChannel + 1);
+			Double_t error = spectra[i].histogram->GetBinError(j - minChannel + 1);
+			Double_t resolution = spectraPlot[i]->getCurve("resolution")->Eval(j - minChannel + 0.5);
+			Double_t fit = spectraPlot[i]->getCurve("fit")->Eval(j - minChannel + 0.5);
 			Double_t channel, chi;
-			if (!doRange) {
+			if (!DO_RANGE) {
 				hresid[i]->GetPoint(j - minChannel + 1, channel, chi);
 			} else {
 //                TODO: add code for ranges (two curves)

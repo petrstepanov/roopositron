@@ -29,7 +29,7 @@ RooAbsPdf* OneGaussProvider::initPdf(int i) {
     RooRealVar* g1FWHM = new RooRealVar("FWHM_gauss1", "1st gauss FWHM", 0.3, 0.1, 0.5, "ns");
     RooFormulaVar* g1Dispersion = new RooFormulaVar("gauss1Dispersion", "@0*@1/@2", RooArgList(*g1FWHM, *fwhm2disp, *channelWidth));
 
-    RooRealVar* gMean = new RooRealVar("mean_gauss", "Resolution function mean", 300, 250, 350, "ch");
+    RooRealVar* gMean = new RooRealVar("mean_gauss", "Resolution function mean", 1, "ch");
     return new RooGaussian("gauss","Gaussian PDF", *observable, *gMean, *g1Dispersion) ;  
 	
 }

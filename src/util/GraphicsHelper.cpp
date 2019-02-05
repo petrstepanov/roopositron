@@ -21,6 +21,7 @@
 const Double_t GraphicsHelper::FONT_SIZE_SMALL = 0.028;
 const Double_t GraphicsHelper::FONT_SIZE_NORMAL = 0.05;
 const Double_t GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT = 0.35;
+const Double_t GraphicsHelper::LEGEND_XMIN = 0.7;
 
 Double_t GraphicsHelper::getSpectrumPadFontFactor(){
 	return 0.5/(1-RESIDUALS_PAD_RELATIVE_HEIGHT);
@@ -45,7 +46,18 @@ void GraphicsHelper::drawRegion(RooPlot* frame, Int_t xMin, Int_t xMax) {
 	std::cout << "yMin: " << yMin << ", yMax: " << yMax << std::endl;
 }
 
-TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Int_t sigDigits, Double_t xmin, Double_t xmax, Double_t ymax) {
+void GraphicsHelper::printVariable(Int_t sigDigits, const char* options, Int_t& currentLine, RooRealVar* var, TPaveText* box, RooArgList* paramsList) {
+	TString* formatted = var->format(sigDigits, options);
+	TText* t = box->AddText(formatted->Data());
+	Bool_t notConstant = !var->isConstant();
+	Bool_t atMaximum = var->getVal() + var->getError() > var->getMax();
+	Bool_t atMinimum = var->getVal() - var->getError() < var->getMin();
+	if (notConstant && (atMaximum || atMinimum)) t->SetTextColor(kPink-8);
+	paramsList->remove(*var);
+	currentLine++;
+}
+
+TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, Double_t xmax, Double_t ymax) {
 
 	Bool_t showConstants = kTRUE;
 	Bool_t showLabel = kFALSE;
@@ -54,7 +66,7 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Int_t sigDigits
 //	TString opts = TString("NEU");
 //	opts.ToLower();
 
-	const char* options = "NEU";
+	const char* options = "NEULP";
 
 
 	// calculate the box's size, adjusting for constant parameters
@@ -95,25 +107,18 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Int_t sigDigits
 	box->AddText("");
 	currentLine++;
 
+	Int_t sigDigits = 0;
 	if (RooRealVar* var = findRooRealVarInList(paramsList, "bins")) {
-		TString *formatted = var->format(0, options);
-		box->AddText(formatted->Data());
-		paramsList->remove(*var);
-		currentLine++;
+		printVariable(sigDigits, options, currentLine, var, box, paramsList);
 	}
 
 	if (RooRealVar* var = findRooRealVarInList(paramsList, "integral")) {
-		TString *formatted = var->format(0, options);
-		box->AddText(formatted->Data());
-		paramsList->remove(*var);
-		currentLine++;
+		printVariable(sigDigits, options, currentLine, var, box, paramsList);
 	}
 
+	sigDigits = 3;
 	if (RooRealVar* var = findRooRealVarInList(paramsList, "background")) {
-		TString *formatted = var->format(3, options);
-		box->AddText(formatted->Data());
-		paramsList->remove(*var);
-		currentLine++;
+		printVariable(sigDigits, options, currentLine, var, box, paramsList);
 	}
 
 	hrLineNumbers.push_back(currentLine);
@@ -121,10 +126,7 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Int_t sigDigits
 	currentLine++;
 
 	while (RooRealVar* var = findRooRealVarInList(paramsList, "ource")) {
-		TString *formatted = var->format(3, options);
-		box->AddText(formatted->Data());
-		paramsList->remove(*var);
-		currentLine++;
+		printVariable(sigDigits, options, currentLine, var, box, paramsList);
 	}
 
 	hrLineNumbers.push_back(currentLine);
@@ -132,10 +134,7 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Int_t sigDigits
 	currentLine++;
 
 	while (RooRealVar* var = findRooRealVarInList(paramsList, "gauss")) {
-		TString *formatted = var->format(3, options);
-		box->AddText(formatted->Data());
-		paramsList->remove(*var);
-		currentLine++;
+		printVariable(sigDigits, options, currentLine, var, box, paramsList);
 	}
 
 	hrLineNumbers.push_back(currentLine);

@@ -13,7 +13,7 @@
 #define USEDEBUG
 
 #ifdef USEDEBUG
-#define Debug( x ) std::cout << x << std::endl
+#define Debug( x ) std::cout << std::endl << x << std::endl
 #else
 #define Debug( x )
 #endif

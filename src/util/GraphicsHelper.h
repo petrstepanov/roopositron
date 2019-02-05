@@ -20,7 +20,7 @@
 class GraphicsHelper {
 public:
 	static void drawRegion(RooPlot* frame, Int_t xMin, Int_t xMax);
-	static TPaveText* makePaveText(const RooArgSet& params, Int_t sigDigits, Double_t xmin, Double_t xmax, Double_t ymax);
+	static TPaveText* makePaveText(const RooArgSet& params, Double_t xmin, Double_t xmax, Double_t ymax);
 
 //    GraphicsHelper();
 //    GraphicsHelper(const GraphicsHelper& orig);
@@ -29,12 +29,14 @@ public:
 	static const Double_t FONT_SIZE_SMALL;
 	static const Double_t FONT_SIZE_NORMAL;
 	static const Double_t RESIDUALS_PAD_RELATIVE_HEIGHT;
+	static const Double_t LEGEND_XMIN;
 
 	static Double_t getSpectrumPadFontFactor();
 	static Double_t getResidualsPadFontFactor();
 
 private:
 	static RooRealVar* findRooRealVarInList(RooArgList* list, const char* name);
+	static void printVariable(Int_t sigDigits, const char* options, Int_t& currentLine, RooRealVar* var, TPaveText* box, RooArgList* paramsList);
 };
 
 #endif /* GRAPHICSHELPER_H */
