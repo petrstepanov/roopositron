@@ -12,9 +12,10 @@
  */
 
 #include "FileUtils.h"
+#include <TUnixSystem.h>
 #include "../model/Constants.h"
 #include "../util/StringUtils.h"
-#include <TUnixSystem.h>
+#include "../util/Debug.h"
 
 TH1F* FileUtils::importTH1F(std::string filename, int i){
     Constants* constants = Constants::getInstance();
@@ -96,12 +97,4 @@ std::vector<std::string> FileUtils::getFilenamesInCurrentDrectory(const char* ex
         perror("");
     }
     return lFileNames;
-}
-
-void FileUtils::saveImage(TCanvas* canvas, const char* filename){
-    TImage *imgCanvas = TImage::Create();
-    imgCanvas->FromPad(canvas);
-    imgCanvas->WriteImage(filename);
-    std::cout << "FileUtils::saveImage " << filename << std::endl;
-    delete imgCanvas;
 }

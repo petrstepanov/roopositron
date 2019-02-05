@@ -39,12 +39,12 @@ RooAbsPdf* PowderProvider::initPdf(int i) {
     RooRealVar* l3g = new RooRealVar("#lambda_3#gamma", "Three-gamma annihilation rate", 0.007, "1/ns");
     l3g->setConstant(kTRUE);
     
-    RooRealVar* V0 = new RooRealVar("V0", "Ps speed when leaving the powder", 5.9E6, "#AA/ns");
+    RooRealVar* V0 = new RooRealVar("V0", "Ps speed when leaving the powder", 5.9E6, "A/ns");
     V0->setConstant(kTRUE);
-    RooRealVar* Vth = new RooRealVar("Vth", "Thermalized Ps speed ", 8E5, "#AA/ns");
+    RooRealVar* Vth = new RooRealVar("Vth", "Thermalized Ps speed ", 8E5, "A/ns");
     Vth->setConstant(kTRUE);
     
-    RooRealVar* L = new RooRealVar("L", "Powder diameter", 500, 10, 50000, "#AA"); // 10A - 50mkm
+    RooRealVar* L = new RooRealVar("L", "Powder diameter", 500, 10, 50000, "A"); // 10A - 50mkm
     
     RooRealVar* pPs = new RooRealVar("pPs", "Probability of forming qf-Ps", 0.5, 0, 1, "");
     

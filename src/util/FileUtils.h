@@ -29,7 +29,6 @@ class FileUtils {
 public:
     static std::vector<std::string> getFilenamesInCurrentDrectory(const char* extension);
     static TH1F* importTH1F(std::string filename, int i);
-    static void saveImage(TCanvas*, const char*);
     static void createDirectory(std::string directoryName);
     
 private:

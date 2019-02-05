@@ -34,7 +34,6 @@
 #include <TPaveText.h>
 #include <TGaxis.h>
 
-
 #include "RooWorkspace.h"
 
 #include "model/Constants.h"
@@ -56,7 +55,6 @@
 #include "util/RootHelper.h"
 #include "util/Debug.h"
 
-
 //#include "temp/MyPdfCache.h"
 //#include "temp/MyPdf.h"
 //#include "temp/ConvPdf.h"
@@ -76,11 +74,11 @@ typedef std::pair<std::string, RooDataHist*> dhistPair;
 // TODO: make FileUtils output spectrums
 struct Spectrum {
 	TH1F* histogram;              // ROOT histogram
-	std::string filename;
-	Double_t integral;                 // total counts
+	TString filename;
+	Double_t integral;            // total counts
 	Int_t numberOfBins;
-	Int_t binWithMinimumCount;             // bin number with minimum value in the range
-	Int_t binWithMaximumCount;             // bin number with maximum value in the range
+	Int_t binWithMinimumCount;    // bin number with minimum value in the range
+	Int_t binWithMaximumCount;    // bin number with maximum value in the range
 	Double_t minimumCount;        // minimum count across all bins
 	Double_t maximumCount;        // maximum count across all bins
 	Double_t averageBackground;
@@ -94,12 +92,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	// Construct a list of .Spe files from current directory
 	std::vector<std::string> filenames = FileUtils::getFilenamesInCurrentDrectory(".Spe");
 
-	// Construct a list of Spectrum structs to store spectra information
+	// Construct a list of Spectrum structs to store individual spectra information
 	std::vector<Spectrum> spectra;
 	for (unsigned i = 0; i < filenames.size(); i++) {
 		Spectrum s;
 		s.histogram = FileUtils::importTH1F(filenames[i], i);
-		s.filename = filenames[i];
+		s.filename = filenames[i].c_str();
 		s.numberOfBins = s.histogram->GetXaxis()->GetNbins();
 		s.integral = s.histogram->Integral();
 		s.binWithMinimumCount = s.histogram->GetMinimumBin();
@@ -109,6 +107,14 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		s.averageBackground = HistProcessor::getAverageBackground(s.histogram);
 		spectra.push_back(s);
 	}
+
+	// Create constants object that stores values from "constants.txt" file
+	Constants* constants = Constants::getInstance();
+
+	// Define some global app constants
+	const Int_t BINS = constants->getMaxChannel() - constants->getMinChannel() + 1;
+	const Bool_t doRange = constants->getExcludeMinChannel() > 1 && constants->getExcludeMinChannel() < constants->getExcludeMaxChannel() && constants->getExcludeMaxChannel() < BINS ? kTRUE : kFALSE;
+
 	// Define number of spectrums
 	const int iNumberOfFiles = filenames.size();
 	std::cout << "Found " << iNumberOfFiles << " files.\n" << std::endl;
@@ -138,20 +144,15 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	Int_t* iUpperLimit = new Int_t[iNumberOfFiles];
 	Int_t* iLowerLimit = new Int_t[iNumberOfFiles];
 
-	// Constants object reads values from "constants.txt" file
-	Constants* constants = Constants::getInstance();
-
 	// TODO: drop these variables in favor of histogram struct
 
-	const Int_t MIN_CHANNEL = constants->getMinChannel();
-	const Int_t MAX_CHANNEL = constants->getMaxChannel();
 //        const Int_t CHANNELS = constants->getNumberOfChannels();
-	Double_t CHANNEL_WIDTH = constants->getChannelWidth();
+	const Double_t CHANNEL_WIDTH = constants->getChannelWidth();
 	const Int_t SKIP_LINES = constants->getSkipLines();
 
 	for (unsigned i = 0; i < iNumberOfFiles; i++) {
 		// Import Data
-		fullTH1F[i] = new TH1F(TString::Format("fullTH1F_%d", i + 1), TString::Format("fullTH1F_%d", i + 1), MAX_CHANNEL - MIN_CHANNEL + 1, 0, MAX_CHANNEL - MIN_CHANNEL + 1);
+		fullTH1F[i] = new TH1F(TString::Format("fullTH1F_%d", i + 1), TString::Format("fullTH1F_%d", i + 1), BINS, 0, BINS);
 		// Open File
 		std::cout << std::endl << "Spectrum " << i + 1 << " filename is \"" << sFileNames[i] << "\"" << std::endl;
 		std::string path = sFileNames[i];
@@ -174,13 +175,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		iLowerLimit[i] = iMinCount / 2;
 	}
 
-	// Define Channels Axis
+	// Define Channels Observable
+	RooRealVar* rChannels = new RooRealVar("rChannels", "Channels axis", 0, BINS, "ch");
 
-	RooRealVar* rChannels = new RooRealVar("rChannels", "Channels axis", 0, MAX_CHANNEL - MIN_CHANNEL + 1, "ch");
-	rChannels->setBins(MAX_CHANNEL - MIN_CHANNEL + 1);
-	// Set convolution bins same as 
-	rChannels->setBins(MAX_CHANNEL - MIN_CHANNEL + 1, "cache");
-//	rChannels->setBins(8192, "cache");
+	// Set convolution bins same as real number of axis bins (notices it works nice)
+	rChannels->setBins(BINS);
+	rChannels->setBins(BINS, "cache");
 
 	// Convert TH1F spectra to RooDataHist
 	RooDataHist** histSpectrum = new RooDataHist*[iNumberOfFiles];
@@ -189,13 +189,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	}
 
 	// Construct additive decay models
-//	ObjectNamer* simultaneousNamer = new ObjectNamer("-");
 	RooAbsPdf** decay_model = new RooAbsPdf*[iNumberOfFiles];
-//        RooArgList** components = new RooArgList*[iNumberOfFiles];	
-//        RooArgList** convolutedComponents = new RooArgList*[iNumberOfFiles];	
 	RooAbsPdf** res_funct = new RooAbsPdf*[iNumberOfFiles];
-//        RooAbsPdf** source_component = new RooAbsPdf*[iNumberOfFiles];
-//        RooAbsPdf** source_component_convoluted = new RooAbsPdf*[iNumberOfFiles];
 
 	RooWorkspace* w = new RooWorkspace("w", "w");
 	for (unsigned i = 0; i < iNumberOfFiles; i++) {
@@ -213,12 +208,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		// Initialize background here
 		RooPolynomial* bg = new RooPolynomial("bg", "y=1", *rChannels, RooArgSet());
 		// Parameterize background as counts, not as fraction (intentionally RooRealVar, not RooConst)
-		RooRealVar* bgCount = new RooRealVar("background", "Background level counts", spectra[i].averageBackground, spectra[i].averageBackground/2, spectra[i].averageBackground*2, "counts");
+		RooRealVar* bgCount = new RooRealVar("background", "Background level counts", spectra[i].averageBackground, spectra[i].averageBackground / 2, spectra[i].averageBackground * 2, "counts");
 		bgCount->setConstant(kTRUE);
 		Int_t b = fullTH1F[i]->GetXaxis()->GetNbins();
-		RooRealVar* bins = new RooRealVar("bins", "Histogram bins", b, b-1, b+1);
+		RooRealVar* bins = new RooRealVar("bins", "Histogram bins", b, b - 1, b + 1);
 		bins->setConstant(kTRUE);
-		RooRealVar* fullIntegral = new RooRealVar("integral", "Full histogram integral", fullTH1F[i]->Integral(1, b),fullTH1F[i]->Integral(1, b)-1,fullTH1F[i]->Integral(1, b)+1);
+		RooRealVar* fullIntegral = new RooRealVar("integral", "Full histogram integral", fullTH1F[i]->Integral(1, b), fullTH1F[i]->Integral(1, b) - 1, fullTH1F[i]->Integral(1, b) + 1);
 		fullIntegral->setConstant(kTRUE);
 		RooFormulaVar* IBg = new RooFormulaVar("IBg", "@0*@1/@2", RooArgList(*bgCount, *bins, *fullIntegral));
 
@@ -232,7 +227,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		} else {
 			std::string suffix = std::to_string(i + 1);
 			w->import(*pdfWithBg, RooFit::RenameAllVariablesExcept(suffix.c_str(), rChannels->GetName()), RooFit::RenameAllNodes(suffix.c_str()));
-			decay_model[i] = w->pdf(Form("pdf_%d", i+1));
+			decay_model[i] = w->pdf(Form("pdf_%d", i + 1));
 		}
 //	    components[i] = acp->getAllComponents();
 //	    convolutedComponents[i] = acp->getConvolutedComponents();
@@ -295,15 +290,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	 ___________.__  __    __  .__
 	 \_   _____/|__|/  |__/  |_|__| ____    ____
 	 |    __)  |  \   __\   __\  |/    \  / ___\
-         |     \   |  ||  |  |  | |  |   |  \/ /_/  >
+	 |     \   |  ||  |  |  | |  |   |  \/ /_/  >
 	 \___  /   |__||__|  |__| |__|___|  /\___  /
 	 \/                           \//_____/
-	 __________
-	 \______   \_______  ____   ____  ____   ______ ______
-	 |     ___/\_  __ \/  _ \_/ ___\/ __ \ /  ___//  ___/
-	 |    |     |  | \(  <_> )  \__\  ___/ \___ \ \___ \
-         |____|     |__|   \____/ \___  >___  >____  >____  >
-	 \/    \/     \/     \/
 
 	 */
 
@@ -323,18 +312,6 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 	// Construct combined dataset
 	RooDataHist* combinedData = new RooDataHist("combData", "combined data", *rChannels, *category, histogramsMap);
-
-	// Following code is a workaround
-//	RooDataHist* combData;
-//	if (iNumberOfFiles == 1)      combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]));
-//	else if (iNumberOfFiles == 2) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]));
-//	else if (iNumberOfFiles == 3) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]), Import("spec2", *histSpectrum[2]));
-//	else if (iNumberOfFiles == 4) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]), Import("spec2", *histSpectrum[2]), Import("spec3", *histSpectrum[3]));
-//	else if (iNumberOfFiles == 5) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]), Import("spec2", *histSpectrum[2]), Import("spec3", *histSpectrum[3]), Import("spec4", *histSpectrum[4]));
-//	else if (iNumberOfFiles == 6) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]), Import("spec2", *histSpectrum[2]), Import("spec3", *histSpectrum[3]), Import("spec4", *histSpectrum[4]), Import("spec5", *histSpectrum[5]));
-//	else if (iNumberOfFiles == 7) combData = new RooDataHist("combData", "combined data", *rChannels, Index(*sample), Import("spec0", *histSpectrum[0]), Import("spec1", *histSpectrum[1]), Import("spec2", *histSpectrum[2]), Import("spec3", *histSpectrum[3]), Import("spec4", *histSpectrum[4]), Import("spec5", *histSpectrum[5]), Import("spec6", *histSpectrum[6]));
-//	else exit(1);
-//	combinedData->Print();
 
 	// Construct combined model and add
 	RooSimultaneous* simPdf = new RooSimultaneous("simPdf", "Simultaneous PDF", *category);
@@ -357,18 +334,11 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 	// Use RooMinuit interface to minimize chi^2
 
-	Int_t EXCLUDE_MIN_CHANNEL = constants->getExcludeMinChannel();
-	Int_t EXCLUDE_MAX_CHANNEL = constants->getExcludeMaxChannel();
-	Bool_t doRange = kFALSE;
-	if (EXCLUDE_MIN_CHANNEL > 1 && EXCLUDE_MIN_CHANNEL < EXCLUDE_MAX_CHANNEL && EXCLUDE_MAX_CHANNEL < MAX_CHANNEL - MIN_CHANNEL) {
-		doRange = kTRUE;
-	}
-
 	RooChi2Var* simChi2;
 	if (doRange) {
 		std::cout << "Doing Ranges!" << std::endl;
-		rChannels->setRange("LEFT", 1, EXCLUDE_MIN_CHANNEL);
-		rChannels->setRange("RIGHT", EXCLUDE_MAX_CHANNEL, rChannels->getBins());
+		rChannels->setRange("LEFT", 1, constants->getExcludeMinChannel());
+		rChannels->setRange("RIGHT", constants->getExcludeMaxChannel(), BINS);
 		Int_t numCpu = RootHelper::getNumCpu();
 		simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::Range("LEFT,RIGHT"), RooFit::NumCPU(numCpu));
 
@@ -378,12 +348,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 //                TString rangeName = "LEFT";
 //                rangeName += '_';
 //                rangeName += types[i];
-//                rChannels->setRange(rangeName.Data(),1, EXCLUDE_MIN_CHANNEL) ;
+//                rChannels->setRange(rangeName.Data(),1, EXCLUDE_minChannel) ;
 //
 //                rangeName = "RIGHT";
 //                rangeName += '_';
 //                rangeName += types[i];
-//                rChannels->setRange(rangeName.Data(),EXCLUDE_MAX_CHANNEL, rChannels->getBins()) ;
+//                rChannels->setRange(rangeName.Data(),EXCLUDE_maxChannel, rChannels->getBins()) ;
 //            }
 //             simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::Range("LEFT,RIGHT"), RooFit::SplitRange(kTRUE));
 
@@ -402,112 +372,125 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	RooMinimizer* m = new RooMinimizer(*simChi2);
 	// m->setStrategy(); // RooMinimizer::Speed (default), RooMinimizer::Balance, RooMinimizer::Robustness
 	m->setMinimizerType("Minuit");
-	Int_t resultMigrad = 1; //m->migrad();
-	Int_t resultHesse = 1; //m->hesse();
-	std::cout << "RooMinimizer: migrad=" << resultMigrad << ", hesse=" << resultHesse << std::endl;
+	Int_t resultMigrad = m->migrad();
+	Int_t resultHesse = m->hesse();
+	Debug("[main] migrad=" << resultMigrad << ", hesse=" << resultHesse);
 
 	RooArgSet* simFloatPars = simPdf->getParameters(*combinedData);
 	RooAbsCollection* simFloatPars1 = simFloatPars->selectByAttrib("Constant", kFALSE);
 	Int_t simNp = simFloatPars1->getSize();
 
-	std::cout << "Fit Performed OK!" << std::endl;
+	Debug("[main] Fitting completed.");
 
 	// Save parameters to file
 	storage->save(simPdf->getParameters(*rChannels));
-
-	// Variable to store chi2 values for every spectrum
-	RooChi2Var** chi2 = new RooChi2Var*[iNumberOfFiles];
-	//  for (i=0; i<iNumberOfFiles; i++) chi2[i] = new RooChi2Var (TString::Format("chi2_%d",i+1),"chi powered",*decay_model_with_source_bg[i],*histSpectrum[i],NumCPU(2),DataError(RooAbsData::Poisson));
-	for (unsigned i = 0; i < iNumberOfFiles; i++) {
-		chi2[i] = new RooChi2Var(TString::Format("chi2_%d", i + 1), "chi powered", *decay_model[i], *histSpectrum[i]); // NumCPU(8) , , DataError(RooAbsData::None)
-	}
 
 	/*
 	 ________                    .__    .__
 	 /  _____/___________  ______ |  |__ |__| ____   ______
 	 /   \  __\_  __ \__  \ \____ \|  |  \|  |/ ___\ /  ___/
 	 \    \_\  \  | \// __ \|  |_> >   Y  \  \  \___ \___ \
-         \______  /__|  (____  /   __/|___|  /__|\___  >____  >
+	 \______  /__|  (____  /   __/|___|  /__|\___  >____  >
 	 \/           \/|__|        \/        \/     \/
 
 	 */
 
-	// Create canvases and pads first (otherwise it segfaults while drawing a line on TPaveText)
+	// Create canvases and pads first
+	// Otherwise program segfaults when drawing stuff on a RooPlot (when calling AddLine() in TPaveText instance)
+	TCanvas** canvas = new TCanvas*[iNumberOfFiles];
+	for (unsigned i = 0; i < iNumberOfFiles; i++) {
+		canvas[i] = new TCanvas(Form("canvas-%d", i + 1), Form("Spectrum N%d \"%s\"", i + 1, sFileNames[i].c_str()), constants->getImageWidth(), constants->getImageHeight());
+		canvas[i]->SetFillColor(0);
+		canvas[i]->Divide(1, 2);
 
+		canvas[i]->cd(1)->SetPad(0, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT, 1, 1);
+		gPad->SetMargin(0.07, 0.01, 0.08, 0.1);
+		gPad->SetLogy();
+		gPad->SetGrid();
 
+		canvas[i]->cd(2)->SetPad(0, 0, 1, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT);
+		gPad->SetMargin(0.07, 0.01, 0.3, 0.05);
+		gPad->SetGrid();
+	}
 
-
-	// Define frame for data points and fit
+	// Draw spectrum plot (top)
 	RooPlot** graphFrame = new RooPlot*[iNumberOfFiles];
 	for (unsigned i = 0; i < iNumberOfFiles; i++) {
-		// graphFrame[i] = rChannels -> frame(CHANNELS+1);
-		graphFrame[i] = rChannels->frame(MAX_CHANNEL - MIN_CHANNEL + 1);
-		graphFrame[i]->SetTitle(TString::Format("Spectrum N%d \"%s\"", i + 1, sFileNames[i].c_str()));
-		graphFrame[i]->SetName(TString::Format("spectrum_%d", i));
+		graphFrame[i] = rChannels->frame();
+		graphFrame[i]->SetName(Form("spectrum_%d", i));
+		graphFrame[i]->SetTitle(Form("Spectrum %d \"%s\"", i + 1, sFileNames[i].c_str()));
+		graphFrame[i]->GetXaxis()->SetRangeUser(0, BINS);
 
-		graphFrame[i]->GetXaxis()->SetRangeUser(0, MAX_CHANNEL - MIN_CHANNEL + 1);
-
-//            if (doRange){
-//                histSpectrum[i]->plotOn(graphFrame[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kBlack), RooFit::LineWidth(0), RooFit::MarkerSize(0.2), RooFit::MarkerColor(kBlack), Range("LEFT,RIGHT"));
-//            } else {
-//                histSpectrum[i]->plotOn(graphFrame[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kBlack), RooFit::LineWidth(0), RooFit::MarkerSize(0.2), RooFit::MarkerColor(kBlack));
-//            }
 		histSpectrum[i]->plotOn(graphFrame[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kBlack), RooFit::LineWidth(0), RooFit::MarkerSize(0.2), RooFit::MarkerColor(kBlack), RooFit::Name("data"));
-
-		// Draw Resolution Function summed with Background
-//            RooRealVar* bgFractionReal = new RooRealVar(TString::Format("bg_fraction_real_%d", i+1), "", bgFraction[i]);
-//            RooAddPdf* resFuncPlusBg = new RooAddPdf(TString::Format("res_funct_with_bg_%d", i+1), TString::Format("res_funct_with_bg_%d", i+1), RooArgList(*bg[i], *res_funct[i]), RooArgList(*bgFractionReal));// , kTRUE);
-//            resFuncPlusBg->plotOn(graphFrame[i], RooFit::LineStyle(3), RooFit::LineColor(kGray + 3), RooFit::LineWidth(1), RooFit::Name("resolution"));
 
 		// Draw Resolution Function
 		res_funct[i]->plotOn(graphFrame[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kGray + 1), RooFit::LineWidth(1), RooFit::Name("resolution"));
 
-		// Draw complete fit, dont't forget the ranges option
+		// Draw complete fit, dont't forget the ranges if needed
 		// https://root-forum.cern.ch/t/excluding-regions-in-a-fit/9109
+		decay_model[i]->plotOn(graphFrame[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kPink - 4), RooFit::LineWidth(2), RooFit::Name("fit"), doRange ? RooFit::Range("LEFT,RIGHT") : NULL);
+
+		// Add legend with list of model parameters
+		RooArgSet* parameters = decay_model[i]->getParameters(graphFrame[i]->getNormVars());
+		TPaveText* pt = GraphicsHelper::makePaveText(*parameters, 3, 0.75, 0.99, 0.9);
+		graphFrame[i]->addObject(pt);
+
+		// Set custom Y axis limits
+		Double_t yMin = pow(10, MathUtil::orderOfMagnitude(spectra[i].averageBackground));  // Minimum is order of magnitude of the average background value
+		Double_t yMax = graphFrame[i]->GetMaximum();  // Maximum is default (whatever ROOT plots)
+		Debug(yMin << " " << yMax);
+		graphFrame[i]->GetYaxis()->SetRangeUser(yMin, yMax);
+
+		// Draw grayed out region excluded from plot
 		if (doRange) {
-			decay_model[i]->plotOn(graphFrame[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kPink - 4), RooFit::LineWidth(2), RooFit::Name("fit"), RooFit::Range("LEFT,RIGHT"));
-		} else {
-			decay_model[i]->plotOn(graphFrame[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kPink - 4), RooFit::LineWidth(2), RooFit::Name("fit"));
+			GraphicsHelper::drawRegion(graphFrame[i], constants->getExcludeMinChannel(), constants->getExcludeMaxChannel());
 		}
 
-		//                std::string legendLabel = constants->getDecayModel() + " model parameters";
-//                        graphFrame[i]->getAttText()->SetTextFont()  // TextSize(0.02);
+		// Draw nanosecond axis
+		Double_t scaleFactor = GraphicsHelper::getSpectrumPadFontFactor();
+		RooAbsArg* rooAbsArg = decay_model[i]->getParameters(graphFrame[i]->getNormVars())->find("mean_gauss");
+		if (RooRealVar* rooRealVar = dynamic_cast<RooRealVar*>(rooAbsArg)) {
+			Double_t zeroChannel = rooRealVar->getVal();
+			Double_t channelWidth = Constants::getInstance()->getChannelWidth();
+			Double_t timeMin = -channelWidth * zeroChannel;
+			Double_t timeMax = (rChannels->getMax() - zeroChannel) * channelWidth;
+			TGaxis *timeAxis = new TGaxis(0, yMin, rChannels->getMax(), yMin, timeMin, timeMax, 510, "+L");
+			timeAxis->SetTitleSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
+			timeAxis->SetTitleOffset(0.68);
+			timeAxis->SetTitleFont(42);
+			timeAxis->SetTitle("(ns)");
+			timeAxis->SetTitleSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
+			timeAxis->SetLabelSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
+			timeAxis->SetLabelOffset(0.02);
+			timeAxis->SetLabelFont(42);
+			graphFrame[i]->addObject(timeAxis);
+		}
 
-		// Draw legend
-//		RooArgSet* parameters = decay_model[i]->getParameters(graphFrame[i]->getNormVars());
-//		GraphicsHelper::paramOn(*parameters, graphFrame[i], 3, 0.78, 0.99, 0.9);
+		// Update regular axis
+		graphFrame[i]->GetXaxis()->SetLabelColor(0);
+		graphFrame[i]->GetXaxis()->SetTitleSize(0);
+		graphFrame[i]->GetXaxis()->SetTickLength(0);
 
+		graphFrame[i]->GetYaxis()->SetLabelSize(scaleFactor * (GraphicsHelper::FONT_SIZE_NORMAL));
+		graphFrame[i]->GetYaxis()->SetTitleSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
+		graphFrame[i]->GetYaxis()->SetTitleOffset(0.9);
 
-
-		// If legend height exceeds the plot height - scale the legend
-//		TObject* temp = graphFrame[i]->findObject("myParamBox");
-//		if (TPaveText* legend = dynamic_cast<TPaveText*>(temp)) {
-//			if (legend->GetY1() < 0.03) { // 0.03 is bottom padding
-//				legend->SetY1(0.03);
-//				legend->AddText("");
-//			}
-//		}
-
+#ifdef USEDEBUG
 		graphFrame[i]->Print("V");
+#endif
 	}
+	Debug("[main] Spectra plots successfully created.");
 
-	std::cout << "Plot Frames Created OK!" << std::endl;
-
-//	gStyle->SetTextFont(10*6+3);
-
-	// Evaluate Chi2 Values
-	Double_t* chi2Value = new Double_t[iNumberOfFiles];
-	RooHist** hresid = new RooHist*[iNumberOfFiles];
+	// Draw residuals plot (bottom)
 	RooPlot** chiFrame = new RooPlot*[iNumberOfFiles];
-	Int_t* n_Degree = new Int_t[iNumberOfFiles];
+	RooHist** hresid = new RooHist*[iNumberOfFiles];
 	for (unsigned i = 0; i < iNumberOfFiles; i++) {
+		chiFrame[i] = rChannels->frame(RooFit::Title(" "));
+		RooChi2Var* chi2 = new RooChi2Var(Form("#chi^{2}_{%d}", i + 1), "chi-square", *decay_model[i], *histSpectrum[i]);
 		RooAbsCollection* freeParameters = (decay_model[i]->getParameters(*histSpectrum[i]))->selectByAttrib("Constant", kFALSE);
-		n_Degree[i] = MAX_CHANNEL - MIN_CHANNEL + 1 - freeParameters->getSize();
-		// std::cout << "simNp: " << simNp << std::endl;
-		// chi2Value[i] = (simChi2->getVal()) / n_Degree[i];  // multiply on number of files
-		chi2Value[i] = chi2[i]->getVal() / n_Degree[i];  // multiply on number of files
+		Int_t degreesFreedom = spectra[i].numberOfBins - freeParameters->getSize();
+		Double_t chi2Value = chi2->getVal() / degreesFreedom;
 
-		chiFrame[i] = rChannels->frame(RooFit::Title(" ")); //Title(TString::Format("Goodness of fit: chi^2 = %.1f / %d = %.3f", chi2[i]->getVal(), n_Degree[i], chi2Value[i])));
 		// If doing ranges we have to manually construct chi frames from the curves
 		// https://root-forum.cern.ch/t/pull-histogram-with-multiple-ranges/20935
 		if (doRange) {
@@ -528,162 +511,78 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			hresid[i]->SetMarkerSize(0.2);
 			chiFrame[i]->addPlotable(hresid[i]);
 		}
-//                ((RooDataHist*)hresid[i])->plotOn(chiFrame[i],DataError(RooAbsData::None));
-//		chiFrame[i]->GetXaxis()->SetRangeUser(0, MAX_CHANNEL-MIN_CHANNEL+1);
 
-		// Write RooDataHist statistics on chi frame (to create TPaveStats object)
-		// histSpectrum[i]->statOn(chiFrame[i]);
-	}
-	std::cout << "Chi2 Frames Created OK!" << std::endl;
-
-	// DRAW CANVAS WITH BOTH FRAMES
-	TCanvas** canvas = new TCanvas*[iNumberOfFiles];
-	for (unsigned i = 0; i < iNumberOfFiles; i++) {
-		canvas[i] = new TCanvas(Form("canvas-%d", i + 1), Form("Spectrum N%d \"%s\"", i + 1, sFileNames[i].c_str()), constants->getImageWidth(), constants->getImageHeight());
-		canvas[i]->SetFillColor(0);
-
-		canvas[i]->Divide(1, 2);
-//		TPad *pad1 = new TPad("pad1", "The pad 80% of the height", 0.0, 0.2, 1.0, 1.0, 21);
-//		TPad *pad2 = new TPad("pad2", "The pad 20% of the height", 0.0, 0.0, 1.0, 0.2, 22);
-//		pad1->Draw();
-//		pad2->Draw();
-
-//		pad1->SetMargin(0.055, 0.01, 0.03, 0.1);
-//		pad1->
-
-		// Draw Legend
-		{
-			RooArgSet* parameters = decay_model[i]->getParameters(graphFrame[i]->getNormVars());
-			TPaveText* pt = GraphicsHelper::makePaveText(*parameters, 3, 0.75, 0.99, 0.9);
-			graphFrame[i]->addObject(pt);
-		}
-
-		// Set spectrum Y axis limits (tip: only works after canvas was modified and updated)
-		// Y axis minimum is a number of 10^t < background
-		Double_t yMin = pow(10, MathUtil::orderOfMagnitude(spectra[i].averageBackground));
-		// Y axis maximum is default ROOT's gPad value
-		Double_t yMax = graphFrame[i]->GetMaximum();
-		Debug (yMin << " " << yMax);
-		graphFrame[i]->GetYaxis()->SetRangeUser(yMin, yMax);
-
-		// Draw second Axis
-		RooAbsArg* rooAbsArg = decay_model[i]->getParameters(graphFrame[i]->getNormVars())->find("mean_gauss");
-		if (RooRealVar* rooRealVar = dynamic_cast<RooRealVar*>(rooAbsArg)){
-			Double_t zeroChannel = rooRealVar->getVal();
-			Double_t channelWidth = Constants::getInstance()->getChannelWidth();
-			Double_t timeMin = -channelWidth*zeroChannel;
-			Double_t timeMax = (rChannels->getMax() - zeroChannel)*channelWidth;
-//				std::cout << "time axis (" << timeMin << ", " << timeMax << std::endl;
-//				std::cout << "gPad->GetUxmin(): " << gPad->GetUxmin() << std::endl;
-//				std::cout << "gPad->GetUxmax(): " << gPad->GetUxmax() << std::endl;
-//				std::cout << "gPad->GetUymin(): " << gPad->GetUymin() << std::endl;
-//				std::cout << "gPad->GetUymax(): " << gPad->GetUymax() << std::endl;
-			TGaxis *timeAxis = new TGaxis(0, yMin, rChannels->getMax(), yMin, timeMin, timeMax, 510, "+L");
-//				timeAxis->SetTickLength(0.03);
-			timeAxis->SetTitleSize(GraphicsHelper::getSpectrumPadFontFactor()*GraphicsHelper::FONT_SIZE_NORMAL);
-			timeAxis->SetTitleOffset(0.68);  // ? 1.7->1.5->1->0.7
-			timeAxis->SetTextFont(42);
-			timeAxis->SetTitle("(ns)");
-			timeAxis->SetTitleSize(GraphicsHelper::getSpectrumPadFontFactor()*GraphicsHelper::FONT_SIZE_NORMAL);
-			timeAxis->SetLabelSize(GraphicsHelper::getSpectrumPadFontFactor()*GraphicsHelper::FONT_SIZE_NORMAL);
-			timeAxis->SetLabelOffset(0.02);
-			timeAxis->SetLabelFont(42);
-			graphFrame[i]->addObject(timeAxis);
-		}
-
-		canvas[i]->cd(1)->SetPad(0, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT, 1, 1); // xlow ylow xup yup
-		gPad->SetGridx();
-		gPad->SetGridy();
-		gPad->SetMargin(0.07, 0.01, 0.08, 0.1); // left right bottom top
-
-		// Pad text size is proportionsl to its heght. Here we revert the font size back.
-		// https://root.cern.ch/doc/master/classTAttText.html#T4
-//		canvas[i]->cd(1)->SetAttTextPS(gStyle->GetTextAlign(), gStyle->GetTextAngle(), gStyle->GetTextColor(), gStyle->GetTextFont(), gStyle->GetTextSize()*0.5/(1-ratio));
-
-		Double_t spectrumFontFactor = GraphicsHelper::getSpectrumPadFontFactor();
-		graphFrame[i]->GetXaxis()->SetLabelColor(0);
-		graphFrame[i]->GetXaxis()->SetTitleSize(0);
-		graphFrame[i]->GetXaxis()->SetTickLength(0);
-
-		graphFrame[i]->GetYaxis()->SetLabelSize(spectrumFontFactor*(GraphicsHelper::FONT_SIZE_NORMAL));
-		graphFrame[i]->GetYaxis()->SetTitleSize(spectrumFontFactor*GraphicsHelper::FONT_SIZE_NORMAL);
-		graphFrame[i]->GetYaxis()->SetTitleOffset(0.9);
-
+		// Draw region excluded from plot
 		if (doRange) {
-			GraphicsHelper::drawRegion(graphFrame[i], EXCLUDE_MIN_CHANNEL, EXCLUDE_MAX_CHANNEL);
+			GraphicsHelper::drawRegion(chiFrame[i], constants->getExcludeMinChannel(), constants->getExcludeMaxChannel());
 		}
 
-		// Set spectrum Y axis limits (tip: only works after canvas was modified and updated)
-		gPad->SetLogy();
+		// Add legend with chi^2 value
+		Double_t scaleFactor = GraphicsHelper::getResidualsPadFontFactor();
+		TPaveText* leg = new TPaveText(0.75, 0.85, 0.99, 0.95, "BRNDC");  // x1 y1 x2 y2  0.75, 0.99, 0.9
+		leg->AddText(Form("#chi^{2} = %.1f / %d = %.3f", chi2->getVal(), degreesFreedom, chi2Value));
+		leg->SetTextSize(scaleFactor * GraphicsHelper::FONT_SIZE_SMALL * 1.3);
+		leg->SetBorderSize(1);
+		leg->SetFillColor(0);
+		leg->SetTextAlign(12);
+		chiFrame[i]->addObject(leg);
 
-		// Font size correction (compensate on the Pads uneven heights)
-		graphFrame[i]->Draw(); // Draw frame on current canvas (pad)
-
-        canvas[i]->cd(2)->SetPad(0, 0, 1, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT);
-		gPad->SetMargin(0.07, 0.01, 0.3, 0.05); // left right bottom top - margin for bottom title space
-		gPad->SetGridx();
-
-		Double_t residualsFontFactor = GraphicsHelper::getResidualsPadFontFactor();
-		chiFrame[i]->GetYaxis()->SetTitle("Fit residuals");
-		chiFrame[i]->GetYaxis()->SetTitleOffset(0.48);
-		chiFrame[i]->GetYaxis()->SetTitleSize(residualsFontFactor*(GraphicsHelper::FONT_SIZE_NORMAL));
-		chiFrame[i]->GetYaxis()->SetLabelSize(residualsFontFactor*(GraphicsHelper::FONT_SIZE_NORMAL));
-		chiFrame[i]->GetYaxis()->SetLabelOffset(0.01);
-
-		chiFrame[i]->GetXaxis()->SetTitleSize(residualsFontFactor*(GraphicsHelper::FONT_SIZE_NORMAL));
-		chiFrame[i]->GetXaxis()->SetTitleOffset(2);
-		chiFrame[i]->GetXaxis()->SetLabelSize(residualsFontFactor*(GraphicsHelper::FONT_SIZE_NORMAL));
-		chiFrame[i]->GetXaxis()->SetLabelOffset(0.04);
-
-		if (doRange) {
-			GraphicsHelper::drawRegion(chiFrame[i], EXCLUDE_MIN_CHANNEL, EXCLUDE_MAX_CHANNEL);
-		}
-
-		// Draw horizontal line along residuals
+		// Draw horizontal line
 		TLine* hr = new TLine(1, 0, rChannels->getBins(), 0);
 		hr->SetLineStyle(7);
 		hr->SetLineWidth(2);
 		hr->SetLineColor(kPink - 4);
-//            sBox->SetFillColorAlpha(2, 0.2);
 		chiFrame[i]->addObject(hr);
 
-		TPaveText* leg = new TPaveText(0.75, 0.85, 0.99, 0.95, "BRNDC");  // x1 y1 x2 y2  0.75, 0.99, 0.9
-		leg->AddText(Form("chi^{2} = %.1f / %d = %.3f", chi2[i]->getVal(), n_Degree[i], chi2Value[i]));
-		leg->SetTextSize(residualsFontFactor*GraphicsHelper::FONT_SIZE_SMALL*1.3);
-		leg->SetFillColor(0);
-		leg->SetBorderSize(1);
-		leg->SetTextAlign(12);
-		leg->SetFillStyle(1001);
-		chiFrame[i]->addObject(leg);
+		// Update axis
+		chiFrame[i]->GetYaxis()->SetTitle("Fit residuals");
+		chiFrame[i]->GetYaxis()->SetTitleOffset(0.48);
+		chiFrame[i]->GetYaxis()->SetTitleSize(scaleFactor * (GraphicsHelper::FONT_SIZE_NORMAL));
+		chiFrame[i]->GetYaxis()->SetLabelSize(scaleFactor * (GraphicsHelper::FONT_SIZE_NORMAL));
+		chiFrame[i]->GetYaxis()->SetLabelOffset(0.01);
 
+		chiFrame[i]->GetXaxis()->SetTitleSize(scaleFactor * (GraphicsHelper::FONT_SIZE_NORMAL));
+		chiFrame[i]->GetXaxis()->SetTitleOffset(2);
+		chiFrame[i]->GetXaxis()->SetLabelSize(scaleFactor * (GraphicsHelper::FONT_SIZE_NORMAL));
+		chiFrame[i]->GetXaxis()->SetLabelOffset(0.04);
+
+		// Write RooDataHist statistics on chi frame (to create TPaveStats object)
+		histSpectrum[i]->statOn(chiFrame[i]);
+
+#ifdef USEDEBUG
+		chiFrame[i]->Print("V");
+#endif
+	}
+	Debug("[main] Residual plots successfully created.");
+
+	// Draw plots on the pads
+	for (unsigned i = 0; i < iNumberOfFiles; i++) {
+		// Draw plots on correspondent pads
+		canvas[i]->cd(1);
+		graphFrame[i]->Draw();
+		canvas[i]->cd(2);
 		chiFrame[i]->Draw();
-
-		//            ps->SetName("mystats");
-
-//            if (!isRoot){
 		canvas[i]->Modified();
 		canvas[i]->Update();
-//              gSystem->ProcessEvents();
-//            }
 
-		TString imageFilename = TString::Format("./%s-%s/fit-%s-%s-%d.png", (StringUtils::joinStrings(constants->getDecayModels())).c_str(), constants->getResolutionFunctionModel(),
+		// Save raster and vector images
+		// https://root.cern.ch/doc/master/classTPad.html#a649899aa030f537517022a5d51ec152f
+		TString imageFilePathName = Form("./%s-%s/fit-%s-%s-%d", (StringUtils::joinStrings(constants->getDecayModels())).c_str(), constants->getResolutionFunctionModel(),
 				(StringUtils::joinStrings(constants->getDecayModels())).c_str(), constants->getResolutionFunctionModel(), i + 1);
-		FileUtils::saveImage(canvas[i], imageFilename.Data());
+		TString pngURI = imageFilePathName + ".png";
+		TString epsURI = imageFilePathName + ".eps";
+		canvas[i]->Print(pngURI, "png");
+		canvas[i]->Print(epsURI, "eps");
 	}
+	Debug("[main] Canvas images successfully exported.");
 
 	/*
 	 ________          __                 __
 	 \_____  \  __ ___/  |_______  __ ___/  |_
 	 /   |   \|  |  \   __\____ \|  |  \   __\
-        /    |    \  |  /|  | |  |_> >  |  /|  |
+	/    |    \  |  /|  | |  |_> >  |  /|  |
 	 \_______  /____/ |__| |   __/|____/ |__|
 	 \/            |__|
-	 __________                                     __
-	 \______   \_____ ____________    _____ _____ _/  |_  ___________  ______
-	 |     ___/\__  \\_  __ \__  \  /     \\__  \\   __\/ __ \_  __ \/  ___/
-	 |    |     / __ \|  | \// __ \|  Y Y  \/ __ \|  | \  ___/|  | \/\___ \
-         |____|    (____  /__|  (____  /__|_|  (____  /__|  \___  >__|  /____  >
-	 \/           \/      \/     \/          \/           \/
 
 	 */
 
@@ -700,49 +599,38 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 				<< "\"Count\"" << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Error\"" << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Resolution\"" << std::left << std::setw(FILE_COLUMN_WIDTH)
 				<< "\"Fit\"" << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Chi^2\"" << std::endl;
 
-		for (unsigned j = MIN_CHANNEL; j <= MAX_CHANNEL; j++) {
-			Double_t time = (double) (j - MIN_CHANNEL) * (constants->getChannelWidth());
-			Double_t count = fullTH1F[i]->GetBinContent(j - MIN_CHANNEL + 1);
-			Double_t error = fullTH1F[i]->GetBinError(j - MIN_CHANNEL + 1);
-			Double_t resolution = graphFrame[i]->getCurve("resolution")->Eval(j - MIN_CHANNEL + 0.5);
-			Double_t fit = graphFrame[i]->getCurve("fit")->Eval(j - MIN_CHANNEL + 0.5);
+		const Int_t minChannel = constants->getMinChannel();
+		const Int_t maxChannel = constants->getMaxChannel();
+		for (unsigned j = minChannel; j <= maxChannel; j++) {
+			Double_t time = (double) (j - minChannel) * (constants->getChannelWidth());
+			Double_t count = fullTH1F[i]->GetBinContent(j - minChannel + 1);
+			Double_t error = fullTH1F[i]->GetBinError(j - minChannel + 1);
+			Double_t resolution = graphFrame[i]->getCurve("resolution")->Eval(j - minChannel + 0.5);
+			Double_t fit = graphFrame[i]->getCurve("fit")->Eval(j - minChannel + 0.5);
 			Double_t channel, chi;
 			if (!doRange) {
-				hresid[i]->GetPoint(j - MIN_CHANNEL + 1, channel, chi);
+				hresid[i]->GetPoint(j - minChannel + 1, channel, chi);
 			} else {
 //                TODO: add code for ranges (two curves)
 			}
-//
 			outputFile << std::left << std::setw(FILE_COLUMN_WIDTH) << j << std::left << std::setw(FILE_COLUMN_WIDTH) << time << std::left << std::setw(FILE_COLUMN_WIDTH) << count << std::left
 					<< std::setw(FILE_COLUMN_WIDTH) << error << std::left << std::setw(FILE_COLUMN_WIDTH) << resolution << std::left << std::setw(FILE_COLUMN_WIDTH) << fit << std::left
 					<< std::setw(FILE_COLUMN_WIDTH) << chi;
 			outputFile << std::endl;
 		}
-
 		outputFile.close();
 	}
-
 	RootHelper::stopAndPrintTimer();
-
 	return 1;
 }
 
 int main(int argc, char* argv[]) {
-//    If need to use gdb - use this timeout and -O2 compiler flag
-//    int seconds = 3;
-//    usleep(seconds*1E6);
-
 	// Create ROOT application
 	// https://github.com/root-project/root/blob/master/tutorials/gui/mditest.C#L409
-	TApplication* app = new TApplication("Positron Fit", &argc, argv);
+	TApplication* app = new TApplication("positronFit", &argc, argv);
 
 	run(argc, argv);
 
 	app->Run();
 	return 0;
 }
-
-// void positronfit(){
-// If running app like `root -l positronfit.c` the instance of gApplication is created
-// run(gApplication->Argc(), gApplication->Argv(), kTRUE);
-// }
