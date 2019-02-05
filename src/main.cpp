@@ -431,6 +431,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	 \/           \/|__|        \/        \/     \/
 
 	 */
+
+	// Create canvases and pads first (otherwise it segfaults while drawing a line on TPaveText)
+
+
+
+
 	// Define frame for data points and fit
 	RooPlot** graphFrame = new RooPlot*[iNumberOfFiles];
 	for (unsigned i = 0; i < iNumberOfFiles; i++) {
@@ -533,7 +539,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	// DRAW CANVAS WITH BOTH FRAMES
 	TCanvas** canvas = new TCanvas*[iNumberOfFiles];
 	for (unsigned i = 0; i < iNumberOfFiles; i++) {
-		canvas[i] = new TCanvas(TString::Format("canvas-%d", i + 1), TString::Format("Spectrum N%d \"%s\"", i + 1, sFileNames[i].c_str()), constants->getImageWidth(), constants->getImageHeight());
+		canvas[i] = new TCanvas(Form("canvas-%d", i + 1), Form("Spectrum N%d \"%s\"", i + 1, sFileNames[i].c_str()), constants->getImageWidth(), constants->getImageHeight());
 		canvas[i]->SetFillColor(0);
 
 		canvas[i]->Divide(1, 2);
