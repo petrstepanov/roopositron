@@ -27,20 +27,20 @@ ParametersPool::ParametersPool(std::string ioPath) {
 
 void ParametersPool::constructExcludedParametersList() {
 	// Don't save mean value (not important for results)
-	parametersExcludedFromSave.push_back("gaussMean");
+	parametersExcludedFromSave.push_back("mean_gauss");
 	parametersExcludedFromSave.push_back("bins");
 	parametersExcludedFromSave.push_back("integral");
 	parametersExcludedFromSave.push_back("background");
 
 // Don't user input gauss FWHM's and Intensities
 // Always use default values. Otherwise it's too much stuff
-	parametersExcludedFromInput.push_back("gaussMean");
+	parametersExcludedFromInput.push_back("mean_gauss");
 	parametersExcludedFromInput.push_back("background");
-	parametersExcludedFromInput.push_back("gauss1FWHM");
-	parametersExcludedFromInput.push_back("gauss2FWHM");
-	parametersExcludedFromInput.push_back("gauss2Frac");
-	parametersExcludedFromInput.push_back("gauss3FWHM");
-	parametersExcludedFromInput.push_back("gauss3Frac");
+	parametersExcludedFromInput.push_back("FWHM_gauss1");
+	parametersExcludedFromInput.push_back("FWHM_gauss2");
+	parametersExcludedFromInput.push_back("Int_gauss2");
+	parametersExcludedFromInput.push_back("FWHM_gauss3");
+	parametersExcludedFromInput.push_back("Int_gauss3");
 	parametersExcludedFromInput.push_back("bins");
 	parametersExcludedFromInput.push_back("integral");
 }

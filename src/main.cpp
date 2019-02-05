@@ -34,10 +34,8 @@
 #include <TPaveText.h>
 #include <TGaxis.h>
 
-#include "RooWorkspace.h"
 
-#include "util/FileUtils.h"
-#include "util/RootHelper.h"
+#include "RooWorkspace.h"
 
 #include "model/Constants.h"
 #include "model/ParametersPool.h"
@@ -53,6 +51,11 @@
 #include "roofit/AdditiveConvolutionPdf.h"
 #include "roofit/ModelCommonizer.h"
 #include "util/ObjectNamer.h"
+#include "util/MathUtil.h"
+#include "util/FileUtils.h"
+#include "util/RootHelper.h"
+#include "util/Debug.h"
+
 
 //#include "temp/MyPdfCache.h"
 //#include "temp/MyPdf.h"
@@ -74,12 +77,13 @@ typedef std::pair<std::string, RooDataHist*> dhistPair;
 struct Spectrum {
 	TH1F* histogram;              // ROOT histogram
 	std::string filename;
-	Double_t counts;                 // total counts
-	Int_t channels;
-	Int_t minimumBin;             // bin number with minimum event count
-	Int_t maximumBin;             // bin number with maximum event count
-	Double_t minimumCount;           // minimum count across all bins
-	Double_t maximumCount;           // maximum count across all bins
+	Double_t integral;                 // total counts
+	Int_t numberOfBins;
+	Int_t binWithMinimumCount;             // bin number with minimum value in the range
+	Int_t binWithMaximumCount;             // bin number with maximum value in the range
+	Double_t minimumCount;        // minimum count across all bins
+	Double_t maximumCount;        // maximum count across all bins
+	Double_t averageBackground;
 };
 
 // ASCII font generator is here: http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Resolution%0AFunction
@@ -94,17 +98,17 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	std::vector<Spectrum> spectra;
 	for (unsigned i = 0; i < filenames.size(); i++) {
 		Spectrum s;
-		TH1F* histogram = FileUtils::importTH1F(filenames[i], i);
-		s.histogram = histogram;
+		s.histogram = FileUtils::importTH1F(filenames[i], i);
 		s.filename = filenames[i];
-		s.channels = histogram->GetXaxis()->GetNbins();
-		s.counts = histogram->Integral();
-		s.minimumBin = histogram->GetMinimumBin();
-		s.maximumBin = histogram->GetMaximumBin();
-		s.minimumCount = histogram->GetBinContent(histogram->GetMinimumBin());
-		s.maximumCount = histogram->GetBinContent(histogram->GetMaximumBin());
+		s.numberOfBins = s.histogram->GetXaxis()->GetNbins();
+		s.integral = s.histogram->Integral();
+		s.binWithMinimumCount = s.histogram->GetMinimumBin();
+		s.binWithMinimumCount = s.histogram->GetMaximumBin();
+		s.minimumCount = s.histogram->GetBinContent(s.binWithMinimumCount);
+		s.maximumCount = s.histogram->GetBinContent(s.binWithMaximumCount);
+		s.averageBackground = HistProcessor::getAverageBackground(s.histogram);
+		spectra.push_back(s);
 	}
-
 	// Define number of spectrums
 	const int iNumberOfFiles = filenames.size();
 	std::cout << "Found " << iNumberOfFiles << " files.\n" << std::endl;
@@ -199,7 +203,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		RooAbsPdf* pdf = acp->getPdf();
 
 		// Set mean gauss values
-		RooRealVar* gaussMean = (RooRealVar*) (pdf->getParameters(*rChannels))->find("gaussMean");
+		RooRealVar* gaussMean = (RooRealVar*) (pdf->getParameters(*rChannels))->find("mean_gauss");
 		if (gaussMean) {
 			gaussMean->setMin(iTopChannel[i] - 100);
 			gaussMean->setMax(iTopChannel[i] + 100);
@@ -208,9 +212,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 		// Initialize background here
 		RooPolynomial* bg = new RooPolynomial("bg", "y=1", *rChannels, RooArgSet());
-		Double_t averageBackground = HistProcessor::getAverageBackground(fullTH1F[i]);
 		// Parameterize background as counts, not as fraction (intentionally RooRealVar, not RooConst)
-		RooRealVar* bgCount = new RooRealVar("background", "Background level counts", averageBackground, averageBackground/2, averageBackground*2, "counts");
+		RooRealVar* bgCount = new RooRealVar("background", "Background level counts", spectra[i].averageBackground, spectra[i].averageBackground/2, spectra[i].averageBackground*2, "counts");
 		bgCount->setConstant(kTRUE);
 		Int_t b = fullTH1F[i]->GetXaxis()->GetNbins();
 		RooRealVar* bins = new RooRealVar("bins", "Histogram bins", b, b-1, b+1);
@@ -399,8 +402,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	RooMinimizer* m = new RooMinimizer(*simChi2);
 	// m->setStrategy(); // RooMinimizer::Speed (default), RooMinimizer::Balance, RooMinimizer::Robustness
 	m->setMinimizerType("Minuit");
-	Int_t resultMigrad = m->migrad();
-	Int_t resultHesse = m->hesse();
+	Int_t resultMigrad = 1; //m->migrad();
+	Int_t resultHesse = 1; //m->hesse();
 	std::cout << "RooMinimizer: migrad=" << resultMigrad << ", hesse=" << resultHesse << std::endl;
 
 	RooArgSet* simFloatPars = simPdf->getParameters(*combinedData);
@@ -478,6 +481,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 //				legend->AddText("");
 //			}
 //		}
+
 		graphFrame[i]->Print("V");
 	}
 
@@ -550,8 +554,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 		// Draw second Axis
 		{
-			TVirtualPad* pad = canvas[i]->cd(1);
-			RooAbsArg* rooAbsArg = decay_model[i]->getParameters(graphFrame[i]->getNormVars())->find("gaussMean");
+//			TVirtualPad* pad = canvas[i]->cd(1);
+			RooAbsArg* rooAbsArg = decay_model[i]->getParameters(graphFrame[i]->getNormVars())->find("mean_gauss");
 			if (RooRealVar* rooRealVar = dynamic_cast<RooRealVar*>(rooAbsArg)){
 				Double_t zeroChannel = rooRealVar->getVal();
 				Double_t channelWidth = Constants::getInstance()->getChannelWidth();
@@ -577,11 +581,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		}
 
 		canvas[i]->cd(1)->SetPad(0, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT, 1, 1); // xlow ylow xup yup
-		canvas[i]->cd(1)->SetGridx();
-		canvas[i]->cd(1)->SetGridy();
-		canvas[i]->cd(1)->SetMargin(0.07, 0.01, 0.08, 0.1); // left right bottom top
-		canvas[i]->cd(1)->SetLogy();
-
+		gPad->SetGridx();
+		gPad->SetGridy();
+		gPad->SetMargin(0.07, 0.01, 0.08, 0.1); // left right bottom top
 
 		// Pad text size is proportionsl to its heght. Here we revert the font size back.
 		// https://root.cern.ch/doc/master/classTAttText.html#T4
@@ -601,13 +603,27 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			GraphicsHelper::drawRegion(graphFrame[i], EXCLUDE_MIN_CHANNEL, EXCLUDE_MAX_CHANNEL);
 		}
 
+		// Set spectrum Y axis limits (tip: only works after canvas was modified and updated)
+		{
+			Debug (yMin << " " << yMax);
+			graphFrame[i]->GetYaxis()->SetRangeUser(yMin, yMax);
+		}
+		gPad->SetLogy();
+		// Set spectrum Y axis limits (tip: only works after canvas was modified and updated)
+		{
+			// Y axis minimum is a number of 10^t < background
+			Double_t yMin = pow(10, MathUtil::orderOfMagnitude(spectra[i].averageBackground));
+			// Y axis maximum is default ROOT's gPad value
+			Double_t yMax = graphFrame[i]->GetMaximum();
+			Debug (yMin << " " << yMax);
+			graphFrame[i]->GetYaxis()->SetRangeUser(yMin, yMax);
+		}
 		// Font size correction (compensate on the Pads uneven heights)
 		graphFrame[i]->Draw(); // Draw frame on current canvas (pad)
 
         canvas[i]->cd(2)->SetPad(0, 0, 1, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT);
-		canvas[i]->cd(2)->SetMargin(0.07, 0.01, 0.3, 0.05); // left right bottom top - margin for bottom title space
-//		canvas[i]->cd(2)->SetAttTextPS(gStyle->GetTextAlign(), gStyle->GetTextAngle(), gStyle->GetTextColor(), gStyle->GetTextFont(), 0.1);
-		canvas[i]->cd(2)->SetGridx();
+		gPad->SetMargin(0.07, 0.01, 0.3, 0.05); // left right bottom top - margin for bottom title space
+		gPad->SetGridx();
 
 		Double_t residualsFontFactor = GraphicsHelper::getResidualsPadFontFactor();
 		chiFrame[i]->GetYaxis()->SetTitle("Fit residuals");
@@ -656,18 +672,6 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 				(StringUtils::joinStrings(constants->getDecayModels())).c_str(), constants->getResolutionFunctionModel(), i + 1);
 		FileUtils::saveImage(canvas[i], imageFilename.Data());
 	}
-
-	// Add Legends (weird but it sigfaults if I add earlier)
-//	for (unsigned i = 0; i < iNumberOfFiles; i++) {
-//		canvas[i]->cd(1);
-//		RooArgSet* parameters = decay_model[i]->getParameters(graphFrame[i]->getNormVars());
-//		TPaveText* pt = GraphicsHelper::makePaveText(*parameters, 3, 0.78, 0.99, 0.9);
-//		graphFrame[i]->addObject(pt);
-//		graphFrame[i]->Draw();
-//		canvas[i]->Modified();
-//		canvas[i]->Update();
-//	}
-
 
 	/*
 	 ________          __                 __

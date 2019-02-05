@@ -111,14 +111,14 @@ void AdditiveConvolutionPdf::initResolutionModel(const char* resolutionId,
 
 void AdditiveConvolutionPdf::initCoefficients() {
 	// Initialize source contribution coefficient
-	sourceContribution = new RooRealVar("I_source", "Source contribution", 11, 5, 20, "%");
+	sourceContribution = new RooRealVar("Int_source", "Source contribution", 11, 5, 20, "%");
 	sourceContributionNorm = new RooFormulaVar("sourceContributionNorm", "@0/100", *sourceContribution);
 }
 
 void AdditiveConvolutionPdf::convoluteComponents(RooRealVar *observable) {
 	// Create list of cache variables (roofit supports max 2 now)
 //    RooArgSet* resolutionVariables = resolutionFunction->getVariables();
-//    RooRealVar* resolutionMean = (RooRealVar*) resolutionVariables->find("gaussMean");
+//    RooRealVar* resolutionMean = (RooRealVar*) resolutionVariables->find("mean_gauss");
 
 	// Convolute components
 	double bufferFraction = Constants::getInstance()->getBufferFraction();
