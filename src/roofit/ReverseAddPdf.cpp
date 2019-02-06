@@ -166,7 +166,7 @@ RooAbsPdf* ReverseAddPdf::add(RooArgList* pdfList, const char* pdfName) {
 	// Construct list of original model coefficients
 	// I_i = [I4, I3, I2]
 	// 1st "Source" component intensity
-	std::string IName = StringUtils::suffix("I", numberOfComponents-i, pdfName);
+	std::string IName = StringUtils::suffix("Int", numberOfComponents-i, pdfName);
 	
 	std::string ITitle = pdfName;
 	if (ITitle.empty()){

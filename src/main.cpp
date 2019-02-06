@@ -119,14 +119,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		s.maximumCount = s.histogram->GetBinContent(s.binWithMaximumCount);
 		s.averageBackground = HistProcessor::getAverageBackground(s.histogram);
 		spectra.push_back(s);
-		Debug("Spectrum " << i+1 << " file is \"" << s.filename << "\"");
-		Debug("  bins: " << s.numberOfBins);
-		Debug("  integral: " << s.integral);
-		Debug("  bin with minimum count: " << s.binWithMinimumCount);
-		Debug("  bin with maximum count: " << s.binWithMaximumCount);
-		Debug("  minimum count: " << s.minimumCount);
-		Debug("  maximum count: " << s.maximumCount);
-		Debug("  average background: " << s.averageBackground);
+		Debug(
+				"Spectrum " << i+1 << " file is \"" << s.filename << "\"" << std::endl << "  bins: " << s.numberOfBins << "  integral: " << s.integral << "  bin with minimum count: " << s.binWithMinimumCount << "  bin with maximum count: " << s.binWithMaximumCount << "  minimum count: " << s.minimumCount << "  maximum count: " << s.maximumCount << "  average background: " << s.averageBackground);
 	}
 
 	// Construct additive decay models
@@ -348,11 +342,11 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			Double_t timeMin = -channelWidth * zeroChannel;
 			Double_t timeMax = (channels->getMax() - zeroChannel) * channelWidth;
 			TGaxis *timeAxis = new TGaxis(0, yMin, channels->getMax(), yMin, timeMin, timeMax, 510, "+L");
+			timeAxis->SetName("timeAxis");
 			timeAxis->SetTitleSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
-			timeAxis->SetTitleOffset(0.68);
+			timeAxis->SetTitleOffset(0.62);
 			timeAxis->SetTitleFont(42);
 			timeAxis->SetTitle("(ns)");
-			timeAxis->SetTitleSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
 			timeAxis->SetLabelSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
 			timeAxis->SetLabelOffset(0.02);
 			timeAxis->SetLabelFont(42);

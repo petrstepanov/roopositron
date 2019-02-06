@@ -68,7 +68,7 @@ RooArgList* Constants::initDefaultValues() {
     constants->add(*constant);
     constant = new RooStringVar("decayModel", " # comma-separated names \"exp\", \"trapping\", \"grain\", \"powder\"", "exp");
     constants->add(*constant);
-    constant = new RooStringVar("resolutionFunction", " # \"2gauss\" or \"3gauss\"", "2gauss");
+    constant = new RooStringVar("resolutionFunction", " # \"1gauss\", \"2gauss\" or \"3gauss\"", "2gauss");
     constants->add(*constant);
     constant = new RooStringVar("sourceComponents", " # number of components in source", "1");
     constants->add(*constant);
