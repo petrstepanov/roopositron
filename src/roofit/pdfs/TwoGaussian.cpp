@@ -28,20 +28,18 @@ TwoGaussian::TwoGaussian(const TwoGaussian& other, const char* name) :
 Double_t TwoGaussian::evaluate() const {
 	Double_t arg = x - mean;
 
-	Double_t ret1 = exp(-0.5 * arg * arg / sigma1 / sigma1);
-	Double_t ret2 = exp(-0.5 * arg * arg / sigma2 / sigma2);
+	Double_t ret1 = exp(-arg * arg / sigma1 / sigma1 / 2);
+	Double_t ret2 = exp(-arg * arg / sigma2 / sigma2 / 2);
 	return (1. - i2) * ret1 + i2 * ret2;
 }
 
 // Indefinite integral
 Double_t TwoGaussian::indefiniteIntegral(Double_t y) const {
 	Double_t sqrtPiOver2 = TMath::Sqrt(TMath::PiOver2());
-	Double_t s1Sqrt2 = sigma1 * TMath::Sqrt2();
-	Double_t s2Sqrt2 = sigma2 * TMath::Sqrt2();
 
 	// see "gauss.nb"
-	Double_t ret1 = - sqrtPiOver2 * sigma1 * RooMath::erf((mean - y) / s1Sqrt2);
-	Double_t ret2 = - sqrtPiOver2 * sigma2 * RooMath::erf((mean - y) / s2Sqrt2);
+	Double_t ret1 = sqrtPiOver2 * sigma1 * TMath::Erf((y - mean) / (sigma1 * TMath::Sqrt2()));
+	Double_t ret2 = sqrtPiOver2 * sigma2 * TMath::Erf((y - mean) / (sigma2 * TMath::Sqrt2()));
 	return (1. - i2) * ret1 + i2 * ret2;
 }
 
@@ -58,7 +56,6 @@ Double_t TwoGaussian::analyticalIntegral(Int_t code, const char* rangeName) cons
 
 	Double_t ret = 0;
 	if (code == 1) {
-		// Range always called symmetrical [-AXIS_HALF_WIDTH-100, AXIS_HALF_WIDTH+100] : (-1100; 1100) if 2000 bins
 		Double_t x1 = x.min(rangeName);
 		Double_t x2 = x.max(rangeName);
 

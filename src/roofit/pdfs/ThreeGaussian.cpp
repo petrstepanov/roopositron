@@ -40,16 +40,13 @@ Double_t ThreeGaussian::evaluate() const {
 
 Double_t ThreeGaussian::indefiniteIntegral(Double_t y) const {
 	Double_t sqrtPiOver2 = TMath::Sqrt(TMath::PiOver2());
-	Double_t s1Sqrt2 = sigma1 * TMath::Sqrt2();
-	Double_t s2Sqrt2 = sigma2 * TMath::Sqrt2();
-	Double_t s3Sqrt2 = sigma3 * TMath::Sqrt2();
 
 	// see "gauss.nb"
-	Double_t int1 = - sqrtPiOver2 * sigma1 * RooMath::erf((mean-y) / s1Sqrt2);
-	Double_t int2 = - sqrtPiOver2 * sigma2 * RooMath::erf((mean-y) / s2Sqrt2);
-	Double_t int3 = - sqrtPiOver2 * sigma3 * RooMath::erf((mean-y) / s3Sqrt2);
+	Double_t int1 = sqrtPiOver2 * sigma1 * TMath::Erf((y - mean) / (sigma1 * TMath::Sqrt2()));
+	Double_t int2 = sqrtPiOver2 * sigma2 * TMath::Erf((y - mean) / (sigma2 * TMath::Sqrt2()));
+	Double_t int3 = sqrtPiOver2 * sigma3 * TMath::Erf((y - mean) / (sigma3 * TMath::Sqrt2()));
 
-	return (1. - i2 - i3) * int1 + i2 * int2 + i3 * int3;
+	return (1.-i2-i3)*int1 + i2*int2 + i3*int3;
 }
 
 // Get analytical integral -- important to return 0 and 1!
