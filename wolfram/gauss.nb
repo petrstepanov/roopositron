@@ -3,17 +3,17 @@
 (*** Wolfram Notebook File ***)
 (* http://www.wolfram.com/nb *)
 
-(* CreatedBy='Mathematica 11.0' *)
+(* CreatedBy='Mathematica 11.3' *)
 
 (*CacheID: 234*)
 (* Internal cache information:
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[      3639,        127]
-NotebookOptionsPosition[      3174,        106]
-NotebookOutlinePosition[      3521,        121]
-CellTagsIndexPosition[      3478,        118]
+NotebookDataLength[      3769,        107]
+NotebookOptionsPosition[      3241,         89]
+NotebookOutlinePosition[      3595,        105]
+CellTagsIndexPosition[      3552,        102]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -22,26 +22,31 @@ Notebook[{
 Cell[CellGroupData[{
 Cell[BoxData[{
  RowBox[{
-  RowBox[{"gauss", "[", "x_", "]"}], "=", 
-  RowBox[{"Exp", "[", 
-   RowBox[{
-    RowBox[{"-", 
-     RowBox[{
-      RowBox[{"(", 
-       RowBox[{"x", "-", "\[Mu]"}], ")"}], "^", "2"}]}], "/", 
-    RowBox[{"(", 
-     RowBox[{"2", "*", "\[Sigma]", "*", "\[Sigma]"}], ")"}]}], 
-   "]"}]}], "\[IndentingNewLine]", 
- RowBox[{"Integrate", "[", 
   RowBox[{
-   RowBox[{"gauss", "[", "x", "]"}], ",", "x"}], 
-  "]"}], "\[IndentingNewLine]"}], "Input",
- CellChangeTimes->{{3.734126165171506*^9, 3.734126169218545*^9}, {
-  3.734126445125326*^9, 3.7341265259059715`*^9}, {3.7341269414355817`*^9, 
-  3.7341269436884537`*^9}, {3.734126977219322*^9, 3.7341270238597775`*^9}, {
-  3.7341271221096163`*^9, 3.7341271659531746`*^9}, {3.734127209047926*^9, 
-  3.734127216657054*^9}, {3.734127250999889*^9, 3.7341272557514358`*^9}, {
-  3.7341272873601985`*^9, 3.7341272888595414`*^9}}],
+   RowBox[{"g", "[", "x_", "]"}], "=", 
+   RowBox[{"Exp", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"-", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"x", "-", "mean"}], ")"}], "^", "2"}]}], "/", 
+      RowBox[{"sigma", "^", "2"}]}], "/", "2"}], "]"}]}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"gInt", "[", "x_", "]"}], "=", 
+  RowBox[{"Integrate", "[", 
+   RowBox[{
+    RowBox[{"g", "[", "x", "]"}], ",", "x"}], "]"}]}]}], "Input",
+ CellChangeTimes->{{3.758443863947941*^9, 3.758443868322401*^9}, {
+  3.758443917625182*^9, 3.7584439401056967`*^9}, {3.75844401256835*^9, 
+  3.758444025894082*^9}, {3.758444075533719*^9, 3.758444113089157*^9}, {
+  3.758444172880417*^9, 3.7584442045087757`*^9}, {3.758444465545683*^9, 
+  3.7584444849323387`*^9}, {3.7584451647310762`*^9, 3.7584452158462057`*^9}, {
+  3.75844525060506*^9, 3.758445262497674*^9}, {3.758445295031024*^9, 
+  3.758445304383786*^9}, {3.758445815938715*^9, 3.758445819327351*^9}, {
+  3.758445875278887*^9, 3.758445875404274*^9}},
+ CellLabel->"In[50]:=",ExpressionUUID->"b339ec4a-704c-47c7-9c6f-0ee66ef9030d"],
 
 Cell[BoxData[
  SuperscriptBox["\[ExponentialE]", 
@@ -49,64 +54,43 @@ Cell[BoxData[
    FractionBox[
     SuperscriptBox[
      RowBox[{"(", 
-      RowBox[{"x", "-", "\[Mu]"}], ")"}], "2"], 
+      RowBox[{
+       RowBox[{"-", "mean"}], "+", "x"}], ")"}], "2"], 
     RowBox[{"2", " ", 
-     SuperscriptBox["\[Sigma]", "2"]}]]}]]], "Output",
- CellChangeTimes->{3.7341272192655935`*^9, 3.7341272579839745`*^9, 
-  3.734127290484029*^9}],
+     SuperscriptBox["sigma", "2"]}]]}]]], "Output",
+ CellChangeTimes->{
+  3.7584439551549473`*^9, {3.758444017064416*^9, 3.758444026597658*^9}, {
+   3.758444085082356*^9, 3.758444114753422*^9}, {3.758444179110832*^9, 
+   3.758444206661303*^9}, {3.758444472020145*^9, 3.75844448551789*^9}, 
+   3.7584451668934793`*^9, {3.758445198742092*^9, 3.758445216872993*^9}, {
+   3.75844528096206*^9, 3.758445305353014*^9}, 3.75844582007364*^9, 
+   3.758445876839756*^9},
+ CellLabel->"Out[50]=",ExpressionUUID->"f61d1a3e-e0c2-431d-b5c4-ab2afc6f6be5"],
 
 Cell[BoxData[
  RowBox[{
-  SqrtBox[
-   FractionBox["\[Pi]", "2"]], " ", "\[Sigma]", " ", 
+  RowBox[{"-", 
+   SqrtBox[
+    FractionBox["\[Pi]", "2"]]}], " ", "sigma", " ", 
   RowBox[{"Erf", "[", 
    FractionBox[
-    RowBox[{"x", "-", "\[Mu]"}], 
+    RowBox[{"mean", "-", "x"}], 
     RowBox[{
-     SqrtBox["2"], " ", "\[Sigma]"}]], "]"}]}]], "Output",
- CellChangeTimes->{3.7341272192655935`*^9, 3.7341272579839745`*^9, 
-  3.734127290499774*^9}]
-}, Open  ]],
-
-Cell[CellGroupData[{
-
-Cell[BoxData[
- RowBox[{
-  RowBox[{"gaussnorm", "[", "x_", "]"}], "=", 
-  RowBox[{
-   RowBox[{
-    RowBox[{"Exp", "[", 
-     RowBox[{
-      RowBox[{"-", 
-       RowBox[{
-        RowBox[{"(", 
-         RowBox[{"x", "-", "\[Mu]"}], ")"}], "^", "2"}]}], "/", 
-      RowBox[{"(", 
-       RowBox[{"2", "*", "\[Sigma]", "*", "\[Sigma]"}], ")"}]}], "]"}], "/", 
-    RowBox[{"Sqrt", "[", 
-     RowBox[{"2", "\[Pi]"}], "]"}]}], "/", "\[Sigma]"}]}]], "Input",
- CellChangeTimes->{{3.7341399301811438`*^9, 3.734139980941726*^9}, {
-  3.734175994445822*^9, 3.734175997562297*^9}}],
-
-Cell[BoxData[
- FractionBox[
-  SuperscriptBox["\[ExponentialE]", 
-   RowBox[{"-", 
-    FractionBox[
-     SuperscriptBox[
-      RowBox[{"(", 
-       RowBox[{"x", "-", "\[Mu]"}], ")"}], "2"], 
-     RowBox[{"2", " ", 
-      SuperscriptBox["\[Sigma]", "2"]}]]}]], 
-  RowBox[{
-   SqrtBox[
-    RowBox[{"2", " ", "\[Pi]"}]], " ", "\[Sigma]"}]]], "Output",
- CellChangeTimes->{3.7341399846496964`*^9, 3.734175999711686*^9}]
+     SqrtBox["2"], " ", "sigma"}]], "]"}]}]], "Output",
+ CellChangeTimes->{
+  3.7584439551549473`*^9, {3.758444017064416*^9, 3.758444026597658*^9}, {
+   3.758444085082356*^9, 3.758444114753422*^9}, {3.758444179110832*^9, 
+   3.758444206661303*^9}, {3.758444472020145*^9, 3.75844448551789*^9}, 
+   3.7584451668934793`*^9, {3.758445198742092*^9, 3.758445216872993*^9}, {
+   3.75844528096206*^9, 3.758445305353014*^9}, 3.75844582007364*^9, 
+   3.7584458768478937`*^9},
+ CellLabel->"Out[51]=",ExpressionUUID->"a70618f7-dc05-47f9-a032-227d6a7817fe"]
 }, Open  ]]
 },
-WindowSize->{759, 813},
-WindowMargins->{{64, Automatic}, {38, Automatic}},
-FrontEndVersion->"11.0 for Microsoft Windows (64-bit) (September 21, 2016)",
+WindowSize->{673, 855},
+WindowMargins->{{Automatic, 160}, {Automatic, 0}},
+FrontEndVersion->"11.3 for Mac OS X x86 (32-bit, 64-bit Kernel) (March 5, \
+2018)",
 StyleDefinitions->"Default.nb"
 ]
 (* End of Notebook Content *)
@@ -121,15 +105,13 @@ CellTagsIndex->{}
 (*NotebookFileOutline
 Notebook[{
 Cell[CellGroupData[{
-Cell[580, 22, 888, 21, 69, "Input"],
-Cell[1471, 45, 340, 10, 45, "Output"],
-Cell[1814, 57, 326, 10, 56, "Output"]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[2177, 72, 565, 16, 30, "Input"],
-Cell[2745, 90, 413, 13, 122, "Output"]
+Cell[580, 22, 1151, 26, 73, "Input",ExpressionUUID->"b339ec4a-704c-47c7-9c6f-0ee66ef9030d"],
+Cell[1734, 50, 753, 17, 51, "Output",ExpressionUUID->"f61d1a3e-e0c2-431d-b5c4-ab2afc6f6be5"],
+Cell[2490, 69, 735, 17, 119, "Output",ExpressionUUID->"a70618f7-dc05-47f9-a032-227d6a7817fe"]
 }, Open  ]]
 }
 ]
 *)
+
+(* End of internal cache information *)
 

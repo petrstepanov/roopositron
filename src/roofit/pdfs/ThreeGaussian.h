@@ -25,7 +25,7 @@ class ThreeGaussian : public RooAbsPdf {
 public:
     ThreeGaussian() {};
     ThreeGaussian(const char *name, const char *title,
-            RooAbsReal& _x, RooAbsReal& _mean1, RooAbsReal& _sigma1, RooAbsReal& _mean2, RooAbsReal& _sigma2, RooAbsReal& _sigma3, RooAbsReal& _i2, RooAbsReal& _i3);
+            RooAbsReal& _x, RooAbsReal& _mean, RooAbsReal& _sigma1, RooAbsReal& _sigma2, RooAbsReal& _sigma3, RooAbsReal& _i2, RooAbsReal& _i3);
     ThreeGaussian(const ThreeGaussian& other, const char* name = 0);
     virtual TObject* clone(const char* newname) const { return new ThreeGaussian(*this, newname); }
     inline virtual ~ThreeGaussian() {}
@@ -35,9 +35,8 @@ public:
     
 protected:
     RooRealProxy x;
-    RooRealProxy mean1;
+    RooRealProxy mean;
     RooRealProxy sigma1;
-    RooRealProxy mean2;
     RooRealProxy sigma2;
     RooRealProxy sigma3;
     RooRealProxy i2;

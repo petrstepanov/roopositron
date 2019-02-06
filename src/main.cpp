@@ -324,6 +324,11 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		// https://root-forum.cern.ch/t/excluding-regions-in-a-fit/9109
 		spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kPink - 4), RooFit::LineWidth(2), RooFit::Name("fit"), DO_RANGE ? RooFit::Range("LEFT,RIGHT") : NULL);
 
+		// Draw grayed out region excluded from plot
+		if (DO_RANGE) {
+			GraphicsHelper::drawRegion(spectraPlot[i], constants->getExcludeMinChannel(), constants->getExcludeMaxChannel());
+		}
+
 		// Add legend with list of model parameters
 		RooArgSet* parameters = spectra[i].model->getParameters(spectraPlot[i]->getNormVars());
 		TPaveText* pt = GraphicsHelper::makePaveText(*parameters, GraphicsHelper::LEGEND_XMIN, 0.99, 0.9);
@@ -333,11 +338,6 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		Double_t yMin = pow(10, MathUtil::orderOfMagnitude(spectra[i].averageBackground));  // Minimum is order of magnitude of the average background value
 		Double_t yMax = spectraPlot[i]->GetMaximum();  // Maximum is default (whatever ROOT plots)
 		spectraPlot[i]->GetYaxis()->SetRangeUser(yMin, yMax);
-
-		// Draw grayed out region excluded from plot
-		if (DO_RANGE) {
-			GraphicsHelper::drawRegion(spectraPlot[i], constants->getExcludeMinChannel(), constants->getExcludeMaxChannel());
-		}
 
 		// Draw nanosecond axis
 		Double_t scaleFactor = GraphicsHelper::getSpectrumPadFontFactor();

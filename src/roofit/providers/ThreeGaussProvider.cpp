@@ -50,5 +50,5 @@ RooAbsPdf* ThreeGaussProvider::initPdf(int i) {
 	// Zero channel start values are assigned later (relative to the MIN_CHANNEL value)
     RooRealVar* gMean = new RooRealVar("mean_gauss", "Resolution function mean", 1, "ch");
 
-	return new ThreeGaussian("threeGauss", "Three gauss model", *observable, *gMean, *g1Dispersion, *gMean, *g2Dispersion, *g3Dispersion, *g2FractionNorm, *g3FractionNorm);
+	return new ThreeGaussian("threeGauss", "Three gauss model", *observable, *gMean, *g1Dispersion, *g2Dispersion, *g3Dispersion, *g2FractionNorm, *g3FractionNorm);
 }
