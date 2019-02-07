@@ -335,8 +335,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 		// Draw nanosecond axis
 		Double_t scaleFactor = GraphicsHelper::getSpectrumPadFontFactor();
-		RooAbsArg* rooAbsArg = spectra[i].model->getParameters(spectraPlot[i]->getNormVars())->find("mean_gauss");
-		if (RooRealVar* rooRealVar = dynamic_cast<RooRealVar*>(rooAbsArg)) {
+		if (RooRealVar* rooRealVar = RootHelper::findParameterNameContains(spectra[i].model, channels, "mean_gauss")) {
 			Double_t zeroChannel = rooRealVar->getVal();
 			Double_t channelWidth = Constants::getInstance()->getChannelWidth();
 			Double_t timeMin = -channelWidth * zeroChannel;
