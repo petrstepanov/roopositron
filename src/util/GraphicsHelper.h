@@ -31,6 +31,8 @@ public:
 	static const Double_t RESIDUALS_PAD_RELATIVE_HEIGHT;
 	static const Double_t LEGEND_XMIN;
 
+	static const Style_t GRAPH_COLOR = kViolet + 6;
+
 	static Double_t getSpectrumPadFontFactor();
 	static Double_t getResidualsPadFontFactor();
 

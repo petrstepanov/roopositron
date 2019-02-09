@@ -316,7 +316,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 		// Draw complete fit, dont't forget the ranges if needed
 		// https://root-forum.cern.ch/t/excluding-regions-in-a-fit/9109
-		spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kPink - 4), RooFit::LineWidth(2), RooFit::Name("fit"), DO_RANGE ? RooFit::Range("LEFT,RIGHT") : NULL);
+		spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(GraphicsHelper::GRAPH_COLOR), RooFit::LineWidth(2), RooFit::Name("fit"), DO_RANGE ? RooFit::Range("LEFT,RIGHT") : NULL);
 
 		// Draw grayed out region excluded from plot
 		if (DO_RANGE) {
@@ -343,7 +343,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			TGaxis *timeAxis = new TGaxis(0, yMin, channels->getMax(), yMin, timeMin, timeMax, 510, "+L");
 			timeAxis->SetName("timeAxis");
 			timeAxis->SetTitleSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
-			timeAxis->SetTitleOffset(0.62);
+			timeAxis->SetTitleOffset(0.64);
 			timeAxis->SetTitleFont(42);
 			timeAxis->SetTitle("(ns)");
 			timeAxis->SetLabelSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
@@ -415,9 +415,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 		// Draw horizontal line
 		TLine* hr = new TLine(1, 0, channels->getBins(), 0);
-		hr->SetLineStyle(7);
+		hr->SetLineStyle(1); // https://root.cern.ch/doc/master/classTAttLine.html#L3
 		hr->SetLineWidth(2);
-		hr->SetLineColor(kPink - 4);
+		hr->SetLineColor(GraphicsHelper::GRAPH_COLOR);
 		chiFrame[i]->addObject(hr);
 
 		// Update axis

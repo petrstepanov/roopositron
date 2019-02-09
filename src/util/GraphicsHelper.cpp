@@ -53,7 +53,7 @@ void GraphicsHelper::printVariable(Int_t sigDigits, const char* options, Int_t& 
 	Bool_t notConstant = !var->isConstant();
 	Bool_t atMaximum = var->getVal() + var->getError() > var->getMax();
 	Bool_t atMinimum = var->getVal() - var->getError() < var->getMin();
-	if (notConstant && (atMaximum || atMinimum)) t->SetTextColor(kPink-8);
+	if (notConstant && (atMaximum || atMinimum)) t->SetTextColor(kOrange+8);
 	paramsList->remove(*var);
 	currentLine++;
 
