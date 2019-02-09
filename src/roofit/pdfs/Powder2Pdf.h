@@ -1,18 +1,12 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/* 
- * File:   PowderPdf.h
- * Author: petrstepanov
+ * Powder2.h
  *
- * Created on November 9, 2016, 8:48 PM
+ *  Created on: Feb 7, 2019
+ *      Author: student
  */
 
-#ifndef MY_POWDERPDF
-#define MY_POWDERPDF
+#ifndef SRC_ROOFIT_PDFS_POWDER2PDF_H_
+#define SRC_ROOFIT_PDFS_POWDER2PDF_H_
 
 #include "RooAbsReal.h"
 #include "RooAbsPdf.h"
@@ -22,48 +16,50 @@
 #include "TAxis.h"
 #include "TMath.h"
 
-class PowderPdf: public RooAbsPdf {
+class Powder2Pdf: public RooAbsPdf {
 public:
-	PowderPdf() {
+	Powder2Pdf() {
 	}
 	;
-	PowderPdf(const char *name, const char *title, RooAbsReal& _t,
+	Powder2Pdf(const char *name, const char *title, //
+			RooAbsReal& _t,            // Observable
 			RooAbsReal& _L,            // Diameter of the powder
-			RooAbsReal& _kv,           // Probability of capturing into vacancy
+			RooAbsReal& _kd1,          // Probability of capturing in defect type 1
+			RooAbsReal& _kd2,          // Probability of capturing in defect type 2
 			RooAbsReal& _Pps,          // Probability of forming qf-Ps
 			RooAbsReal& _lb,           // Annihilation rate in bulk
-			RooAbsReal& _lv,           // Annihilation rate in vacancy
+			RooAbsReal& _ld1,          // Annihilation rate in defect 1
+			RooAbsReal& _ld2,          // Annihilation rate in defect 2
 			RooAbsReal& _lPs,          // Annihilation rate of Ps atom
 			RooAbsReal& _Mr,           // Powder mass to e+ mass ratio ~1E5?
-			RooAbsReal& _mu, // Probability of o-Ps -> p-Ps conversion due to paramagnetic O2
+			RooAbsReal& _mu,           // Probability of o-Ps -> p-Ps conversion due to paramagnetic O2
 			RooAbsReal& _l2g,          // Two-gamma annihilation rate
-//			RooAbsReal& _l3g,          // Three-gamma annihilation rate
-			RooAbsReal& _V0,          // Two-gamma annihilation rate
+			RooAbsReal& _V0,           // Two-gamma annihilation rate
 			RooAbsReal& _Vth,          // Three-gamma annihilation rate
 			Double_t chW);
-	PowderPdf(const PowderPdf& other, const char* name = 0);
+	Powder2Pdf(const Powder2Pdf& other, const char* name = 0);
 	virtual TObject* clone(const char* newname) const {
-		return new PowderPdf(*this, newname);
+		return new Powder2Pdf(*this, newname);
 	}
-	inline virtual ~PowderPdf() {
+	inline virtual ~Powder2Pdf() {
 	}
 
-	Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars,
-			const char* rangeName = 0) const;
+	Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName = 0) const;
 	Double_t analyticalIntegral(Int_t code, const char* rangeName = 0) const;
 
 protected:
 	RooRealProxy t;
 	RooRealProxy L;
-	RooRealProxy kv;
+	RooRealProxy kd1;
+	RooRealProxy kd2;
 	RooRealProxy Pps;
 	RooRealProxy lb;
-	RooRealProxy lv;
+	RooRealProxy ld1;
+	RooRealProxy ld2;
 	RooRealProxy lPs;
 	RooRealProxy Mr;
 	RooRealProxy mu;
 	RooRealProxy l2g;
-//	RooRealProxy l3g;
 	RooRealProxy V0;
 	RooRealProxy Vth;
 
@@ -78,8 +74,7 @@ protected:
 	Double_t indefiniteIntegral(Double_t y) const;
 
 private:
-ClassDef(PowderPdf, 1)
+ClassDef(Powder2Pdf, 1)
 };
 
-#endif /* MY_POWDERPDF */
-
+#endif /* SRC_ROOFIT_PDFS_POWDER2PDF_H_ */

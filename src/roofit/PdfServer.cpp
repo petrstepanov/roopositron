@@ -18,6 +18,7 @@
 #include "providers/ExpProvider.h"
 #include "providers/GrainProvider.h"
 #include "providers/PowderProvider.h"
+#include "providers/Powder2Provider.h"
 #include "providers/TrappingProvider.h"
 
 PdfServer::PdfServer(){}
@@ -30,7 +31,8 @@ PdfHashNames PdfServer::hashPdfName(const char* pdfName) {
     if (name == "exp") return kExponentPdf;
     if (name == "trapping") return kTrappingPdf;
     if (name == "grain") return kGrainPdf;
-    if (name == "powder") return kPowderPdf;    
+    if (name == "powder") return kPowderPdf;
+    if (name == "powder2") return kPowder2Pdf;
     return kExponentPdf;
 }
 
@@ -82,7 +84,13 @@ RooAbsPdf* PdfServer::getPdf(const char* name, RooRealVar* observable) {
 		return pp->getPdf(pdfIndexes[kPowderPdf]);
 	    }	
 	    break;
-	default: 
+	case kPowder2Pdf:
+	    {
+		Powder2Provider* pp = new Powder2Provider(observable);
+		return pp->getPdf(pdfIndexes[kPowderPdf]);
+	    }
+	    break;
+	default:
 	    return NULL;
     }
 }

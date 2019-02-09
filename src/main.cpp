@@ -102,7 +102,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		std::cout << "No Maestro '.Spe' files found in current directory. Press CTRL+C." << std::endl;
 		return 0;
 	}
-	Debug("[main] Found " << filenames.size() << " spectra.");
+	Debug("main", "Found " << filenames.size() << " spectra.");
 
 	// Construct a list of Spectrum structs to store individual spectra information
 	std::vector<Spectrum> spectra;
@@ -184,12 +184,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	}
 
 	// Output
-	Debug("[main] Constructed following models:");
+	Debug("main", "Constructed following models:");
 	for (unsigned i = 0; i < spectra.size(); i++) {
 #ifdef USEDEBUG
 		spectra[i].model->Print();
-	}
 #endif
+	}
 
 	// Create output folder out of model components' names and resolution function name, e.g. "exp-exp-2gauss"
 	std::string outputPath = StringUtils::joinStrings(constants->getDecayModels()) + "-" + constants->getResolutionFunctionModel();
@@ -267,7 +267,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	m->setMinimizerType("Minuit");
 	Int_t resultMigrad = m->migrad();
 	Int_t resultHesse = m->hesse();
-	Debug("[main] Fitting completed: migrad=" << resultMigrad << ", hesse=" << resultHesse);
+	Debug("main", "Fitting completed: migrad=" << resultMigrad << ", hesse=" << resultHesse);
 
 	// Save parameters to file
 	storage->save(simPdf->getParameters(*channels));
@@ -365,7 +365,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		spectraPlot[i]->Print("V");
 #endif
 	}
-	Debug("[main] Spectra plots successfully created.");
+	Debug("main", "Spectra plots successfully created.");
 
 	// Draw residuals plot (bottom)
 	RooPlot** chiFrame = new RooPlot*[spectra.size()];
@@ -436,7 +436,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		chiFrame[i]->Print("V");
 #endif
 	}
-	Debug("[main] Residual plots successfully created.");
+	Debug("main", "Residual plots successfully created.");
 
 	// Draw plots on the pads
 	for (unsigned i = 0; i < spectra.size(); i++) {
@@ -457,7 +457,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		canvas[i]->Print(pngURI, "png");
 		canvas[i]->Print(epsURI, "eps");
 	}
-	Debug("[main] Canvas images successfully exported.");
+	Debug("main", "Canvas images successfully exported.");
 
 	/*
 	 ________          __                 __

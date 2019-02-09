@@ -23,7 +23,8 @@ enum PdfHashNames {
     kExponentPdf,
     kTrappingPdf,
     kGrainPdf,
-    kPowderPdf
+    kPowderPdf,
+    kPowder2Pdf
 };
 
 class PdfServer {

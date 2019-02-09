@@ -72,7 +72,7 @@ RooArgSet* ParametersPool::readPoolParametersFromFile() {
 		if (strcmp(type, "fixed") == 0) {
 			parameter->setConstant(kTRUE);
 		} else {
-			parameter->setError(error);
+			// parameter->setError(error);
 		}
 		parameter->Print();
 		parametersPool->add(*parameter);
@@ -203,7 +203,7 @@ Bool_t ParametersPool::save(RooArgSet* modelParameters) {
 
 //			Double_t parameterMin = parameter->isConstant() ? parameter->getVal() : parameter->getMin();
 //			Double_t parameterMax = parameter->isConstant() ? parameter->getVal() : parameter->getMax();
-			Double_t parameterErr = parameter->isConstant() ? 0 : parameter->getMax();
+			Double_t parameterErr = parameter->isConstant() ? 0 : parameter->getError();
 
 			// https://stackoverflow.com/questions/23776824/what-is-the-meaning-of-s-in-a-printf-format-string/23777065
 			fprintf(pFile, "%-*s%-*f%-*f%-*f%-*f%-*s%-*s%s\n", tab, parameter->GetName(), tab, parameter->getVal(), tab, parameter->getMin(), tab, parameter->getMax(), tab, parameterErr, tab,

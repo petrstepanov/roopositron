@@ -13,6 +13,7 @@
 
 #include "GraphicsHelper.h"
 #include "StringUtils.h"
+#include "Debug.h"
 #include <TBox.h>
 #include <TPaveText.h>
 #include <RooRealVar.h>
@@ -41,26 +42,27 @@ void GraphicsHelper::drawRegion(RooPlot* frame, Int_t xMin, Int_t xMax) {
 	sBox->SetLineWidth(0);
 	sBox->SetFillColorAlpha(15, 0.2);
 	frame->addObject(sBox);
-
-	std::cout << "xMin: " << xMin << ", xMax: " << xMax << std::endl;
-	std::cout << "yMin: " << yMin << ", yMax: " << yMax << std::endl;
+	Debug("GraphicsHelper::drawRegion", "xMin: " << xMin << ", xMax: " << xMax << "yMin: " << yMin << ", yMax: " << yMax);
 }
 
 void GraphicsHelper::printVariable(Int_t sigDigits, const char* options, Int_t& currentLine, RooRealVar* var, TPaveText* box, RooArgList* paramsList) {
 	TString* formatted = var->format(sigDigits, options);
-	TText* t = box->AddText(formatted->Data());
+	const char* formattedString = formatted->Data();
+	TText* t = box->AddText(formattedString);
+
 	Bool_t notConstant = !var->isConstant();
 	Bool_t atMaximum = var->getVal() + var->getError() > var->getMax();
 	Bool_t atMinimum = var->getVal() - var->getError() < var->getMin();
 	if (notConstant && (atMaximum || atMinimum)) t->SetTextColor(kPink-8);
 	paramsList->remove(*var);
 	currentLine++;
+
+	Debug("GraphicsHelper::printVariable", var->GetName() << "; notConstant " << notConstant << "; atMaximum " << atMaximum << "; atMinimum " << atMinimum);
 }
 
 TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, Double_t xmax, Double_t ymax) {
 
 	Bool_t showConstants = kTRUE;
-	Bool_t showLabel = kFALSE;
 
 	// parse the options
 //	TString opts = TString("NEU");
@@ -78,9 +80,6 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 		if (showConstants || !var->isConstant())
 			ymin -= dy;
 	}
-
-	if (showLabel)
-		ymin -= dy;
 
 	ymin -= dy*5; // New line on top abd bottom plus three lines
 
@@ -101,84 +100,70 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 	paramsList->sort();
 
 	// Line counter (to draw horizontal lines later)
-	Int_t currentLine = 0;
+	Int_t linesNumber = 0;
 	std::vector<int> hrLineNumbers;
 
+	// Empty first line (for better padding)
 	box->AddText("");
-	currentLine++;
+	linesNumber++;
 
 	Int_t sigDigits = 0;
+	// Print "bins", "integral" and "background" variables first
 	if (RooRealVar* var = findRooRealVarInList(paramsList, "bins")) {
-		printVariable(sigDigits, options, currentLine, var, box, paramsList);
+		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
 	}
 
 	if (RooRealVar* var = findRooRealVarInList(paramsList, "integral")) {
-		printVariable(sigDigits, options, currentLine, var, box, paramsList);
+		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
 	}
 
 	sigDigits = 3;
 	if (RooRealVar* var = findRooRealVarInList(paramsList, "background")) {
-		printVariable(sigDigits, options, currentLine, var, box, paramsList);
+		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
 	}
 
-	hrLineNumbers.push_back(currentLine);
+	// Add horizontal rule
+	hrLineNumbers.push_back(linesNumber);
 	box->AddText("");
-	currentLine++;
+	linesNumber++;
 
+	// Print source contribution related variables
 	while (RooRealVar* var = findRooRealVarInList(paramsList, "ource")) {
-		printVariable(sigDigits, options, currentLine, var, box, paramsList);
+		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
 	}
 
-	hrLineNumbers.push_back(currentLine);
+	// Add horizontal rule
+	hrLineNumbers.push_back(linesNumber);
 	box->AddText("");
-	currentLine++;
+	linesNumber++;
 
+	// Print resolution function related variables
 	while (RooRealVar* var = findRooRealVarInList(paramsList, "gauss")) {
-		printVariable(sigDigits, options, currentLine, var, box, paramsList);
+		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
 	}
 
-	hrLineNumbers.push_back(currentLine);
+	// Add horizontal rule
+	hrLineNumbers.push_back(linesNumber);
 	box->AddText("");
-	currentLine++;
+	linesNumber++;
 
-	//	box->AddLine(0, 0.1, 1, 0.1);
-
-//	pIter->Reset();
-//	while ((var = (RooRealVar*) pIter->Next())) {
-//		if (var->isConstant() && !showConstants)
-//			continue;
-//
-//		TString *formatted = options ? var->format(sigDigits, options) : var->format(*formatCmd);
-//		box->AddText(formatted->Data());
-//		delete formatted;
-//	}
-
+	// Print other variables (model)
 	pIter = paramsList->createIterator();
 	while ((var = (RooRealVar*) pIter->Next())) {
 		if (var->isConstant() && !showConstants) continue;
-		TString *formatted = var->format(sigDigits, options);
-		box->AddText(formatted->Data());
-		currentLine++;
+		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
 	}
 
+	// Empty last line (for better padding)
 	box->AddText("");
-	currentLine++;
+	linesNumber++;
 
-	// Draw horizontal lines
-	std::cout << "GraphicsHelper::makePaveText" << std::endl;
+	// Draw horizontal rules
 	for (std::vector<int>::iterator it = hrLineNumbers.begin(); it != hrLineNumbers.end(); ++it){
-		std::cout << "line at: " << *it << "; total: " << currentLine << std::endl;
-		Double_t y = ((Double_t)*it+0.5)/(Double_t)currentLine;
+		Debug("GraphicsHelper::makePaveText", "line at: " << *it << "; total lines: " << linesNumber);
+		Double_t y = ((Double_t)*it + 0.5)/(Double_t)linesNumber;
 		box->AddLine(0, 1-y, 1, 1-y);
 	}
-
-
-	// add the optional label if specified
-	if (showLabel)
-		box->AddText("label");
-
-	// Add box to frame
-//	frame->addObject(box);
 
 	delete pIter;
 	return box;
