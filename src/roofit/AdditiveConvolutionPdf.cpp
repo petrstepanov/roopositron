@@ -153,7 +153,7 @@ void AdditiveConvolutionPdf::constructModel() {
 	// std::cout << std::endl << "AdditiveConvolutionPdf::constructModel" << std::endl;
 	// Sum components
 	RooAbsPdf* sumConvolutedComponents = ReverseAddPdf::add(convolutedComponentsList);
-	RooAbsPdf* sumSourceConvolutedComponents = ReverseAddPdf::add(convolutedSourceComponentsList, "Src");
+	RooAbsPdf* sumSourceConvolutedComponents = ReverseAddPdf::add(convolutedSourceComponentsList, "Source");
 
 	model = new RooAddPdf("componentsSourceModel", "Components model with source", RooArgList(*sumSourceConvolutedComponents, *sumConvolutedComponents), RooArgList(*sourceContributionNorm));
 }

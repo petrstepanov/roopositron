@@ -16,7 +16,9 @@ test-spectra/constants.txt
 *.pch
 
 # ROOT
-*.pcm
+*.pcm   # dictionary file
+*.cxx   # dictionary temp file
+*.dSYM  # shared library something
 
 # Compiled Dynamic libraries
 #*.so
