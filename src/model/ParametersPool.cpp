@@ -63,7 +63,7 @@ RooArgSet* ParametersPool::readPoolParametersFromFile() {
 
 	// Skip header
 	char buffer[256];
-	fgets(buffer, 256, pFile);
+	if (fgets(buffer, 256, pFile) == NULL) return parametersPool;
 
 	// Read parameters
 	// Scanf with spaces. https://stackoverflow.com/questions/2854488/reading-a-string-with-spaces-with-sscanf

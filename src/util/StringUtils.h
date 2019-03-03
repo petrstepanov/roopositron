@@ -15,6 +15,7 @@
 #define STRINGUTILS_H
 
 #include <iostream>
+#include <vector>
 
 class StringUtils {
 public:
