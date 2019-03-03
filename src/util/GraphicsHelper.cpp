@@ -23,6 +23,8 @@ const Double_t GraphicsHelper::FONT_SIZE_SMALL = 0.028;
 const Double_t GraphicsHelper::FONT_SIZE_NORMAL = 0.05;
 const Double_t GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT = 0.35;
 const Double_t GraphicsHelper::LEGEND_XMIN = 0.7;
+const Double_t GraphicsHelper::MARKER_SIZE = 0.4;
+
 
 Double_t GraphicsHelper::getSpectrumPadFontFactor(){
 	return 0.5/(1-RESIDUALS_PAD_RELATIVE_HEIGHT);

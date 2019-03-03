@@ -30,6 +30,7 @@ public:
 	static const Double_t FONT_SIZE_NORMAL;
 	static const Double_t RESIDUALS_PAD_RELATIVE_HEIGHT;
 	static const Double_t LEGEND_XMIN;
+	static const Double_t MARKER_SIZE;
 
 	static const Style_t GRAPH_COLOR = kViolet + 6;
 

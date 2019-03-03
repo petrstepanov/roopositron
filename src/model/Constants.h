@@ -32,7 +32,8 @@ public:
     int getMaxChannel();
     int getExcludeMinChannel();
     int getExcludeMaxChannel();    
-    const char* getResolutionFunctionModel();    
+    const char* getResolutionFunctionModel();
+    const char* getMinimizerType();
     int getSourceComponentsNumber();
     std::vector<std::string> getDecayModels();
     std::vector<std::string> getCommonParameters();

@@ -39,3 +39,11 @@ Double_t HistProcessor::getAverageBackground(TH1F* hist) {
     Double_t wingIntegral = hist->Integral(1, wingBins);
     return wingIntegral / wingBins;
 }
+
+void HistProcessor::setZeroErrors(RooHist* h){
+	// Weird but in RooHist bins numbered 0 to < nbins opposed to TH1 (from 1 to <= nbins)
+	for (UInt_t i=0; i<h->GetXaxis()->GetNbins(); i++){
+		h->SetPointEYhigh(i, 0);
+		h->SetPointEYlow(i, 0);
+	}
+}

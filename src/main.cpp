@@ -87,7 +87,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 	// Define some global app constants
 	const Int_t BINS = constants->getMaxChannel() - constants->getMinChannel() + 1;
-	const Bool_t DO_RANGE = constants->getExcludeMinChannel() > 1 && constants->getExcludeMinChannel() < constants->getExcludeMaxChannel() && constants->getExcludeMaxChannel() < BINS ? kTRUE : kFALSE;
+	const Bool_t DO_RANGE =
+			constants->getExcludeMinChannel() > 1 && constants->getExcludeMinChannel() < constants->getExcludeMaxChannel()
+					&& constants->getExcludeMaxChannel() < BINS ? kTRUE : kFALSE;
 
 	// Define Channels Observable
 	RooRealVar* channels = new RooRealVar("channels", "Channels axis", 0, BINS, "ch");
@@ -126,7 +128,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	// Construct additive decay models
 	RooWorkspace* w = new RooWorkspace("w", "w");
 	for (unsigned i = 0; i < spectra.size(); i++) {
-		AdditiveConvolutionPdf* acp = new AdditiveConvolutionPdf(constants->getDecayModels(), constants->getResolutionFunctionModel(), constants->getSourceComponentsNumber(), channels);
+		AdditiveConvolutionPdf* acp = new AdditiveConvolutionPdf(constants->getDecayModels(), constants->getResolutionFunctionModel(),
+				constants->getSourceComponentsNumber(), channels);
 		RooAbsPdf* pdf = acp->getPdf();
 
 		// Set mean gauss values
@@ -141,7 +144,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		RooPolynomial* bg = new RooPolynomial("bg", "y=1", *channels, RooArgSet());
 
 		// Parameterize background as counts, not as fraction (intentionally RooRealVar, not RooConst)
-		RooRealVar* bgCount = new RooRealVar("background", "Background level counts", spectra[i].averageBackground, spectra[i].averageBackground / 2, spectra[i].averageBackground * 2, "counts");
+		RooRealVar* bgCount = new RooRealVar("background", "Background level counts", spectra[i].averageBackground, spectra[i].averageBackground / 2,
+				spectra[i].averageBackground * 2, "counts");
 		bgCount->setConstant(kTRUE);
 		Int_t b = spectra[i].numberOfBins;
 		RooRealVar* bins = new RooRealVar("bins", "Histogram bins", b, b, b);
@@ -261,10 +265,10 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::NumCPU(numCpu));
 	}
 
-	// RooMinimizer:
+	// RooMinimizer
 	RooMinimizer* m = new RooMinimizer(*simChi2);
 	// m->setStrategy(); // RooMinimizer::Speed (default), RooMinimizer::Balance, RooMinimizer::Robustness
-	m->setMinimizerType("Minuit");
+	m->setMinimizerType(constants->getMinimizerType());
 	Int_t resultMigrad = m->migrad();
 	Int_t resultHesse = m->hesse();
 	Debug("main", "Fitting completed: migrad=" << resultMigrad << ", hesse=" << resultHesse);
@@ -286,7 +290,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	// Otherwise program segfaults when drawing stuff on a RooPlot (when calling AddLine() in TPaveText instance)
 	TCanvas** canvas = new TCanvas*[spectra.size()];
 	for (unsigned i = 0; i < spectra.size(); i++) {
-		canvas[i] = new TCanvas(Form("canvas-%d", i + 1), Form("Spectrum N%d \"%s\"", i + 1, spectra[i].filename.Data()), constants->getImageWidth(), constants->getImageHeight());
+		canvas[i] = new TCanvas(Form("canvas-%d", i + 1), Form("Spectrum N%d \"%s\"", i + 1, spectra[i].filename.Data()), constants->getImageWidth(),
+				constants->getImageHeight());
 		canvas[i]->SetFillColor(0);
 		canvas[i]->Divide(1, 2);
 
@@ -308,8 +313,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		spectraPlot[i]->SetTitle(Form("Spectrum %d \"%s\"", i + 1, spectra[i].filename.Data()));
 		spectraPlot[i]->GetXaxis()->SetRangeUser(0, BINS);
 
-		spectra[i].dataHistogram->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kBlack), RooFit::LineWidth(0), RooFit::MarkerSize(0.2), RooFit::MarkerColor(kBlack),
-				RooFit::Name("data"));
+		// Plot data points
+		spectra[i].dataHistogram->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kBlack), RooFit::LineWidth(0), RooFit::MarkerSize(GraphicsHelper::MARKER_SIZE), RooFit::MarkerColor(kBlack), RooFit::Name("data"));
 
 		// Draw Resolution Function
 		spectra[i].resolutionFunction->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kGray + 1), RooFit::LineWidth(1), RooFit::Name("resolution"));
@@ -329,8 +334,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		spectraPlot[i]->addObject(pt);
 
 		// Set custom Y axis limits
-		Double_t yMin = pow(10, MathUtil::orderOfMagnitude(spectra[i].averageBackground));  // Minimum is order of magnitude of the average background value
-		Double_t yMax = spectraPlot[i]->GetMaximum();  // Maximum is default (whatever ROOT plots)
+		Double_t yMin = pow(10, MathUtil::orderOfMagnitude(spectra[i].averageBackground)); // Minimum is order of magnitude of the average background value
+		Double_t yMax = spectraPlot[i]->GetMaximum(); // Maximum is default (whatever ROOT plots)
 		spectraPlot[i]->GetYaxis()->SetRangeUser(yMin, yMax);
 
 		// Draw nanosecond axis
@@ -381,21 +386,25 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		// https://root-forum.cern.ch/t/pull-histogram-with-multiple-ranges/20935
 		if (DO_RANGE) {
 			RooHist* dataHist = (RooHist*) spectraPlot[i]->getHist("data");
-			auto curve1 = (RooCurve*) spectraPlot[i]->getObject(2);  // 2 is index in the list of RooPlot items (see printout from graphFrame[i]->Print("V")
+			auto curve1 = (RooCurve*) spectraPlot[i]->getObject(2); // 2 is index in the list of RooPlot items (see printout from graphFrame[i]->Print("V")
 			auto curve2 = (RooCurve*) spectraPlot[i]->getObject(3);
 			auto hresid1 = dataHist->makePullHist(*curve1, true);
 			auto hresid2 = dataHist->makePullHist(*curve2, true);
-			hresid1->SetLineWidth(0);
-			hresid1->SetMarkerSize(0.2);
-			hresid2->SetLineWidth(0);
-			hresid2->SetMarkerSize(0.2);
+			hresid1->SetMarkerSize(GraphicsHelper::MARKER_SIZE);
+			hresid2->SetMarkerSize(GraphicsHelper::MARKER_SIZE);
+			// Draw options: "P" - with marker https://root.cern.ch/doc/v608/classTHistPainter.html
 			chiFrame[i]->addPlotable(hresid1, "P");
-			chiFrame[i]->addPlotable(hresid2);
+			chiFrame[i]->addPlotable(hresid2, "P");
+			Debug("main", "hresid2 draw option: " << hresid2->GetDrawOption());
+			// Since "HIST" draw option (no error bars) makes no effect? We manually ser errors to zero
+			HistProcessor::setZeroErrors(hresid1);
+			HistProcessor::setZeroErrors(hresid2);
 		} else {
 			hresid[i] = spectraPlot[i]->pullHist();
-			hresid[i]->SetLineWidth(0);
-			hresid[i]->SetMarkerSize(0.2);
-			chiFrame[i]->addPlotable(hresid[i]);
+			hresid[i]->SetMarkerSize(GraphicsHelper::MARKER_SIZE);
+			chiFrame[i]->addPlotable(hresid[i], "P");
+			Debug("main", "hresid[" << i << "] draw option: " << hresid[i]->GetDrawOption());
+			HistProcessor::setZeroErrors(hresid[i]);
 		}
 
 		// Draw region excluded from plot
@@ -450,8 +459,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 		// Save raster and vector images
 		// https://root.cern.ch/doc/master/classTPad.html#a649899aa030f537517022a5d51ec152f
-		TString imageFilePathName = Form("./%s-%s/fit-%s-%s-%d", (StringUtils::joinStrings(constants->getDecayModels())).c_str(), constants->getResolutionFunctionModel(),
-				(StringUtils::joinStrings(constants->getDecayModels())).c_str(), constants->getResolutionFunctionModel(), i + 1);
+		TString imageFilePathName = Form("./%s-%s/fit-%s-%s-%d", (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
+				constants->getResolutionFunctionModel(), (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
+				constants->getResolutionFunctionModel(), i + 1);
 		TString pngURI = imageFilePathName + ".png";
 		TString epsURI = imageFilePathName + ".eps";
 		canvas[i]->Print(pngURI, "png");
@@ -464,7 +474,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	 \_____  \  __ ___/  |_______  __ ___/  |_
 	 /   |   \|  |  \   __\____ \|  |  \   __\
 	/    |    \  |  /|  | |  |_> >  |  /|  |
-	\_______  /____/ |__| |   __/|____/ |__|
+	 \_______  /____/ |__| |   __/|____/ |__|
 	 \/            |__|
 
 	 */
@@ -472,15 +482,17 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	// TODO: move to FileUtils
 	for (unsigned i = 0; i < spectra.size(); i++) {
 		std::ofstream outputFile;
-		TString dataFilename = Form("./%s-%s/data-%s-%s-%d.txt", (StringUtils::joinStrings(constants->getDecayModels())).c_str(), constants->getResolutionFunctionModel(),
-				(StringUtils::joinStrings(constants->getDecayModels())).c_str(), constants->getResolutionFunctionModel(), i + 1);
+		TString dataFilename = Form("./%s-%s/data-%s-%s-%d.txt", (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
+				constants->getResolutionFunctionModel(), (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
+				constants->getResolutionFunctionModel(), i + 1);
 		outputFile.open(dataFilename.Data());
 
 		const unsigned FILE_COLUMN_WIDTH = 20;
 		// Write file header
-		outputFile << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Channel\"" << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Time, ns\"" << std::left << std::setw(FILE_COLUMN_WIDTH)
-				<< "\"Count\"" << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Error\"" << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Resolution\"" << std::left << std::setw(FILE_COLUMN_WIDTH)
-				<< "\"Fit\"" << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Chi^2\"" << std::endl;
+		outputFile << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Channel\"" << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Time, ns\"" << std::left
+				<< std::setw(FILE_COLUMN_WIDTH) << "\"Count\"" << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Error\"" << std::left
+				<< std::setw(FILE_COLUMN_WIDTH) << "\"Resolution\"" << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Fit\"" << std::left
+				<< std::setw(FILE_COLUMN_WIDTH) << "\"Chi^2\"" << std::endl;
 
 		const Int_t minChannel = constants->getMinChannel();
 		const Int_t maxChannel = constants->getMaxChannel();
@@ -496,9 +508,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			} else {
 //                TODO: add code for ranges (two curves)
 			}
-			outputFile << std::left << std::setw(FILE_COLUMN_WIDTH) << j << std::left << std::setw(FILE_COLUMN_WIDTH) << time << std::left << std::setw(FILE_COLUMN_WIDTH) << count << std::left
-					<< std::setw(FILE_COLUMN_WIDTH) << error << std::left << std::setw(FILE_COLUMN_WIDTH) << resolution << std::left << std::setw(FILE_COLUMN_WIDTH) << fit << std::left
-					<< std::setw(FILE_COLUMN_WIDTH) << chi;
+			outputFile << std::left << std::setw(FILE_COLUMN_WIDTH) << j << std::left << std::setw(FILE_COLUMN_WIDTH) << time << std::left
+					<< std::setw(FILE_COLUMN_WIDTH) << count << std::left << std::setw(FILE_COLUMN_WIDTH) << error << std::left << std::setw(FILE_COLUMN_WIDTH)
+					<< resolution << std::left << std::setw(FILE_COLUMN_WIDTH) << fit << std::left << std::setw(FILE_COLUMN_WIDTH) << chi;
 			outputFile << std::endl;
 		}
 		outputFile.close();

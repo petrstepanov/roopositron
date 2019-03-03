@@ -16,6 +16,7 @@
 
 #include "RtypesCore.h"
 #include "TH1F.h"
+#include "RooHist.h"
 
 class HistProcessor {
 public:
@@ -25,6 +26,7 @@ public:
     
     static Double_t getConstBackgroundFraction(TH1F* hist);
     static Double_t getAverageBackground(TH1F* hist);
+    static void setZeroErrors(RooHist* hist);
 private:
 
 };

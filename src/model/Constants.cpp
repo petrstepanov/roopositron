@@ -66,6 +66,8 @@ RooArgList* Constants::initDefaultValues() {
     constants->add(*constant);
     constant = new RooStringVar("excludeMaxChannel", " # right exclude channel", "0");
     constants->add(*constant);
+    constant = new RooStringVar("minimizerType", " # \"Minuit\", \"Minuit2\", \"Fumili\", \"GSLMultiMin\"", "Minuit");
+    constants->add(*constant);
     constant = new RooStringVar("decayModel", " # comma-separated names \"exp\", \"trapping\", \"grain\", \"powder\"", "exp");
     constants->add(*constant);
     constant = new RooStringVar("resolutionFunction", " # \"1gauss\", \"2gauss\" or \"3gauss\"", "2gauss");
@@ -203,6 +205,11 @@ int Constants::getExcludeMaxChannel() {
 
 const char* Constants::getResolutionFunctionModel(){
     RooStringVar* var = (RooStringVar*) constants->find("resolutionFunction");    
+    return var->getVal();
+}
+
+const char* Constants::getMinimizerType(){
+    RooStringVar* var = (RooStringVar*) constants->find("minimizerType");
     return var->getVal();
 }
 
