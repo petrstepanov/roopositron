@@ -196,7 +196,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	}
 
 	// Create output folder out of model components' names and resolution function name, e.g. "exp-exp-2gauss"
-	std::string outputPath = StringUtils::joinStrings(constants->getDecayModels()) + "-" + constants->getResolutionFunctionModel();
+	TString minimizerType(constants->getMinimizerType());
+	minimizerType.ToLower();
+	std::string outputPath = StringUtils::joinStrings(constants->getDecayModels()) + "-" + constants->getResolutionFunctionModel() + "-" + minimizerType.Data();
 	FileUtils::createDirectory(outputPath);
 
 	// Obtain and store number of free parameters for every model (why?)
