@@ -198,7 +198,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	// Create output folder out of model components' names and resolution function name, e.g. "exp-exp-2gauss"
 	TString minimizerType(constants->getMinimizerType());
 	minimizerType.ToLower();
-	std::string outputPath = StringUtils::joinStrings(constants->getDecayModels()) + "-" + constants->getResolutionFunctionModel() + "-" + minimizerType.Data();
+	std::string outputPath = "./" + StringUtils::joinStrings(constants->getDecayModels()) + "-" + constants->getResolutionFunctionModel() + "-" + minimizerType.Data();
 	FileUtils::createDirectory(outputPath);
 
 	// Obtain and store number of free parameters for every model (why?)
@@ -461,8 +461,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 		// Save raster and vector images
 		// https://root.cern.ch/doc/master/classTPad.html#a649899aa030f537517022a5d51ec152f
-		TString imageFilePathName = Form("./%s-%s/fit-%s-%s-%d", (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
-				constants->getResolutionFunctionModel(), (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
+		TString imageFilePathName = Form("%s/fit-%s-%s-%d", outputPath.c_str(), (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
 				constants->getResolutionFunctionModel(), i + 1);
 		TString pngURI = imageFilePathName + ".png";
 		TString epsURI = imageFilePathName + ".eps";
@@ -472,12 +471,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	Debug("main", "Canvas images successfully exported.");
 
 	/*
-	 ________          __                 __
-	 \_____  \  __ ___/  |_______  __ ___/  |_
+	 ________          __                __
+	 \_____  \  __ ___/  |_______ __ ___/  |_
 	 /   |   \|  |  \   __\____ \|  |  \   __\
 	/    |    \  |  /|  | |  |_> >  |  /|  |
-	 \_______  /____/ |__| |   __/|____/ |__|
-	 \/            |__|
+	\_______  /____/ |__| |   __/|____/ |__|
+	 \/                   |__|
 
 	 */
 
