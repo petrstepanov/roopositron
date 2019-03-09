@@ -21,16 +21,21 @@ enum PdfHashNames {
     kTwoGaussPdf,
     kThreeGaussPdf,
     kExponentPdf,
+	kTwoExponentPdf,
+	kThreeExponentPdf,
     kTrappingPdf,
     kGrainPdf,
     kPowderPdf,
-    kPowder2Pdf
+    kPowder2Pdf,
+	kParamagneticPdf
 };
 
 class PdfServer {
 public:   
     PdfServer();
+    virtual ~PdfServer();
     RooAbsPdf* getPdf(const char* name, RooRealVar* observable);
+    RooAbsPdf* getPdf(Int_t name, RooRealVar* observable);
 
 private:
     static PdfHashNames hashPdfName(const char* pdfName);

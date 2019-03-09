@@ -22,7 +22,9 @@
 class AbstractProvider {
 public:
     AbstractProvider(RooRealVar* observable);
-    RooAbsPdf* getPdf(int i=0);
+    virtual ~AbstractProvider();
+
+    RooAbsPdf* getPdf(int i = 1);
     
 protected:
     virtual RooAbsPdf* initPdf(int i)=0;  

@@ -14,6 +14,7 @@
 #include "RootHelper.h"
 #include "StringUtils.h"
 #include <TUnixSystem.h>
+#include <RooWorkspace.h>
 #include <iostream>
 
 //void RootHelper::deleteObject(const char* name){
@@ -32,17 +33,6 @@ Int_t RootHelper::getNumCpu() {
 	gSystem->GetSysInfo(&sysInfo);
 	std::cout << "RootHelper::getNumCpu: sysInfo.fCpus = " << sysInfo.fCpus << std::endl;
 	return (sysInfo.fCpus >= 0) ? sysInfo.fCpus : 1;
-}
-
-TStopwatch* RootHelper::watch = new TStopwatch();
-
-void RootHelper::startTimer() {
-	watch->Start();
-}
-
-void RootHelper::stopAndPrintTimer() {
-	watch->Stop();
-	watch->Print();
 }
 
 void RootHelper::printPdfCoefficientNames(RooAbsPdf* pdf, RooRealVar* observable) {
@@ -72,4 +62,13 @@ RooRealVar* RootHelper::findParameterNameContains(RooAbsPdf* pdf, RooRealVar* ob
 		}
 	}
 	return NULL;
+}
+
+RooAbsPdf* RootHelper::suffixPdfAndNodes(RooAbsPdf* pdf, RooRealVar* observable, const char* suffix){
+	RooWorkspace* w = new RooWorkspace("w", "w");
+	w->import(*pdf, RooFit::RenameAllVariablesExcept(suffix, observable->GetName()), RooFit::RenameAllNodes(suffix));
+	#ifdef USEDEBUG
+		w->Print();
+	#endif
+	return w->pdf(Form("%s_%s", pdf->GetName(), suffix));
 }

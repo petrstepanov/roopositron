@@ -38,15 +38,17 @@ i2("i2", this, other.i2){
 // Evaluate without normalization
 Double_t TwoExpPdf::evaluate() const {
     if (t < 0) return 0.;
-    Double_t ret1 = exp(-t/tau1);
-    Double_t ret2 = exp(-t/tau2);    
-    return (1. - i2)*ret1 + i2*ret2;
+    if (t == 0) return 1;
+    return (1. - i2)*exp(-t/tau1) + i2*exp(-t/tau2);
 }
 
 // Indefinite integral without normalization [0;+infty)
 Double_t TwoExpPdf::indefiniteIntegral(Double_t y) const {
-    Double_t int1 = -exp(-y/tau1)*tau1;
+    if (y < 0) return 0.;
+    if (y == 0) return -1/tau1 -1/tau2;
+	Double_t int1 = -exp(-y/tau1)*tau1;
     Double_t int2 = -exp(-y/tau2)*tau2;    
+
     return (1. - i2)*int1 + i2*int2;
 }
 
@@ -63,14 +65,14 @@ Double_t TwoExpPdf::analyticalIntegral(Int_t code, const char* rangeName) const 
     if (code==1){
         Double_t x1 = t.min(rangeName);
         Double_t x2 = t.max(rangeName);
+
         if (x2 <= 0) return 0;
         x1 = TMath::Max(0.,x1);
-
         Double_t ret = indefiniteIntegral(x2)-indefiniteIntegral(x1);
         return ret;
     }
     else {
-        std::cout << "Error in RooGaussian::analyticalIntegral" << std::endl;
+        std::cout << "Error in TwoExpPdf::analyticalIntegral" << std::endl;
     }  
     return 0;
 }

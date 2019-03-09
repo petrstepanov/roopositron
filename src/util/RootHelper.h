@@ -24,11 +24,10 @@ public:
 //    static void deleteObject(const char* name);
 //    static void deleteObject(TObject* obj);
     static Int_t getNumCpu();
-    static void startTimer(void);
-    static void stopAndPrintTimer();
     static void printPdfCoefficientNames(RooAbsPdf* pdf, RooRealVar* observable);
     static RooRealVar* findParameterNameContains(RooAbsPdf* pdf, RooRealVar* observable, const char* substring);
-    
+    static RooAbsPdf* suffixPdfAndNodes(RooAbsPdf* pdf, RooRealVar* observable, const char* suffix);
+
 private:
     static TStopwatch* watch;
 };

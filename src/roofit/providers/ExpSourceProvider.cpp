@@ -5,24 +5,24 @@
  */
 
 /* 
- * File:   SourceProvider.cpp
+ * File:   ExpSourceProvider.cpp
  * Author: petrstepanov
  * 
  * Created on December 5, 2018, 8:43 AM
  */
 
-#include "SourceProvider.h"
 #include "RooFormulaVar.h"
 #include "../pdfs/ExpPdf.h"
 #include "../../model/Constants.h"
 #include "../../util/StringUtils.h"
+#include "ExpSourceProvider.h"
 
-SourceProvider::SourceProvider(RooRealVar* _observable) : AbstractProvider(_observable) {}
+ExpSourceProvider::ExpSourceProvider(RooRealVar* _observable) : AbstractProvider(_observable) {}
 
-SourceProvider::~SourceProvider() {
+ExpSourceProvider::~ExpSourceProvider() {
 }
 
-RooAbsPdf* SourceProvider::initPdf(int i) {
+RooAbsPdf* ExpSourceProvider::initPdf(int i) {
     RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
     
     // Instantiate RooRealVar parameters

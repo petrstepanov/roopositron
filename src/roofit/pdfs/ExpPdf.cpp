@@ -28,39 +28,6 @@ t("t", this, other.t),
 tau("tau", this, other.tau){
 }
 
-// No normalization here: https://root.cern.ch/doc/master/classRooAbsPdf.html
-//Double_t ExpPdf::evaluate() const {
-//    if (t < 0) return 0.;
-//    return exp(-t/tau);
-//}
-//
-//Double_t ExpPdf::indefiniteIntegral(Double_t y) const {
-//    return -exp(-y/tau)*tau;
-//}
-//
-//Int_t ExpPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName) const {
-//   if (matchArgs(allVars,analVars,t)) return 1;
-//   return 0;
-//}
-//
-//Double_t ExpPdf::analyticalIntegral(Int_t code, const char* rangeName) const {
-//    assert(code == 1);
-//    
-//    if (code==1){
-//        Double_t x1 = t.min(rangeName);
-//        Double_t x2 = t.max(rangeName);
-//        if (x2 <= 0) return 0;
-//        x1 = TMath::Max(0.,x1);
-//
-//        Double_t ret = indefiniteIntegral(x2)-indefiniteIntegral(x1);
-//        return ret;
-//    }
-//    else {
-//        std::cout << "Error in RooGaussian::analyticalIntegral" << std::endl;
-//    }
-//    return 0;
-//}
-
 // Doing like rooexponential
 Double_t ExpPdf::evaluate() const {
     if (t < 0) return 0.;    
@@ -74,20 +41,20 @@ Double_t ExpPdf::indefiniteIntegral(Double_t y) const {
     return -exp(-y/tau)*tau;
 }
 
+// Get analytical integral
 Int_t ExpPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName) const {
    if (matchArgs(allVars,analVars,t)) return 1;
    return 0;
 }
 
+// Analytical integral
 Double_t ExpPdf::analyticalIntegral(Int_t code, const char* rangeName) const {
     assert(code == 1);
 
     if (code==1){
         Double_t x1 = t.min(rangeName);
         Double_t x2 = t.max(rangeName);
-        
-//        std::cout << "range(" << x1 << ", " << x2 << ")" << std::endl;
-        
+
         if (x2 <= 0) return 0;
         x1 = TMath::Max(0.,x1);
         Double_t ret = indefiniteIntegral(x2)-indefiniteIntegral(x1);

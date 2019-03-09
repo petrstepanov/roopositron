@@ -13,6 +13,7 @@
 
 #include "ModelCommonizer.h"
 #include "../util/StringUtils.h"
+#include "../util/Debug.h"
 
 #include "RooAbsPdf.h"
 #include "RooArgSet.h"
@@ -73,7 +74,7 @@ std::vector<std::string> ModelCommonizer::initCommonParameters(RooAbsPdf* pdf, s
 	for (std::vector<std::string>::iterator it = defaultCommonNames.begin(); it != defaultCommonNames.end(); ++it) {
 		std::cout << *it << " ";
 	}
-	std::cout << std::endl << std::endl << "Type parameters name you want to add to common list:" << std::endl;
+	std::cout << std::endl << std::endl << "Type parameter names you want to make common (space separated):" << std::endl;
 	std::string input;
 	getline(std::cin, input);
 	std::vector<std::string> newCommonNames = StringUtils::parseString(input, " ");
@@ -84,17 +85,16 @@ std::vector<std::string> ModelCommonizer::initCommonParameters(RooAbsPdf* pdf, s
 }
 
 RooAbsPdf* ModelCommonizer::replaceParametersWithCommon(RooAbsPdf* pdf) {
-	std::cout << "ModelCommonizer::replaceParametersWithCommon" << std::endl;
+	Debug("ModelCommonizer::replaceParametersWithCommon");
 
 	// Instantiate Customizer that will replace model parameters
-	RooCustomizer* customizer = new RooCustomizer(*pdf, StringUtils::underscoreSuffix(pdf->GetName(), "custom").c_str());
+	RooCustomizer* customizer = new RooCustomizer(*pdf, Form("%s_custom", pdf->GetName()));
 	Bool_t replacedFlag = kFALSE;
 
 	// Iterate through model local parameters that might need replacement
 	RooArgSet* parameters = pdf->getParameters(*observable);
 	TIterator* it = parameters->createIterator();
-	TObject* temp;
-	while ((temp = it->Next())) {
+	while (TObject* temp = it->Next()) {
 		if (RooRealVar* parameter = dynamic_cast<RooRealVar*>(temp)) {
 			// See if parameter name contains any common parameter name substring
 			// E.g. 'tau_1' contains 'tau'. Then we replace it.

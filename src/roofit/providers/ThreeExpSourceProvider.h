@@ -5,27 +5,26 @@
  */
 
 /* 
- * File:   SourceProvider.h
+ * File:   ThreeExpProvider.h
  * Author: petrstepanov
  *
  * Created on December 5, 2018, 8:43 AM
  */
 
-#ifndef EXPPROVIDER_H
-#define EXPPROVIDER_H
+#ifndef THREEEXPSOURCEPROVIDER_H
+#define THREEEXPSOURCEPROVIDER_H
 
 #include "AbstractProvider.h"
 #include "RooRealVar.h"
+#include "RooAbsPdf.h"
 
-class SourceProvider : public AbstractProvider {
+class ThreeExpSourceProvider : public AbstractProvider {
 public:
-    SourceProvider(RooRealVar* observable);
-    virtual ~SourceProvider();
-    
-private:
-//    RooArgList* initParameters() override;
+	ThreeExpSourceProvider(RooRealVar* observable);
+    virtual ~ThreeExpSourceProvider();
+
     RooAbsPdf* initPdf(int i);
 };
 
-#endif /* EXPPROVIDER_H */
+#endif /* THREEEXPSOURCEPROVIDER_H */
 

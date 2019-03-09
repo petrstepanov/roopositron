@@ -79,8 +79,13 @@ struct Spectrum {
 
 // ASCII font generator is here: http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Resolution%0AFunction
 int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
-	// Start timer to track performance
-	RootHelper::startTimer();
+	// Scan current directory for '.Spe' files; exit if nothing found
+	const std::vector<std::string> filenames = FileUtils::getFilenamesInCurrentDrectory(".Spe");
+	if (filenames.size() < 1) {
+		std::cout << "No Maestro '.Spe' files found in current directory. Press CTRL+C." << std::endl;
+		return 0;
+	}
+	Debug("main", "Found " << filenames.size() << " spectra.");
 
 	// Create constants object that stores values from "constants.txt" file
 	Constants* constants = Constants::getInstance();
@@ -98,15 +103,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	channels->setBins(BINS);
 	channels->setBins(BINS, "cache");
 
-	// Scan current directory for '.Spe' files; exit if nothing found
-	const std::vector<std::string> filenames = FileUtils::getFilenamesInCurrentDrectory(".Spe");
-	if (filenames.size() < 1) {
-		std::cout << "No Maestro '.Spe' files found in current directory. Press CTRL+C." << std::endl;
-		return 0;
-	}
-	Debug("main", "Found " << filenames.size() << " spectra.");
-
-	// Construct a list of Spectrum structs to store individual spectra information
+	// Construct a list of Spectrum struct     	 s to store individual spectra information
 	std::vector<Spectrum> spectra;
 	for (unsigned i = 0; i < filenames.size(); i++) {
 		Spectrum s;
@@ -126,7 +123,6 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	}
 
 	// Construct additive decay models
-	RooWorkspace* w = new RooWorkspace("w", "w");
 	for (unsigned i = 0; i < spectra.size(); i++) {
 		AdditiveConvolutionPdf* acp = new AdditiveConvolutionPdf(constants->getDecayModels(), constants->getResolutionFunctionModel(),
 				constants->getSourceComponentsNumber(), channels);
@@ -159,41 +155,35 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 		// Rename PDF parameters via RooWorkspace
 		if (i == 0) {
-			w->import(*pdfWithBg);
-			spectra[i].model = w->pdf("pdf");
+			spectra[i].model = pdfWithBg;
 		} else {
 			std::string suffix = std::to_string(i + 1);
-			w->import(*pdfWithBg, RooFit::RenameAllVariablesExcept(suffix.c_str(), channels->GetName()), RooFit::RenameAllNodes(suffix.c_str()));
-			spectra[i].model = w->pdf(Form("pdf_%d", i + 1));
+			spectra[i].model = RootHelper::suffixPdfAndNodes(pdfWithBg, channels, suffix.c_str());
 		}
 
 		// Save resolution function
 		spectra[i].resolutionFunction = acp->getResolutionFunction();
 	}
 
-#ifdef USEDEBUG
-	w->Print();
-#endif
-
 	// Introduce common parameters if more than one spectrum (simultaneous fit).
 	if (spectra.size() > 1) {
 		// Initialize commonizer, read parameters from the first spectrum
 		ModelCommonizer* commonizer = new ModelCommonizer(spectra[0].model, channels, constants->getCommonParameters());
-		// All other spectra
 
+		// All other spectra
 		for (unsigned i = 1; i < spectra.size(); i++) {
-			RooAbsPdf* newPdf = commonizer->replaceParametersWithCommon(spectra[i].model);
-			spectra[i].model = newPdf;
+			RooAbsPdf* comminozedPdf = commonizer->replaceParametersWithCommon(spectra[i].model);
+			spectra[i].model = comminozedPdf;
 		}
 	}
 
 	// Output
-	Debug("main", "Constructed following models:");
-	for (unsigned i = 0; i < spectra.size(); i++) {
-#ifdef USEDEBUG
-		spectra[i].model->Print();
-#endif
-	}
+	#ifdef USEDEBUG
+		Debug("main", "Constructed following models:");
+		for (unsigned i = 0; i < spectra.size(); i++) {
+			spectra[i].model->Print();
+		}
+	#endif
 
 	// Create output folder out of model components' names and resolution function name, e.g. "exp-exp-2gauss"
 	TString minimizerType(constants->getMinimizerType());
@@ -218,7 +208,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	 |    __)  |  \   __\   __\  |/    \  / ___\
 	 |     \   |  ||  |  |  | |  |   |  \/ /_/  >
 	 \___  /   |__||__|  |__| |__|___|  /\___  /
-	 \/                           \//_____/
+         \/                           \//_____/
 
 	 */
 
@@ -267,6 +257,10 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::NumCPU(numCpu));
 	}
 
+	// Start timer to track performance
+	TStopwatch* stopWatch = new TStopwatch();
+	stopWatch->Start();
+
 	// RooMinimizer
 	RooMinimizer* m = new RooMinimizer(*simChi2);
 	// m->setStrategy(); // RooMinimizer::Speed (default), RooMinimizer::Balance, RooMinimizer::Robustness
@@ -274,6 +268,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	Int_t resultMigrad = m->migrad();
 	Int_t resultHesse = m->hesse();
 	Debug("main", "Fitting completed: migrad=" << resultMigrad << ", hesse=" << resultHesse);
+	stopWatch->Stop();
 
 	// Save parameters to file
 	storage->save(simPdf->getParameters(*channels));
@@ -516,7 +511,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		}
 		outputFile.close();
 	}
-	RootHelper::stopAndPrintTimer();
+	stopWatch->Print();
 	return 1;
 }
 

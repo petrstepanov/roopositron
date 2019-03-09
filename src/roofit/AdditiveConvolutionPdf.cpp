@@ -14,15 +14,21 @@
 #include "AdditiveConvolutionPdf.h"
 #include "PdfServer.h"
 #include "../util/ObjectNamer.h"
-#include "providers/SourceProvider.h"
 #include "ReverseAddPdf.h"
 #include "../util/StringUtils.h"
+#include "../util/RootHelper.h"
+#include "../util/Debug.h"
 #include "../model/Constants.h"
+#include "../roofit/providers/ExpProvider.h"
+#include "../roofit/providers/TwoExpProvider.h"
+#include "../roofit/providers/ThreeExpProvider.h"
 #include <RooFFTConvPdf.h>
 #include <RooAddPdf.h>
 #include <RooAbsReal.h>
 #include <RooNumIntConfig.h>
 #include <RooMsgService.h>
+#include <RooWorkspace.h>
+#include "providers/ExpSourceProvider.h"
 
 AdditiveConvolutionPdf::AdditiveConvolutionPdf(std::vector<std::string> componentIds, const char* resolutionId, int sourceComponents, RooRealVar* observable) {
 	std::cout << "AdditiveConvolutionPdf::AdditiveConvolutionPdf" << std::endl;
@@ -53,47 +59,58 @@ AdditiveConvolutionPdf::~AdditiveConvolutionPdf() {
 }
 
 void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentIds, int sourceComponents, RooRealVar* observable) {
-//    std::cout << std::endl << "AdditiveConvolutionPdf::initComponents" << std::endl;
-//    std::cout << "Found " << componentsNumber << " components" << std::endl;
-//    ObjectNamer* pdfNamer = new ObjectNamer();
-//    ObjectNamer* coefficientsNamer = new ObjectNamer();
-
-//    ObjectNamer* pdfAndCoeficientsNamer = new ObjectNamer();
-
 	// Build component PDFs
 	for (std::vector<std::string>::const_iterator it = componentIds.begin(); it != componentIds.end(); ++it) {
-//	std::cout << "Component " << *it << std::endl;
 		const char* componentId = ((std::string) *it).c_str();
 		RooAbsPdf* pdf = pdfServer->getPdf(componentId, observable);
-		// pdfNamer makes sure there are no two pdfs of a same type with same name (want exp, exp2, exp3)
-//	pdfNamer->fixUniqueName(pdf);
-
-//	pdfAndCoeficientsNamer->fixUniquePdfAndParameterNames(pdf, observable);
-
-		// coefficientsNamer makes sure there are no pdf coeficients with same name (want exp, exp2, exp3)
-//	RooArgSet* params = pdf->getParameters(*observable);
-//	TIterator* it2 = params->createIterator();
-//	TObject* temp;
-//	while((temp = it2->Next())){
-//	    TNamed* named = dynamic_cast<TNamed*>(temp);
-//	    if(named){
-//		coefficientsNamer->fixUniqueName(named);
-//	    }
-//	}
-//	pdf->Print();
-		// Add PDF to the components list
 		componentsList->add(*pdf);
 	}
-//    componentsList->Print();
+	#ifdef USEDEBUG
+		Debug("AdditiveConvolutionPdf::initComponents", "componentsList")
+		componentsList->Print();
+	#endif
 
 	// Build source contribution PDF from ExpPdf, replace "tau" parameter name with "tauSource"
-	for (unsigned i = 1; i <= sourceComponents; i++) {
-		SourceProvider* sp = new SourceProvider(observable);
-		RooAbsPdf* sourceComponent = sp->getPdf(i);
-		sourceComponentsList->add(*sourceComponent);
+	if (sourceComponents <= 3){
+		RooAbsPdf* sourceComponent = nullptr;
+		switch(sourceComponents) {
+		    case 1: {
+				ExpProvider* ep = new ExpProvider(observable);
+				sourceComponent = ep->getPdf();
+				// if one component fix it at 385 ps
+				if (RooRealVar* tauSource = (RooRealVar*) (sourceComponent->getParameters(*observable))->find("#tau")) {
+					tauSource->setConstant(kTRUE);
+					tauSource->setVal(0.385);
+				}
+				break;
+	        }
+		    case 2: {
+				TwoExpProvider* tep = new TwoExpProvider(observable);
+				sourceComponent = tep->getPdf();
+				break;
+	        }
+		    case 3: {
+				ThreeExpProvider* tep = new ThreeExpProvider(observable);
+				sourceComponent = tep->getPdf();
+				break;
+	        }
+		}
+		// Rename exponential pdf variables and build source pdf.
+		RooAbsPdf* sourceComponentRenamed = RootHelper::suffixPdfAndNodes(sourceComponent, observable, "source");
+		sourceComponentsList->add(*sourceComponentRenamed);
 	}
-
-//    sourcePdf->Print();    
+	// Use sum of ExpPdfs each convoluted with resolution (think its slower)
+	else {
+		for (unsigned i = 1; i <= sourceComponents; i++) {
+			ExpProvider* sp = new ExpProvider(observable);
+			RooAbsPdf* sourceComponent = sp->getPdf(i);
+			sourceComponentsList->add(*sourceComponent);
+		}
+	}
+	#ifdef USEDEBUG
+		Debug("AdditiveConvolutionPdf::initComponents", "sourceComponentsList")
+		sourceComponentsList->Print();
+	#endif
 }
 
 void AdditiveConvolutionPdf::initResolutionModel(const char* resolutionId, RooRealVar* observable) {

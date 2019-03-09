@@ -14,13 +14,16 @@
 #include "AbstractProvider.h"
 
 AbstractProvider::AbstractProvider(RooRealVar* _observable) {
-    observable = _observable;
+	observable = _observable;
+}
+
+AbstractProvider::~AbstractProvider() {
 }
 
 RooAbsPdf* AbstractProvider::getPdf(int i) {
-    if(pdf == NULL){
-	pdf = initPdf(i);
-    }
-    return pdf;
+	if (pdf == NULL) {
+		pdf = initPdf(i);
+	}
+	return pdf;
 }
 

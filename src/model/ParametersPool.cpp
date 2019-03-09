@@ -97,7 +97,7 @@ void ParametersPool::updateModelParametersValuesFromPool(RooArgSet* modelParamet
 			RooRealVar* poolParameter = (RooRealVar*) parametersPool->find(name);
 			// Either set model parameter value, error etc
 			if (poolParameter) {
-				std::cout << "Parameter " << poolParameter->GetName() << " found" << std::endl;
+				std::cout << std::endl << "Parameter " << poolParameter->GetName() << " found" << std::endl;
 				// Fix: roofit can't set min larger than current max and vice versa
 				parameter->setMin(std::numeric_limits<double>::min());
 				parameter->setMax(std::numeric_limits<double>::max());
