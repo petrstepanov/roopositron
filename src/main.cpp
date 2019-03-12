@@ -319,6 +319,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		// Draw grayed out region excluded from plot
 		if (DO_RANGE) {
 			GraphicsHelper::drawRegion(spectraPlot[i], constants->getExcludeMinChannel(), constants->getExcludeMaxChannel());
+			spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(GraphicsHelper::GRAPH_COLOR), RooFit::LineWidth(2), RooFit::LineStyle(kDashed));
 			spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(GraphicsHelper::GRAPH_COLOR), RooFit::LineWidth(2), RooFit::Name("fit"), RooFit::Range("LEFT,RIGHT"), RooFit::NormRange("LEFT,RIGHT"));
 		} else {
 			spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(GraphicsHelper::GRAPH_COLOR), RooFit::LineWidth(2), RooFit::Name("fit"));
@@ -382,8 +383,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		// https://root-forum.cern.ch/t/pull-histogram-with-multiple-ranges/20935
 		if (DO_RANGE) {
 			RooHist* dataHist = (RooHist*) spectraPlot[i]->getHist("data");
-			auto curve1 = (RooCurve*) spectraPlot[i]->getObject(3); // 2 is index in the list of RooPlot items (see printout from graphFrame[i]->Print("V")
-			auto curve2 = (RooCurve*) spectraPlot[i]->getObject(4);
+			auto curve1 = (RooCurve*) spectraPlot[i]->getObject(4); // 2 is index in the list of RooPlot items (see printout from graphFrame[i]->Print("V")
+			auto curve2 = (RooCurve*) spectraPlot[i]->getObject(5);
 			auto hresid1 = dataHist->makePullHist(*curve1, true);
 			auto hresid2 = dataHist->makePullHist(*curve2, true);
 			hresid1->SetMarkerSize(GraphicsHelper::MARKER_SIZE);
