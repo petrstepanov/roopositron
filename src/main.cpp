@@ -316,13 +316,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		// Draw Resolution Function
 		spectra[i].resolutionFunction->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kGray + 1), RooFit::LineWidth(1), RooFit::Name("resolution"));
 
-		// Draw complete fit, dont't forget the ranges if needed
-		// https://root-forum.cern.ch/t/excluding-regions-in-a-fit/9109
-		spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(GraphicsHelper::GRAPH_COLOR), RooFit::LineWidth(2), RooFit::Name("fit"), DO_RANGE ? RooFit::Range("LEFT,RIGHT") : NULL);
-
 		// Draw grayed out region excluded from plot
 		if (DO_RANGE) {
 			GraphicsHelper::drawRegion(spectraPlot[i], constants->getExcludeMinChannel(), constants->getExcludeMaxChannel());
+			spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(GraphicsHelper::GRAPH_COLOR), RooFit::LineWidth(2), RooFit::Name("fit"), RooFit::Range("LEFT,RIGHT"), RooFit::NormRange("LEFT,RIGHT"));
+		} else {
+			spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(GraphicsHelper::GRAPH_COLOR), RooFit::LineWidth(2), RooFit::Name("fit"));
 		}
 
 		// Add legend with list of model parameters
@@ -383,8 +382,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		// https://root-forum.cern.ch/t/pull-histogram-with-multiple-ranges/20935
 		if (DO_RANGE) {
 			RooHist* dataHist = (RooHist*) spectraPlot[i]->getHist("data");
-			auto curve1 = (RooCurve*) spectraPlot[i]->getObject(2); // 2 is index in the list of RooPlot items (see printout from graphFrame[i]->Print("V")
-			auto curve2 = (RooCurve*) spectraPlot[i]->getObject(3);
+			auto curve1 = (RooCurve*) spectraPlot[i]->getObject(3); // 2 is index in the list of RooPlot items (see printout from graphFrame[i]->Print("V")
+			auto curve2 = (RooCurve*) spectraPlot[i]->getObject(4);
 			auto hresid1 = dataHist->makePullHist(*curve1, true);
 			auto hresid2 = dataHist->makePullHist(*curve2, true);
 			hresid1->SetMarkerSize(GraphicsHelper::MARKER_SIZE);

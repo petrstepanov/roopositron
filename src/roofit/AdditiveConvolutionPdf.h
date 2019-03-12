@@ -63,8 +63,8 @@ private:
     RooRealVar* sourceContribution;
     RooFormulaVar* sourceContributionNorm;
     
-    Int_t componentsNumber;
-    Int_t sourceComponentsNumber;
+//    Int_t componentsNumber;
+//    Int_t sourceComponentsNumber;
 };
 
 #endif /* ADDITIVECONVOLUTIONPDF_H */

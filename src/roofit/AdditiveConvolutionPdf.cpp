@@ -1,4 +1,4 @@
-/*
+ /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -31,7 +31,7 @@
 #include "providers/ExpSourceProvider.h"
 
 AdditiveConvolutionPdf::AdditiveConvolutionPdf(std::vector<std::string> componentIds, const char* resolutionId, int sourceComponents, RooRealVar* observable) {
-	std::cout << "AdditiveConvolutionPdf::AdditiveConvolutionPdf" << std::endl;
+	std::cout << "AdditiveConvolutionPdcomponentsNumberf::AdditiveConvolutionPdf" << std::endl;
 
 	// https://root.cern.ch/root/html/tutorials/roofit/rf901_numintconfig.C.html
 	// WARNING:Integration -- RooIntegrator1D::integral: integral of ... over range (-240,2641) did not converge after 20 steps
@@ -46,8 +46,8 @@ AdditiveConvolutionPdf::AdditiveConvolutionPdf(std::vector<std::string> componen
 	RooMsgService::instance().addStream(RooFit::INFO, RooFit::Topic(RooFit::Caching));
 
 	pdfServer = new PdfServer();
-	componentsNumber = componentIds.size();
-	sourceComponentsNumber = sourceComponents;
+//	componentsNumber = componentIds.size();
+//	sourceComponentsNumber = sourceComponents;
 	initComponents(componentIds, sourceComponents, observable);
 	initResolutionModel(resolutionId, observable);
 	initCoefficients();
@@ -104,11 +104,12 @@ void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentId
 		for (unsigned i = 1; i <= sourceComponents; i++) {
 			ExpProvider* sp = new ExpProvider(observable);
 			RooAbsPdf* sourceComponent = sp->getPdf(i);
-			sourceComponentsList->add(*sourceComponent);
+			RooAbsPdf* sourceComponentRenamed = RootHelper::suffixPdfAndNodes(sourceComponent, observable, "source");
+			sourceComponentsList->add(*sourceComponentRenamed);
 		}
 	}
 	#ifdef USEDEBUG
-		Debug("AdditiveConvolutionPdf::initComponents", "sourceComponentsList")
+		Debug("AdditiveConvolutionPdf::initComponents", "sourceComponentsList");
 		sourceComponentsList->Print();
 	#endif
 }
@@ -126,13 +127,14 @@ void AdditiveConvolutionPdf::initCoefficients() {
 }
 
 void AdditiveConvolutionPdf::convoluteComponents(RooRealVar *observable) {
+	Debug("AdditiveConvolutionPdf::convoluteComponents");
 	// Create list of cache variables (roofit supports max 2 now)
 	// RooArgSet* resolutionVariables = resolutionFunction->getVariables();
 	// RooRealVar* resolutionMean = (RooRealVar*) resolutionVariables->find("mean_gauss");
 
 	// Convolute components
 	double bufferFraction = Constants::getInstance()->getBufferFraction();
-	for (unsigned i = 0; i < componentsNumber; i++) {
+	for (unsigned i = 0; i < componentsList->getSize(); i++) {
 		RooAbsArg* arg = (componentsList->at(i));
 		RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(arg);
 		RooFFTConvPdf* pdf = new RooFFTConvPdf(StringUtils::suffix("convolutedComponent", i + 1).c_str(), StringUtils::ordinal("convoluted component", i + 1).c_str(), *observable, *component,
@@ -148,7 +150,7 @@ void AdditiveConvolutionPdf::convoluteComponents(RooRealVar *observable) {
 	convolutedComponentsList->Print();
 
 	// Convolute source components
-	for (unsigned i = 0; i < sourceComponentsNumber; i++) {
+	for (unsigned i = 0; i < sourceComponentsList->getSize(); i++) {
 		RooAbsArg* arg = (sourceComponentsList->at(i));
 		RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(arg);
 		RooFFTConvPdf* pdf = new RooFFTConvPdf(StringUtils::suffix("sourceConvolutedComponent", i + 1).c_str(), StringUtils::ordinal("source convoluted component", i + 1).c_str(), *observable,

@@ -68,13 +68,13 @@ RooArgList* Constants::initDefaultValues() {
     constants->add(*constant);
     constant = new RooStringVar("minimizerType", " # \"Minuit\", \"Minuit2\", \"Fumili\", \"GSLMultiMin\"", "Minuit");
     constants->add(*constant);
-    constant = new RooStringVar("decayModel", " # comma-separated names \"exp\", \"trapping\", \"grain\", \"powder\"", "exp");
+    constant = new RooStringVar("decayModel", " # comma-separated names \"exp\", \"2exp\", \"3exp\", \"trapping\", \"grain\", \"powder\"", "exp");
     constants->add(*constant);
     constant = new RooStringVar("resolutionFunction", " # \"1gauss\", \"2gauss\" or \"3gauss\"", "2gauss");
     constants->add(*constant);
-    constant = new RooStringVar("sourceComponents", " # number of components in source", "1");
+    constant = new RooStringVar("sourceComponents", " # number of components in source: 1, 2, 3, etc", "1");
     constants->add(*constant);
-    constant = new RooStringVar("commonParameters", " # comma-separated parameters of simultaneous fit", "FWHM_gauss1,FWHM_gauss2,FWHM_gauss3,Int_gauss2,Int_gauss3,#tau_source,Int_source");
+    constant = new RooStringVar("commonParameters", " # comma-separated parameters of simultaneous fit", "FWHM_gauss1,FWHM_gauss2,FWHM_gauss3,Int_gauss2,Int_gauss3,#tau_source,Int_source,#tau1_source,#tau2_source,#tau3_source,Int2_source,Int3_source");
     constants->add(*constant);
     constant = new RooStringVar("bufferFraction", " # set to about 1.5-2 when dealing with larger lifetime components ~5ns", "0.2");
     constants->add(*constant);

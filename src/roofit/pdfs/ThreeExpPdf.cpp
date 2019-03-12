@@ -20,14 +20,14 @@ ThreeExpPdf::ThreeExpPdf(const char *name, const char *title,
 	RooAbsReal& _tau1,
 	RooAbsReal& _tau2,
 	RooAbsReal& _tau3,
-        RooAbsReal& _i2,
+    RooAbsReal& _i2,
 	RooAbsReal& _i3) :
 	RooAbsPdf(name, title),
 	t("t", "t", this, _t),
 	tau1("tau1", "tau1", this, _tau1),
 	tau2("tau2", "tau2", this, _tau2),
 	tau3("tau3", "tau3", this, _tau3),
-        i2("i2", "i2", this, _i2),
+	i2("i2", "i2", this, _i2),
 	i3("i3", "i3", this, _i3){
 }
 
