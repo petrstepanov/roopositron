@@ -34,13 +34,13 @@ RooAbsPdf* ThreeExpProvider::initPdf(int i) {
     RooRealVar* tau2 = new RooRealVar("#tau2", "2nd positron lifetime", 0.5, 0.1, 5, "ns");
     RooFormulaVar* tau2Ch = new RooFormulaVar("tau2Ch", "2nd positron lifetime, channels", "@0/@1", RooArgList(*tau2, *channelWidth));
 
-    RooRealVar* tau3 = new RooRealVar("#tau3", "3rd positron lifetime", 1.0, 0.1, 5, "ns");
+    RooRealVar* tau3 = new RooRealVar("#tau3", "3rd positron lifetime", 1.0, 0.1, 10, "ns");
     RooFormulaVar* tau3Ch = new RooFormulaVar("tau3Ch", "3rd positron lifetime, channels", "@0/@1", RooArgList(*tau3, *channelWidth));
 
-    RooRealVar* int2 = new RooRealVar("Int2", "2nd exponent fraction", 1, 0, 50, "%");
+    RooRealVar* int2 = new RooRealVar("Int2", "2nd exponent fraction", 20, 0, 100, "%");
     RooFormulaVar* int2Norm = new RooFormulaVar("int2Norm", "@0/100", *int2);
 
-    RooRealVar* int3 = new RooRealVar("Int3", "3rd exponent fraction", 1, 0, 20, "%");
+    RooRealVar* int3 = new RooRealVar("Int3", "3rd exponent fraction", 20, 0, 100, "%");
     RooFormulaVar* int3Norm = new RooFormulaVar("int3Norm", "@0/100", *int3);
 
     // Instantinate model
