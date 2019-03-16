@@ -112,7 +112,7 @@ ReverseAddPdf::~ReverseAddPdf() {
 //	return pdf;
 //    }
 
-RooAbsPdf* ReverseAddPdf::add(RooArgList* pdfList, const char* pdfName) {
+RooAbsPdf* ReverseAddPdf::add(RooArgList* pdfList, RooRealVar* observable, const char* pdfName) {
 	// Construct inverse list;
 	RooArgList* pdfInverseList = new RooArgList();
 	TIterator* it = pdfList->createIterator(kIterBackward);
@@ -136,24 +136,16 @@ RooAbsPdf* ReverseAddPdf::add(RooArgList* pdfList, const char* pdfName) {
 	for (unsigned i = 0; i < numberOfComponents - 1; i++) {
 		// Construct list of original model coefficients
 		// I_i = [I4, I3, I2]
-		// 1st "Source" component intensity
-		std::string IName = StringUtils::suffix("Int", numberOfComponents - i, pdfName);
-
-		std::string ITitle = pdfName;
-		if (ITitle.empty()) {
-			ITitle = "component intensity";
-		} else {
-			ITitle += " component intensity";
-		}
-		ITitle = StringUtils::ordinal(ITitle.c_str(), numberOfComponents - i);
-
-		RooRealVar* I = new RooRealVar(IName.c_str(), ITitle.c_str(), 5.0, 0.0, 100.0, "%");
-
-		std::string INormName = StringUtils::suffix("INorm", numberOfComponents - i, pdfName);
-		RooFormulaVar* INorm = new RooFormulaVar(INormName.c_str(), ITitle.c_str(), "@0/100", *I);
+		const char* componentName = pdfInverseList->at(i)->GetName();
+		const char* componentTitle = pdfInverseList->at(i)->GetTitle();
+		const char* iName = Form("Int_%s", componentName);
+		const char* iTitle = Form("Intensity of %s", componentTitle);
+		RooRealVar* I = new RooRealVar(iName, iTitle, 20, 0, 100, "%");
+		RooFormulaVar* INorm = new RooFormulaVar(Form("%s_norm", iName), Form("%s, normalized", iTitle), "@0/100", *I);
 		I_i->add(*INorm);
 	}
-
-	return new RooAddPdf(TString::Format("reverseModel%s", pdfName), TString::Format("Reverse Coefficients Model %s", pdfName), *pdfInverseList, *I_i);
-
+	RooAddPdf* pdf = new RooAddPdf(Form("addPdf_%s", pdfName), Form("Additive model %s", pdfName), *pdfInverseList, *I_i);
+	// https://sft.its.cern.ch/jira/browse/ROOT-9653
+	pdf->fixAddCoefNormalization(RooArgSet(*observable));
+	return pdf;
 }

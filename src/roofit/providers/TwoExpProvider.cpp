@@ -31,12 +31,12 @@ RooAbsPdf* TwoExpProvider::initPdf(int i) {
     RooRealVar* tau1 = new RooRealVar("#tau1", "1st positron lifetime", 0.2, 0.1, 2, "ns");
     RooFormulaVar* tau1Ch = new RooFormulaVar("tau1Ch", "1st positron lifetime, channels", "@0/@1", RooArgList(*tau1, *channelWidth));
 
-    RooRealVar* tau2 = new RooRealVar("#tau2", "2nd positron lifetime", 0.5, 0.3, 5, "ns");
+    RooRealVar* tau2 = new RooRealVar("#tau2", "2nd positron lifetime", 0.5, 0.3, 10, "ns");
     RooFormulaVar* tau2Ch = new RooFormulaVar("tau2Ch", "2nd positron lifetime, channels", "@0/@1", RooArgList(*tau2, *channelWidth));
 
-    RooRealVar* int2 = new RooRealVar("Int2", "2nd exponent fraction", 1, 0, 20, "%");
+    RooRealVar* int2 = new RooRealVar("Int2", "2nd exponent fraction", 20, 0, 100, "%");
     RooFormulaVar* int2Norm = new RooFormulaVar("int2Norm", "@0/100", *int2);
 
     // Instantinate model
-    return new TwoExpPdf("twoExpPdf", "two exponential component", *observable, *tau1Ch, *tau2Ch, *int2Norm);
+    return new TwoExpPdf("twoExp", "two exponential pdf", *observable, *tau1Ch, *tau2Ch, *int2Norm);
 }

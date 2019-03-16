@@ -31,5 +31,5 @@ RooAbsPdf* ExpSourceProvider::initPdf(int i) {
     RooFormulaVar* tauSourceCh = new RooFormulaVar(StringUtils::suffix("tauSourceCh",i).c_str(), StringUtils::ordinal("positron lifetime in source, channels", i).c_str(), "@0/@1", RooArgList(*tauSource, *channelWidth));
 
     // Instantiate model
-    return new ExpPdf(StringUtils::suffix("sourceComponent",i).c_str(), StringUtils::ordinal("source component", i).c_str(), *observable, *tauSourceCh);
+    return new ExpPdf(StringUtils::suffix("expSource",i).c_str(), StringUtils::ordinal("exponential source pdf", i).c_str(), *observable, *tauSourceCh);
 }

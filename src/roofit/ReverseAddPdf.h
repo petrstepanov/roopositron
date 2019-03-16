@@ -24,8 +24,8 @@ public:
     
 //    static addPdf(RooArgList* pdfList, char* intensityNamePrefix = "");
 //    static RooAbsPdf* addPdfRecursive(RooArgList* pdfList, const char* prefix = "");
-    static RooAbsPdf* add(RooArgList* pdfList, const char* prefix = "");
-    static RooAbsPdf* addRecursive(RooArgList* pdfList, const char* prefix = "");    
+    static RooAbsPdf* add(RooArgList* pdfList, RooRealVar* observable, const char* prefix = "");
+//    static RooAbsPdf* addRecursive(RooArgList* pdfList, const char* prefix = "");
 private:
 
 };

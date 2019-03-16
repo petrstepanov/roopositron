@@ -15,6 +15,7 @@
 #include "StringUtils.h"
 #include <TUnixSystem.h>
 #include <RooWorkspace.h>
+#include "Debug.h"
 #include <iostream>
 
 //void RootHelper::deleteObject(const char* name){
@@ -65,10 +66,13 @@ RooRealVar* RootHelper::findParameterNameContains(RooAbsPdf* pdf, RooRealVar* ob
 }
 
 RooAbsPdf* RootHelper::suffixPdfAndNodes(RooAbsPdf* pdf, RooRealVar* observable, const char* suffix){
+	Debug("RootHelper::suffixPdfAndNodes");
 	RooWorkspace* w = new RooWorkspace("w", "w");
 	w->import(*pdf, RooFit::RenameAllVariablesExcept(suffix, observable->GetName()), RooFit::RenameAllNodes(suffix));
 	#ifdef USEDEBUG
 		w->Print();
 	#endif
-	return w->pdf(Form("%s_%s", pdf->GetName(), suffix));
+	const char* suffixedName = Form("%s_%s", pdf->GetName(), suffix);
+	RooAbsPdf* suffixedPdf =  w->pdf(suffixedName);
+	return suffixedPdf;
 }

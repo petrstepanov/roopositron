@@ -119,7 +119,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		s.averageBackground = HistProcessor::getAverageBackground(s.histogram);
 		spectra.push_back(s);
 		Debug(
-				"Spectrum " << i+1 << " file is \"" << s.filename << "\"" << std::endl << "  bins: " << s.numberOfBins << "  integral: " << s.integral << "  bin with minimum count: " << s.binWithMinimumCount << "  bin with maximum count: " << s.binWithMaximumCount << "  minimum count: " << s.minimumCount << "  maximum count: " << s.maximumCount << "  average background: " << s.averageBackground);
+				"Spectrum " << i+1 << " file is \"" << s.filename << "\"" << std::endl << "  bins: " << s.numberOfBins << std::endl << "  integral: " << s.integral << std::endl << "  bin with minimum count: " << s.binWithMinimumCount << std::endl << "  bin with maximum count: " << s.binWithMaximumCount << std::endl << "  minimum count: " << s.minimumCount << std::endl << "  maximum count: " << s.maximumCount << std::endl << "  average background: " << s.averageBackground);
 	}
 
 	// Construct additive decay models
@@ -136,29 +136,38 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			gaussMean->setVal(spectra[i].binWithMaximumCount);
 		}
 
-		// Initialize background here
-		RooPolynomial* bg = new RooPolynomial("bg", "y=1", *channels, RooArgSet());
+		// Set average background counts
+		if (RooRealVar* avgBgCount = (RooRealVar*) (pdf->getParameters(*channels))->find("background")) {
+			avgBgCount->setConstant(kTRUE);
+			avgBgCount->setMin(spectra[i].averageBackground);
+			avgBgCount->setMax(spectra[i].averageBackground);
+			// avgBgCount->setVal(spectra[i].averageBackground);  // sets automatically with limits
+		}
 
-		// Parameterize background as counts, not as fraction (intentionally RooRealVar, not RooConst)
-		RooRealVar* bgCount = new RooRealVar("background", "Background level counts", spectra[i].averageBackground, spectra[i].averageBackground / 2,
-				spectra[i].averageBackground * 2, "counts");
-		bgCount->setConstant(kTRUE);
-		Int_t b = spectra[i].numberOfBins;
-		RooRealVar* bins = new RooRealVar("bins", "Histogram bins", b, b, b);
-		bins->setConstant(kTRUE);
-		RooRealVar* fullIntegral = new RooRealVar("integral", "Full histogram integral", spectra[i].integral, spectra[i].integral, spectra[i].integral);
-		fullIntegral->setConstant(kTRUE);
-		RooFormulaVar* IBg = new RooFormulaVar("IBg", "@0*@1/@2", RooArgList(*bgCount, *bins, *fullIntegral));
+		// Set bins
+		if (RooRealVar* bins = (RooRealVar*) (pdf->getParameters(*channels))->find("bins")) {
+			bins->setConstant(kTRUE);
+			bins->setMin(spectra[i].numberOfBins);
+			bins->setMax(spectra[i].numberOfBins);
+			// bins->setVal(spectra[i].numberOfBins);
+		}
 
-		// Final PDFs can have the same name, need to provide resolution protocol
-		RooAddPdf* pdfWithBg = new RooAddPdf("pdf", "Final model", RooArgList(*bg, *pdf), *IBg);
+		// Set full integral
+		if (RooRealVar* fullIntegral = (RooRealVar*) (pdf->getParameters(*channels))->find("integral")) {
+			fullIntegral->setConstant(kTRUE);
+			fullIntegral->setMin(spectra[i].integral);
+			fullIntegral->setMax(spectra[i].integral);
+			// fullIntegral->setVal(spectra[i].integral);
+		}
 
 		// Rename PDF parameters via RooWorkspace
 		if (i == 0) {
-			spectra[i].model = pdfWithBg;
+			spectra[i].model = pdf;
 		} else {
-			std::string suffix = std::to_string(i + 1);
-			spectra[i].model = RootHelper::suffixPdfAndNodes(pdfWithBg, channels, suffix.c_str());
+			// TODO: why this crashes the program
+			// const char* suffix = Form("%d", i+1);
+			std::string suffix = std::to_string(i+1);
+			spectra[i].model = RootHelper::suffixPdfAndNodes(pdf, channels, suffix.c_str());
 		}
 
 		// Save resolution function
@@ -192,15 +201,15 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	FileUtils::createDirectory(outputPath);
 
 	// Obtain and store number of free parameters for every model (why?)
-	RooArgSet** floatPars = new RooArgSet*[spectra.size()];
-	RooAbsCollection** floatPars1 = new RooAbsCollection*[spectra.size()];
-	Int_t* np = new Int_t[spectra.size()];
-
-	for (unsigned i = 0; i < spectra.size(); i++) {
-		floatPars[i] = spectra[i].model->getParameters(spectra[i].dataHistogram);
-		floatPars1[i] = floatPars[i]->selectByAttrib("Constant", kFALSE);
-		np[i] = floatPars1[i]->getSize();
-	}
+//	RooArgSet** floatPars = new RooArgSet*[spectra.size()];
+//	RooAbsCollection** floatPars1 = new RooAbsCollection*[spectra.size()];
+//	Int_t* np = new Int_t[spectra.size()];
+//
+//	for (unsigned i = 0; i < spectra.size(); i++) {
+//		floatPars[i] = spectra[i].model->getParameters(spectra[i].dataHistogram);
+//		floatPars1[i] = floatPars[i]->selectByAttrib("Constant", kFALSE);
+//		np[i] = floatPars1[i]->getSize();
+//	}
 
 	/*
 	 ___________.__  __    __  .__
@@ -251,6 +260,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		channels->setRange("LEFT", 1, constants->getExcludeMinChannel());
 		channels->setRange("RIGHT", constants->getExcludeMaxChannel(), BINS);
 		Int_t numCpu = RootHelper::getNumCpu();
+		// Bug: RooChi2Var don't support ranges
 		simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::Range("LEFT,RIGHT"), RooFit::NumCPU(numCpu));
 	} else {
 		Int_t numCpu = RootHelper::getNumCpu();

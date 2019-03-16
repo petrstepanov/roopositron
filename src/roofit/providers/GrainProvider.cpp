@@ -50,5 +50,5 @@ RooAbsPdf* GrainProvider::initPdf(int i) {
 //            decay_model = new MyPdf("decay_model", "decay_model", *rChannels, *lambdaJ_ch, *lambdaBulk_ch, *lambdaGrain_ch, *lambdaVac_ch, *kappaVac_ch);
     // add cache to model - counts 10x faster
 
-    return new GrainPdf("grain", "Grain model", *observable, *lambdaJCh, *lambdaBulkCh, *lambdaGrainCh, *lambdaVacCh, *kappaVacCh);
+    return new GrainPdf("grain", "Grain pdf", *observable, *lambdaJCh, *lambdaBulkCh, *lambdaGrainCh, *lambdaVacCh, *kappaVacCh);
 }

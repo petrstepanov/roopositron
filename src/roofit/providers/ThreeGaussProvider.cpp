@@ -36,11 +36,11 @@ RooAbsPdf* ThreeGaussProvider::initPdf(int i) {
     RooFormulaVar* g2Dispersion = new RooFormulaVar("gauss2Dispersion", "@0*@1/@2", RooArgList(*g2FWHM, *fwhm2disp, *channelWidth));
 
     // 3nd gauss FWHM
-    RooRealVar* g3FWHM = new RooRealVar("FWHM_gauss3", "3rd gauss FWHM", 1.5, 0.8, 3.0, "ns");
+    RooRealVar* g3FWHM = new RooRealVar("FWHM_gauss3", "3rd gauss FWHM", 1.5, 0.8, 5.0, "ns");
 	RooFormulaVar* g3Dispersion = new RooFormulaVar("gauss3Dispersion", "@0*@1/@2", RooArgList(*g3FWHM, *fwhm2disp, *channelWidth));
 
     // Fraction of the 2nd gauss
-    RooRealVar* g2Fraction = new RooRealVar("Int_gauss2", "2nd gauss fraction", 1, 0, 20, "%");
+    RooRealVar* g2Fraction = new RooRealVar("Int_gauss2", "2nd gauss fraction", 1, 0, 50, "%");
     RooFormulaVar* g2FractionNorm = new RooFormulaVar("gauss2FracNorm", "@0/100", *g2Fraction);
 
 	// Fraction of the 3rd gauss
@@ -50,5 +50,5 @@ RooAbsPdf* ThreeGaussProvider::initPdf(int i) {
 	// Zero channel start values are assigned later (relative to the MIN_CHANNEL value)
     RooRealVar* gMean = new RooRealVar("mean_gauss", "Resolution function mean", 1, "ch");
 
-	return new ThreeGaussian("threeGauss", "Three gauss model", *observable, *gMean, *g1Dispersion, *g2Dispersion, *g3Dispersion, *g2FractionNorm, *g3FractionNorm);
+	return new ThreeGaussian("threeGauss", "Three gauss pdf", *observable, *gMean, *g1Dispersion, *g3Dispersion, *g2Dispersion, *g3FractionNorm, *g2FractionNorm);
 }

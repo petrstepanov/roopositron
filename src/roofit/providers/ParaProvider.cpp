@@ -44,5 +44,5 @@ RooAbsPdf* ParaProvider::initPdf(int i) {
 
 	RooRealVar* lopc = new RooRealVar("#lambda_opc", "Ortho-para conversion speed", 1, 1E-3, 1E3, "1/ns");
 
-	return new ParaPdf("para", "Paramagnetic model", *observable, *pPs, *lplus, *lpo, *l2g, *lopc, channelWidth->getValV());
+	return new ParaPdf("para", "Paramagnetic pdf", *observable, *pPs, *lplus, *lpo, *l2g, *lopc, channelWidth->getValV());
 }

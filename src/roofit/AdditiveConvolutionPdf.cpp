@@ -28,37 +28,25 @@
 #include <RooNumIntConfig.h>
 #include <RooMsgService.h>
 #include <RooWorkspace.h>
+#include <RooPolynomial.h>
 #include "providers/ExpSourceProvider.h"
 
 AdditiveConvolutionPdf::AdditiveConvolutionPdf(std::vector<std::string> componentIds, const char* resolutionId, int sourceComponents, RooRealVar* observable) {
-	std::cout << "AdditiveConvolutionPdcomponentsNumberf::AdditiveConvolutionPdf" << std::endl;
-
-	// https://root.cern.ch/root/html/tutorials/roofit/rf901_numintconfig.C.html
-	// WARNING:Integration -- RooIntegrator1D::integral: integral of ... over range (-240,2641) did not converge after 20 steps
-//    RooAbsReal::defaultIntegratorConfig()->Print("v") ;
-//    RooAbsReal::defaultIntegratorConfig()->zgetConfigSection("RooIntegrator1D").setRealValue("maxSteps", 30); // default 20
-
-	// Kill warning messages https://root-forum.cern.ch/t/suppressing-info-messages/14642/11
-	// RooMsgService::instance().setGlobalKillBelow(RooFit::ERROR);
-
-	// Print caching info
-//    RooMsgService::instance().addStream(RooFit::INFO,Topic("Caching"));
-	RooMsgService::instance().addStream(RooFit::INFO, RooFit::Topic(RooFit::Caching));
-
+	Debug("AdditiveConvolutionPdf::AdditiveConvolutionPdf");
+	this->observable = observable;
 	pdfServer = new PdfServer();
-//	componentsNumber = componentIds.size();
-//	sourceComponentsNumber = sourceComponents;
-	initComponents(componentIds, sourceComponents, observable);
-	initResolutionModel(resolutionId, observable);
+	initComponents(componentIds, sourceComponents);
+	initResolutionModel(resolutionId);
 	initCoefficients();
-	convoluteComponents(observable);
+//	convoluteComponents();
 	constructModel();
+	addBackground();
 }
 
 AdditiveConvolutionPdf::~AdditiveConvolutionPdf() {
 }
 
-void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentIds, int sourceComponents, RooRealVar* observable) {
+void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentIds, int sourceComponents) {
 	// Build component PDFs
 	for (std::vector<std::string>::const_iterator it = componentIds.begin(); it != componentIds.end(); ++it) {
 		const char* componentId = ((std::string) *it).c_str();
@@ -114,7 +102,7 @@ void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentId
 	#endif
 }
 
-void AdditiveConvolutionPdf::initResolutionModel(const char* resolutionId, RooRealVar* observable) {
+void AdditiveConvolutionPdf::initResolutionModel(const char* resolutionId) {
 	// std::cout << std::endl << "AdditiveConvolutionPdf::initResolutionModel" << std::endl;
 	resolutionFunction = pdfServer->getPdf(resolutionId, observable);
 	// resolutionFunction->Print();
@@ -126,59 +114,72 @@ void AdditiveConvolutionPdf::initCoefficients() {
 	sourceContributionNorm = new RooFormulaVar("sourceContributionNorm", "@0/100", *sourceContribution);
 }
 
-void AdditiveConvolutionPdf::convoluteComponents(RooRealVar *observable) {
-	Debug("AdditiveConvolutionPdf::convoluteComponents");
-	// Create list of cache variables (roofit supports max 2 now)
-	// RooArgSet* resolutionVariables = resolutionFunction->getVariables();
-	// RooRealVar* resolutionMean = (RooRealVar*) resolutionVariables->find("mean_gauss");
-
-	// Convolute components
-	double bufferFraction = Constants::getInstance()->getBufferFraction();
-	for (unsigned i = 0; i < componentsList->getSize(); i++) {
-		RooAbsArg* arg = (componentsList->at(i));
-		RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(arg);
-		RooFFTConvPdf* pdf = new RooFFTConvPdf(StringUtils::suffix("convolutedComponent", i + 1).c_str(), StringUtils::ordinal("convoluted component", i + 1).c_str(), *observable, *component,
-				*resolutionFunction);
-		// Construct 3D cache for RooFFTConvPdf (faster?) https://root.cern/doc/v610/rf211__paramconv_8C.html
-		// pdf->setCacheObservables(RooArgSet(*observable, *resolutionMean));
-		pdf->setCacheObservables(RooArgSet(*observable));
-		// pdf->setInterpolationOrder(3);
-		pdf->setBufferFraction(bufferFraction);
-		// pdf->setBufferStrategy(RooFFTConvPdf::Extend);
-		convolutedComponentsList->add(*pdf);
-	}
-	convolutedComponentsList->Print();
-
-	// Convolute source components
-	for (unsigned i = 0; i < sourceComponentsList->getSize(); i++) {
-		RooAbsArg* arg = (sourceComponentsList->at(i));
-		RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(arg);
-		RooFFTConvPdf* pdf = new RooFFTConvPdf(StringUtils::suffix("sourceConvolutedComponent", i + 1).c_str(), StringUtils::ordinal("source convoluted component", i + 1).c_str(), *observable,
-				*component, *resolutionFunction);
-		// Construct 3D cache for RooFFTConvPdf (faster?) https://root.cern/doc/v610/rf211__paramconv_8C.html
-		// RooArgSet* variables = resolutionFunction->getVariables();
-		// pdf->setCacheObservables(*variables);
-		// pdf->setCacheObservables(RooArgSet(*observable, *resolutionMean));
-		pdf->setCacheObservables(RooArgSet(*observable));
-		// pdf->setInterpolationOrder(3);
-		pdf->setBufferFraction(bufferFraction); // because sometimes (on some ranges) convolution produced PDF with weird peak
-		//pdf->setBufferStrategy(RooFFTConvPdf::Extend); // large lifetimes ~ 4.8ns give "p.d.f. normalization integral is zero" Extend=0, Mirror=1, Flat=2
-		convolutedSourceComponentsList->add(*pdf);
-	}
-	convolutedSourceComponentsList->Print();
+void AdditiveConvolutionPdf::convoluteComponents() {
+//
+//	// Convolute components
+//	double bufferFraction = Constants::getInstance()->getBufferFraction();
+//	for (unsigned i = 0; i < componentsList->getSize(); i++) {
+//		RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(componentsList->at(i));
+//		const char* componentName = component->GetName();
+//		const char* componentTitle = component->GetTitle();
+//		RooFFTConvPdf* pdf = new RooFFTConvPdf(Form("%sConv", componentName), Form("%s convoluted", componentTitle), *observable, *component, *resolutionFunction);
+//		pdf->setCacheObservables(RooArgSet(*observable));
+//		pdf->setBufferFraction(bufferFraction);
+//		convolutedComponentsList->add(*pdf);
+//	}
+//	Debug("AdditiveConvolutionPdf::convoluteComponents", "convolutedComponentsList");
+//	#ifdef USEDEBUG
+//		convolutedComponentsList->Print();
+//	#endif
+//
+//	// Convolute source components
+//	for (unsigned i = 0; i < sourceComponentsList->getSize(); i++) {
+//		RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(sourceComponentsList->at(i));
+//		const char* componentName = component->GetName();
+//		const char* componentTitle = component->GetTitle();
+//		RooFFTConvPdf* pdf = new RooFFTConvPdf(Form("%sConv", componentName), Form("%s convoluted", componentTitle), *observable, *component, *resolutionFunction);
+//		pdf->setCacheObservables(RooArgSet(*observable));
+//		pdf->setBufferFraction(bufferFraction); // because sometimes (on some ranges) convolution produced PDF with weird peak
+//		convolutedSourceComponentsList->add(*pdf);
+//	}
+//	Debug("AdditiveConvolutionPdf::convoluteComponents", "convolutedSourceComponentsList");
+//	#ifdef USEDEBUG
+//		convolutedSourceComponentsList->Print();
+//	#endif
 }
 
 void AdditiveConvolutionPdf::constructModel() {
 	// std::cout << std::endl << "AdditiveConvolutionPdf::constructModel" << std::endl;
 	// Sum components
-	RooAbsPdf* sumConvolutedComponents = ReverseAddPdf::add(convolutedComponentsList);
-	RooAbsPdf* sumSourceConvolutedComponents = ReverseAddPdf::add(convolutedSourceComponentsList, "Source");
+	RooAbsPdf* sumComponents = ReverseAddPdf::add(componentsList, observable);
+	RooAbsPdf* sumSourceComponents = ReverseAddPdf::add(sourceComponentsList, observable, "Source");
 
-	model = new RooAddPdf("componentsSourceModel", "Components model with source", RooArgList(*sumSourceConvolutedComponents, *sumConvolutedComponents), RooArgList(*sourceContributionNorm));
+	modelNonConvoluted = new RooAddPdf("modelNonConvoluted", "Components model with source", RooArgList(*sumSourceComponents, *sumComponents), RooArgList(*sourceContributionNorm));
+	modelNonConvoluted->fixAddCoefNormalization(RooArgSet(*observable));
+
+	model = new RooFFTConvPdf("model", "Convoluted model with source contribution", *observable, *modelNonConvoluted, *resolutionFunction);
+	((RooFFTConvPdf*)model)->setCacheObservables(RooArgSet(*observable));
+	double bufferFraction = Constants::getInstance()->getBufferFraction();
+	// On some ranges convolution produced PDF with weird peak
+	((RooFFTConvPdf*)model)->setBufferFraction(bufferFraction);
+}
+
+void AdditiveConvolutionPdf::addBackground() {
+	// Initialize background here
+	RooPolynomial* bg = new RooPolynomial("bg", "y=1", *observable, RooArgSet());
+
+	// Parameterize background as counts, (use arbitrary values here)
+	RooRealVar* avgBgCount = new RooRealVar("background", "Background level counts", 100, "counts");
+	RooRealVar* bins = new RooRealVar("bins", "Histogram bins", 1E3);
+	RooRealVar* fullIntegral = new RooRealVar("integral", "Full histogram integral", 1E6);
+	RooFormulaVar* intBg = new RooFormulaVar("intBg", "@0*@1/@2", RooArgList(*avgBgCount, *bins, *fullIntegral));
+
+	// Sum convoluted model with background
+	modelWithBg = new RooAddPdf("modelWithBg", "Convoluted model with background", RooArgList(*bg, *model), *intBg);
 }
 
 RooAbsPdf* AdditiveConvolutionPdf::getPdf() {
-	return model;
+	return modelWithBg;
 }
 
 RooAbsPdf* AdditiveConvolutionPdf::getResolutionFunction() {

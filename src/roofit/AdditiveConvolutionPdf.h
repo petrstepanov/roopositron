@@ -28,7 +28,8 @@ public:
     virtual ~AdditiveConvolutionPdf();
 
     void constructModel();
-    void convoluteComponents(RooRealVar* observable);
+    void addBackground();
+    void convoluteComponents();
     void initCoefficients();
 
     RooAbsPdf* getPdf();
@@ -39,11 +40,12 @@ public:
     RooAbsPdf* getConvolutedSourceComponent();
     
 private:
-    void initComponents(std::vector<std::string> componentIds, int sourceComponents, RooRealVar* observable);
-    void initResolutionModel(const char* resolutionId, RooRealVar* observable);
+    void initComponents(std::vector<std::string> componentIds, int sourceComponents);
+    void initResolutionModel(const char* resolutionId);
 
     PdfServer* pdfServer;
-    
+    RooRealVar* observable;
+
     RooArgList* componentsList = new RooArgList();
     RooArgList* sourceComponentsList = new RooArgList();
     RooAbsPdf* resolutionFunction; 
@@ -54,7 +56,11 @@ private:
     
     RooArgList* convolutedComponentsList = new RooArgList();
     RooArgList* convolutedSourceComponentsList = new RooArgList();
+
+    RooAbsPdf* modelNonConvoluted;
     RooAbsPdf* model;
+    RooAbsPdf* modelWithBg;
+
 
     RooAbsPdf* sourcePdf;
     RooAbsPdf* convolutedSourcePdf;
