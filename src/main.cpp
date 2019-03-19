@@ -171,7 +171,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 					pdf->chi2FitTo(*spectra[0].dataHistogram);
 
 					// Save first spectrum parameters to hard drive
-					storage->updatePoolParameters(pdf->getParameters(RooArgSet(*channels)));0.1
+					storage->updatePoolParameters(pdf->getParameters(RooArgSet(*channels)));
 					storage->saveToFile();
 
 					// Create canvas first (prevents segfault)
