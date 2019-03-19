@@ -164,10 +164,18 @@ void AdditiveConvolutionPdf::constructModel() {
 
 	// Convolute model
 	model = new RooFFTConvPdf("model", "Convoluted model with source contribution", *observable, *modelNonConvoluted, *resolutionFunction);
-	((RooFFTConvPdf*)model)->setCacheObservables(RooArgSet(*observable));
+
+	// Configure convolution to construct a 2-D cache in (channels, mean_gauss)
+	// rather than a 1-d cache in (channels) that needs to be recalculated
+	// if (RooAbsArg* mean = model->getParameters(RooArgSet(*observable))->find("mean_gauss")){
+	//   ((RooFFTConvPdf*)model)->setCacheObservables(RooArgSet(*mean));
+	// }
 	double bufferFraction = Constants::getInstance()->getBufferFraction();
 	// On some ranges convolution produced PDF with weird peak
 	((RooFFTConvPdf*)model)->setBufferFraction(bufferFraction);
+
+	// Try different integrator
+	// RooAbsReal::defaultIntegratorConfig()->method1D().setLabel("RooAdaptiveGaussKronrodIntegrator1D") ;
 }
 
 void AdditiveConvolutionPdf::addBackground() {

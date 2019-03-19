@@ -43,7 +43,8 @@ Double_t ThreeExpPdf::evaluate() const {
 	Double_t exp1 = exp(-t / tau1) / tau1;
 	Double_t exp2 = exp(-t / tau2) / tau2;
 	Double_t exp3 = exp(-t / tau3) / tau3;
-	return (1. - i2 - i3) * exp1  + i2 * exp2 + i3 * exp3;
+	Double_t value = (1. - i2 - i3) * exp1  + i2 * exp2 + i3 * exp3;
+	return value >= 0 ? value : 0;
 }
 
 // Indefinite integral

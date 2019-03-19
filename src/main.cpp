@@ -103,7 +103,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 	// Set convolution bins same as real number of axis bins (notices it works nice)
 	channels->setBins(BINS);
-	channels->setBins(BINS, "cache");
+	channels->setBins(1024, "cache");
 
 	// Construct a list of Spectrum struct     	 s to store individual spectra information
 	std::vector<Spectrum> spectra;
@@ -139,7 +139,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		// Set mean gauss values
 		if (RooRealVar* gaussMean = (RooRealVar*) (pdf->getParameters(*channels))->find("mean_gauss")) {
 			gaussMean->setConstant(kFALSE);
-			RootHelper::setRooRealVarValueLimits(gaussMean, spectra[i].binWithMaximumCount, spectra[i].binWithMaximumCount - 100, spectra[i].binWithMaximumCount + 100);
+			RootHelper::setRooRealVarValueLimits(gaussMean, spectra[i].binWithMaximumCount, spectra[i].binWithMaximumCount - 50, spectra[i].binWithMaximumCount + 50);
+//			gaussMean->setBins(50, "cache");
 		}
 
 		// Set average background counts
@@ -287,7 +288,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		channels->setRange("LEFT", 1, constants->getExcludeMinChannel());
 		channels->setRange("RIGHT", constants->getExcludeMaxChannel(), BINS);
 		Int_t numCpu = RootHelper::getNumCpu();
-		// Bug: RooChi2Var don't support ranges
+		// RooChi2Var don't support ranges https://sft.its.cern.ch/jira/browse/ROOT-10038
 		simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::Range("LEFT,RIGHT"), RooFit::NumCPU(numCpu));
 	} else {
 		Int_t numCpu = RootHelper::getNumCpu();
@@ -298,10 +299,11 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	TStopwatch* stopWatch = new TStopwatch();
 	stopWatch->Start();
 
-	// RooMinimizer
+	// Minimize chi2
 	RooMinimizer* m = new RooMinimizer(*simChi2);
-	// m->setStrategy(); // RooMinimizer::Speed (default), RooMinimizer::Balance, RooMinimizer::Robustness
 	m->setMinimizerType(constants->getMinimizerType());
+	// m->setEps(1000);
+	// m->setStrategy(RooMinimizer::Speed); // RooMinimizer::Speed (default), RooMinimizer::Balance, RooMinimizer::Robustness
 	Int_t resultMigrad = m->migrad();
 	Int_t resultHesse = m->hesse();
 	Debug("main", "Fitting completed: migrad=" << resultMigrad << ", hesse=" << resultHesse);
