@@ -221,8 +221,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		ModelCommonizer* commonizer = new ModelCommonizer(spectra[0].model, channels, constants->getCommonParameters());
 
 		// All other spectra
-		ParametersPool* storage = new ParametersPool(outputPath);
-	for (unsigned i = 1; i < spectra.size(); i++) {
+		// ParametersPool* storage = new ParametersPool(outputPath);
+		for (unsigned i = 1; i < spectra.size(); i++) {
 			RooAbsPdf* comminozedPdf = commonizer->replaceParametersWithCommon(spectra[i].model);
 			spectra[i].model = comminozedPdf;
 		}

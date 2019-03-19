@@ -24,28 +24,27 @@
 #include <iomanip>
 #include <string>
 #include <sstream>
+#include <regex>
 
 ModelCommonizer::ModelCommonizer(RooAbsPdf* pdf, RooRealVar* observable, std::vector<std::string> defaultCommonNames) {
 	this->observable = observable;
-	// User constructs final array with common parameter names
+	// User constructs final array with common parameter names (adds from keyboard)
 	commonParameterNames = initCommonParameters(pdf, defaultCommonNames);
 
-	// Save common parameter pointers to a private list
+	// Save common parameters to a private list
 	RooArgSet* params = pdf->getParameters(*observable);
 	TIterator* it = params->createIterator();
-	TObject* object;
-	while ((object = it->Next())) {
+	while (TObject* object = it->Next()) {
 		RooRealVar* rrv = dynamic_cast<RooRealVar*>(object);
 		if (rrv && StringUtils::contains(rrv->GetName(), commonParameterNames)) {
 			commonParameters->add(*rrv);
 		}
 	}
+
 	// Output common parameters list
-	std::cout << "ModelCommonizer::ModelCommonizer" << std::endl;
-	std::cout << "Common parameters extracted from the first spectrum" << std::endl;
+	Debug("ModelCommonizer::ModelCommonizer", "Common parameters extracted from the first spectrum");
 	TIterator* it2 = commonParameters->createIterator();
-	TObject* temp;
-	while ((temp = it2->Next())) {
+	while (TObject* temp = it2->Next()) {
 		if (TNamed* named = dynamic_cast<TNamed*>(temp)) {
 			named->Print();
 		}
@@ -56,14 +55,12 @@ ModelCommonizer::~ModelCommonizer() {
 }
 
 std::vector<std::string> ModelCommonizer::initCommonParameters(RooAbsPdf* pdf, std::vector<std::string> defaultCommonNames) {
-	// List model parameters and highlight common ones by default (from parameters.txt)
+	// Output model parameters and highlight common ones by default (from parameters.txt)
 	std::cout << std::endl << "Model has following parameters:" << std::endl;
 	RooArgSet* parameters = pdf->getParameters(*observable);
 	TIterator* it = parameters->createIterator();
-	TObject* temp;
-	while ((temp = it->Next())) {
-		RooRealVar* rrv = dynamic_cast<RooRealVar*>(temp);
-		if (rrv) {
+	while (TObject* temp = it->Next()) {
+		if (RooRealVar* rrv = dynamic_cast<RooRealVar*>(temp)) {
 			Bool_t isCommon = StringUtils::contains(rrv->GetName(), defaultCommonNames);
 			std::cout << std::left << std::setw(TAB_WIDTH) << rrv->GetName() << std::left << std::setw(2 * TAB_WIDTH) << rrv->GetTitle() << (isCommon ? "common" : "") << std::endl;
 		}
@@ -114,19 +111,31 @@ RooAbsPdf* ModelCommonizer::replaceParametersWithCommon(RooAbsPdf* pdf) {
 }
 
 RooRealVar* ModelCommonizer::getCommonReplacement(const char* localParameterName) {
-	TIterator* it = commonParameters->createIterator();
-	TObject* temp;
-	while ((temp = it->Next())) {
-		RooRealVar* commonParameter = dynamic_cast<RooRealVar*>(temp);
-		if (commonParameter) {
-			// Replace all tau_# with tau (adding underscore to not interfere with tau_2)
-			std::string commonParameterName_ = commonParameter->GetName();
-			commonParameterName_ += "_";
-			Bool_t match = StringUtils::isSubstring(localParameterName, commonParameterName_.c_str());
-			if (match) {
+	const std::string localParamName = localParameterName;
+	const std::regex re("(.*)(_[0-9]+)$");
+	std::smatch match;
+
+	if (std::regex_match(localParamName, match, re)){
+		// for "#tau1_source_10" returns "#tau1_source"
+		std::string commonParamName = match[1].str();
+		if (RooAbsArg* arg = commonParameters->find(commonParamName.c_str())){
+			if (RooRealVar* commonParameter = dynamic_cast<RooRealVar*>(arg)){
 				return commonParameter;
 			}
 		}
 	}
+//	TIterator* it = commonParameters->createIterator();
+//	while (TObject* temp = it->Next()) {
+//		RooRealVar* commonParameter = dynamic_cast<RooRealVar*>(temp);
+//		if (commonParameter) {
+//			// Replace all tau_# with tau (adding underscore to not interfere with tau_2)
+//			std::string commonParameterName_ = commonParameter->GetName();
+//			commonParameterName_ += "_";
+//			Bool_t match = StringUtils::isSubstring(localParameterName, commonParameterName_.c_str());
+//			if (match) {
+//				return commonParameter;
+//			}
+//		}
+//	}
 	return NULL;
 }
