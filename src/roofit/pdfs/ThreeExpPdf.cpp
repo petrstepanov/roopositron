@@ -17,26 +17,39 @@ ClassImp(ThreeExpPdf);
 
 ThreeExpPdf::ThreeExpPdf(const char *name, const char *title, RooAbsReal& _t, RooAbsReal& _tau1, RooAbsReal& _tau2, RooAbsReal& _tau3, RooAbsReal& _i2,
 		RooAbsReal& _i3) :
-		RooAbsPdf(name, title), t("t", "t", this, _t), tau1("tau1", "tau1", this, _tau1), tau2("tau2", "tau2", this, _tau2), tau3("tau3", "tau3", this, _tau3), i2(
-				"i2", "i2", this, _i2), i3("i3", "i3", this, _i3) {
+		RooAbsPdf(name, title), //
+		t("t", "t", this, _t), //
+		tau1("tau1", "tau1", this, _tau1), //
+		tau2("tau2", "tau2", this, _tau2), //
+		tau3("tau3", "tau3", this, _tau3), //
+		i2("i2", "i2", this, _i2), //
+		i3("i3", "i3", this, _i3) {
 }
 
 ThreeExpPdf::ThreeExpPdf(const ThreeExpPdf& other, const char* name) :
-		RooAbsPdf(other, name), t("t", this, other.t), tau1("tau1", this, other.tau1), tau2("tau2", this, other.tau2), tau3("tau3", this, other.tau3), i2("i2",
-				this, other.i2), i3("i3", this, other.i3) {
+		RooAbsPdf(other, name), //
+		t("t", this, other.t), //
+		tau1("tau1", this, other.tau1), //
+		tau2("tau2", this, other.tau2), //
+		tau3("tau3", this, other.tau3), //
+		i2("i2", this, other.i2), //
+		i3("i3", this, other.i3) {
 }
 
 // Evaluate without normalization
 Double_t ThreeExpPdf::evaluate() const {
 	if (t < 0)
-		return 0.;
-	return (1. - i2 - i3) / tau1 * exp(-t / tau1) + i2 / tau2 * exp(-t / tau2) + i3 / tau3 * exp(-t / tau3);
+		return 0;
+	Double_t exp1 = exp(-t / tau1) / tau1;
+	Double_t exp2 = exp(-t / tau2) / tau2;
+	Double_t exp3 = exp(-t / tau3) / tau3;
+	return (1. - i2 - i3) * exp1  + i2 * exp2 + i3 * exp3;
 }
 
 // Indefinite integral
 Double_t ThreeExpPdf::indefiniteIntegral(Double_t y) const {
 	if (y < 0)
-		return 0.;
+		return 0;
 	Double_t int1 = -exp(-y / tau1);
 	Double_t int2 = -exp(-y / tau2);
 	Double_t int3 = -exp(-y / tau3);

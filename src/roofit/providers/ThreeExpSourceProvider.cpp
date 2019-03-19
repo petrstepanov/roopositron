@@ -44,5 +44,5 @@ RooAbsPdf* ThreeExpSourceProvider::initPdf(int i) {
     RooFormulaVar* intExpSource3Norm = new RooFormulaVar("intExpSource3Norm", "@0/100", *Int_expSource3);
 
     // Instantiate model
-    return new ThreeExpPdf("threeExpSource", "three exponential source pdf", *observable, *tau1SourceCh, *tau3SourceCh, *tau2SourceCh, *intExpSource3Norm, *intExpSource2Norm);
+    return new ThreeExpPdf("threeExpSource", "three exponential source pdf", *observable, *tau1SourceCh, *tau2SourceCh, *tau3SourceCh, *intExpSource2Norm, *intExpSource3Norm);
 }

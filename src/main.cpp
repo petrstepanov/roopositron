@@ -191,7 +191,6 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 					std::string input;
 					std::cout << "First spectrum fit complete. Does the fit look good? (y/n)" << std::endl;
 					std::getline(std::cin, input);
-					((TRootCanvas*)firstCanvas->GetCanvasImp())->UnmapWindow();
 					if (!input.empty()) {
 						char character = input.at(0);
 						if (character == 'n' || character == 'N') {
@@ -200,6 +199,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 							exit(1);
 						}
 					}
+					// ((TRootCanvas*)firstCanvas->GetCanvasImp())->UnmapWindow();
+					firstCanvas->Close();
+					gSystem->ProcessEvents();
 				}
 			}
 		}
