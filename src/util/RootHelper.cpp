@@ -12,6 +12,7 @@
  */
 
 #include "RootHelper.h"
+#include "TString.h"
 #include "StringUtils.h"
 #include <TUnixSystem.h>
 #include <RooWorkspace.h>
@@ -72,7 +73,16 @@ RooAbsPdf* RootHelper::suffixPdfAndNodes(RooAbsPdf* pdf, RooRealVar* observable,
 	#ifdef USEDEBUG
 		w->Print();
 	#endif
-	const char* suffixedName = Form("%s_%s", pdf->GetName(), suffix);
-	RooAbsPdf* suffixedPdf =  w->pdf(suffixedName);
+	TString suffixedName = TString::Format("%s_%s", pdf->GetName(), suffix);
+	RooAbsPdf* suffixedPdf =  w->pdf(suffixedName.Data());
 	return suffixedPdf;
+}
+
+void RootHelper::setRooRealVarValueLimits(RooRealVar* var, Double_t value, Double_t min, Double_t max){
+	// Tip: roofit can't set min larger than current max and vice versa
+	var->setMin(std::numeric_limits<double>::min());
+	var->setMax(std::numeric_limits<double>::max());
+	var->setMin(min);
+	var->setMax(max);
+	var->setVal(value);
 }

@@ -138,13 +138,11 @@ RooAbsPdf* ReverseAddPdf::add(RooArgList* pdfList, RooRealVar* observable, const
 		// I_i = [I4, I3, I2]
 		const char* componentName = pdfInverseList->at(i)->GetName();
 		const char* componentTitle = pdfInverseList->at(i)->GetTitle();
-		const char* iName = Form("Int_%s", componentName);
-		const char* iTitle = Form("Intensity of %s", componentTitle);
-		RooRealVar* I = new RooRealVar(iName, iTitle, 20, 0, 100, "%");
-		RooFormulaVar* INorm = new RooFormulaVar(Form("%s_norm", iName), Form("%s, normalized", iTitle), "@0/100", *I);
+		RooRealVar* I = new RooRealVar(TString::Format("Int_%s", componentName), TString::Format("Intensity of %s", componentTitle), 20, 0, 100, "%");
+		RooFormulaVar* INorm = new RooFormulaVar(TString::Format("Int_%s_norm", componentName), TString::Format("Intensity of %s, normalized", componentTitle), "@0/100", *I);
 		I_i->add(*INorm);
 	}
-	RooAddPdf* pdf = new RooAddPdf(Form("addPdf_%s", pdfName), Form("Additive model %s", pdfName), *pdfInverseList, *I_i);
+	RooAddPdf* pdf = new RooAddPdf(TString::Format("addPdf_%s", pdfName), TString::Format("Additive model %s", pdfName), *pdfInverseList, *I_i);
 	// https://sft.its.cern.ch/jira/browse/ROOT-9653
 	pdf->fixAddCoefNormalization(RooArgSet(*observable));
 	return pdf;

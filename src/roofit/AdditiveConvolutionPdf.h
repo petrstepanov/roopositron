@@ -29,8 +29,7 @@ public:
 
     void constructModel();
     void addBackground();
-    void convoluteComponents();
-    void initCoefficients();
+    // void convoluteComponents();
 
     RooAbsPdf* getPdf();
     RooAbsPdf* getResolutionFunction();
@@ -66,11 +65,8 @@ private:
     RooAbsPdf* convolutedSourcePdf;
     
     // Source contribution coefficients
-    RooRealVar* sourceContribution;
-    RooFormulaVar* sourceContributionNorm;
-    
-//    Int_t componentsNumber;
-//    Int_t sourceComponentsNumber;
+    RooRealVar* Int_source;
+    RooFormulaVar* Int_sourceNorm;
 };
 
 #endif /* ADDITIVECONVOLUTIONPDF_H */

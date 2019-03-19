@@ -88,7 +88,7 @@ RooAbsPdf* ModelCommonizer::replaceParametersWithCommon(RooAbsPdf* pdf) {
 	Debug("ModelCommonizer::replaceParametersWithCommon");
 
 	// Instantiate Customizer that will replace model parameters
-	RooCustomizer* customizer = new RooCustomizer(*pdf, Form("%s_custom", pdf->GetName()));
+	RooCustomizer* customizer = new RooCustomizer(*pdf, TString::Format("%s_custom", pdf->GetName()));
 	Bool_t replacedFlag = kFALSE;
 
 	// Iterate through model local parameters that might need replacement

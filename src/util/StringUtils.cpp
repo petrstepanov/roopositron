@@ -67,14 +67,14 @@ bool StringUtils::contains(const char* string, std::vector<std::string> vector) 
 	return false;
 }
 
-bool StringUtils::containsSubstring(const char* string, std::vector<std::string> vector) {
-	for (std::vector<std::string>::iterator it = vector.begin(); it != vector.end(); ++it) {
-		if (isSubstring((std::string) *it, string)) {
-			return true;
-		}
-	}
-	return false;
-}
+//bool StringUtils::containsSubstring(const char* string, std::vector<std::string> vector) {
+//	for (std::vector<std::string>::iterator it = vector.begin(); it != vector.end(); ++it) {
+//		if (isSubstring((std::string) *it, string)) {
+//			return true;
+//		}
+//	}
+//	return false;
+//}
 
 bool StringUtils::stringContainsToken(const char* string, std::vector<std::string> vector) {
 	for (std::vector<std::string>::iterator it = vector.begin(); it != vector.end(); ++it) {

@@ -23,7 +23,7 @@ public:
     static std::vector<std::string> parseString(std::string string, const char* delimeter = ",");
     static std::string joinStrings(std::vector<std::string> tokens, const char* delimeter = "-");
     static bool contains(const char* name, std::vector<std::string> names);
-    static bool containsSubstring(const char* string, std::vector<std::string> vector);
+//    static bool containsSubstring(const char* string, std::vector<std::string> vector);
     static bool stringContainsToken(const char* string, std::vector<std::string> vector);
 //    static const char* appendSuffix(const char*, int suffix);
     static bool isSubstring(const char* parent, const char* find);

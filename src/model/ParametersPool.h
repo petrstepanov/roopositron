@@ -26,7 +26,9 @@ public:
     ParametersPool(std::string ioPath);
 
     void updateModelParametersValuesFromPool(RooArgSet* modelParameters);
-    Bool_t save(RooArgSet* modelParameters);
+    Bool_t containsAllParameters(RooArgSet* parameters);
+    void updatePoolParameters(RooArgSet* modelParameters);
+    Bool_t saveToFile();
     void print();
 
 private:

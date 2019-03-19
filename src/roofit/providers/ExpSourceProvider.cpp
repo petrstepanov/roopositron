@@ -24,10 +24,26 @@ ExpSourceProvider::~ExpSourceProvider() {
 
 RooAbsPdf* ExpSourceProvider::initPdf(int i) {
     RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
+
+    Double_t tauVal=0.385;
+    Double_t tauValMin=0.1;
+    Double_t tauValMax=3;
+
+    if(i==2){
+    	tauVal=0.3;
+    	tauValMin=0.2;
+    	tauValMax=5;
+    }
+    if(i>=3){
+    	tauVal=1.5;
+    	tauValMin=0.3;
+    	tauValMax=10;
+    }
     
     // Instantiate RooRealVar parameters
     RooRealVar* tauSource = new RooRealVar(StringUtils::suffix("#tau_source",i).c_str(), StringUtils::ordinal("positron lifetime in source", i).c_str(), 0.385, 0.1, 5, "ns");
-    tauSource->setConstant(kTRUE);
+    if(i==1) tauSource->setConstant(kTRUE);
+
     RooFormulaVar* tauSourceCh = new RooFormulaVar(StringUtils::suffix("tauSourceCh",i).c_str(), StringUtils::ordinal("positron lifetime in source, channels", i).c_str(), "@0/@1", RooArgList(*tauSource, *channelWidth));
 
     // Instantiate model

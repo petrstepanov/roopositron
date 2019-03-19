@@ -15,7 +15,9 @@
 #include "Constants.h"
 #include "TSystem.h"
 #include "../util/ObjectNamer.h"
+#include "../util/RootHelper.h"
 #include "../util/StringUtils.h"
+#include "../util/Debug.h"
 #include <sstream>
 #include <iostream>
 
@@ -27,7 +29,7 @@ ParametersPool::ParametersPool(std::string ioPath) {
 
 void ParametersPool::constructExcludedParametersList() {
 	// Don't save mean value (not important for results)
-	parametersExcludedFromSave.push_back("mean_gauss");
+	parametersExcludedFromSave.push_back("mean_gauss"); // ? need this to redraw first plot
 	parametersExcludedFromSave.push_back("bins");
 	parametersExcludedFromSave.push_back("integral");
 	parametersExcludedFromSave.push_back("background");
@@ -83,30 +85,35 @@ RooArgSet* ParametersPool::readPoolParametersFromFile() {
 	return parametersPool;
 }
 
+Bool_t ParametersPool::containsAllParameters(RooArgSet* modelParameters){
+	// Iterate through model parametersdeclared. Either extend values from pool parameters from hard drive.
+	TIterator* it = modelParameters->createIterator();
+	while (TObject* temp = it->Next()) {
+		if (RooRealVar* parameter = dynamic_cast<RooRealVar*>(temp)) {
+			const char* name = parameter->GetName();
+			RooRealVar* poolParameter = (RooRealVar*) parametersPool->find(name);
+			if (!poolParameter) {
+				return kFALSE;
+			}
+		}
+	}
+	return kTRUE;
+}
+
+//		int a; std::cin >> a;
 void ParametersPool::updateModelParametersValuesFromPool(RooArgSet* modelParameters) {
-	std::cout << std::endl << "ParametersPool::updateModelParametersValuesFromPool" << std::endl;
-	std::cout << "Hit ENTER to use default parameter values." << std::endl;
+	Debug("ParametersPool::updateModelParametersValuesFromPool", "Hit ENTER to use default parameter values.");
 
 	// Iterate through model parameters. Either extend values from pool parameters from hard drive.
 	TIterator* it = modelParameters->createIterator();
-	TObject* temp;
-	while ((temp = it->Next())) {
-		RooRealVar* parameter = dynamic_cast<RooRealVar*>(temp);
-		if (parameter) {
-			const char* name = parameter->GetName();
-			RooRealVar* poolParameter = (RooRealVar*) parametersPool->find(name);
+	while (TObject* temp = it->Next()) {
+		if (RooRealVar* parameter = dynamic_cast<RooRealVar*>(temp)) {
 			// Either set model parameter value, error etc
-			if (poolParameter) {
-				std::cout << std::endl << "Parameter " << poolParameter->GetName() << " found" << std::endl;
-				// Fix: roofit can't set min larger than current max and vice versa
-				parameter->setMin(std::numeric_limits<double>::min());
-				parameter->setMax(std::numeric_limits<double>::max());
-				parameter->setMin(poolParameter->getMin());
-				parameter->setMax(poolParameter->getMax());
-				parameter->setVal(poolParameter->getVal());
+			if (RooRealVar* poolParameter = (RooRealVar*) parametersPool->find(parameter->GetName())) {
+				Debug("Parameter " << poolParameter->GetName() << " found");
+				RootHelper::setRooRealVarValueLimits(parameter, poolParameter->getVal(), poolParameter->getMin(), poolParameter->getMax());
 				// TODO: set error if not constant?
 				parameter->setConstant(poolParameter->isConstant());
-//		int a; std::cin >> a;
 			} else {
 				if (!StringUtils::stringContainsToken(parameter->GetName(), parametersExcludedFromInput)) {
 					userInput(parameter);
@@ -165,7 +172,7 @@ void ParametersPool::userInput(RooRealVar* parameter) {
 	}
 }
 
-Bool_t ParametersPool::save(RooArgSet* modelParameters) {
+void ParametersPool::updatePoolParameters(RooArgSet* modelParameters) {
 	// Iterate through model parameters. Either extend values from pool parameters from hard drive.
 	TIterator* it = modelParameters->createIterator();
 	TObject* temp;
@@ -174,15 +181,19 @@ Bool_t ParametersPool::save(RooArgSet* modelParameters) {
 		if (modelParameter) {
 			const char* name = modelParameter->GetName();
 			RooRealVar* poolParameter = (RooRealVar*) parametersPool->find(name);
+
 			// Either set model parameter value, error etc
 			if (poolParameter) {
-				parametersPool->replace(*poolParameter, *modelParameter);
+				parametersPool->remove(*poolParameter, kTRUE, kTRUE);
 			}
+			parametersPool->add(*modelParameter);
 		}
 	}
+}
 
-	std::cout << "ParametersPool::save" << std::endl;
-	std::cout << std::endl << "Saving parameters pool to hard drive (" << filePathName.c_str() << ")." << std::endl;
+// TODO: separate add and save()
+Bool_t ParametersPool::saveToFile() {
+	Debug("ParametersPool::saveToFile", "Saving parameters pool to hard drive (" << filePathName.c_str() << ").");
 	FILE* pFile = fopen(filePathName.c_str(), "w");
 	if (pFile == NULL) {
 		std::cout << "Error writing to file \"" << filePathName << "\"." << std::endl;
@@ -192,10 +203,9 @@ Bool_t ParametersPool::save(RooArgSet* modelParameters) {
 	fprintf(pFile, "%-*s%-*s%-*s%-*s%-*s%-*s%-*s%s\n", tab, "Parameter name", tab, "Value", tab, "Minimum", tab, "Maximum", tab, "Error", tab, "Unit", tab, "Type", "Description");
 
 	// Save parameters
-	it = parametersPool->createIterator();
-	while ((temp = it->Next())) {
-		RooRealVar* parameter = dynamic_cast<RooRealVar*>(temp);
-		if (parameter) {
+	TIterator* it = parametersPool->createIterator();
+	while (TObject* temp = it->Next()) {
+		if (RooRealVar* parameter = dynamic_cast<RooRealVar*>(temp)) {
 			std::string freeOrFixed = parameter->isConstant() ? "fixed" : "free";
 
 			// To prevent reading error from parameters file - we replace empty parameter units with "-"

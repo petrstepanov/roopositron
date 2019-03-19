@@ -23,7 +23,7 @@ TH1F* FileUtils::importTH1F(std::string filename, int i) {
 	const int maxChannel = constants->getMaxChannel();
 	const int skipLines = constants->getSkipLines();
 	const int bins = maxChannel - minChannel + 1;
-	TH1F* histogram = new TH1F(Form("histogram_%d", i+1), Form("ROOT histogram %d", i+1), bins, 0, bins);
+	TH1F* histogram = new TH1F(TString::Format("histogram_%d", i+1), TString::Format("ROOT histogram %d", i+1), bins, 0, bins);
 
 	// Open file
 	std::ifstream inFile(filename.c_str());

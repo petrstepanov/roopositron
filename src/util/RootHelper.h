@@ -27,6 +27,7 @@ public:
     static void printPdfCoefficientNames(RooAbsPdf* pdf, RooRealVar* observable);
     static RooRealVar* findParameterNameContains(RooAbsPdf* pdf, RooRealVar* observable, const char* substring);
     static RooAbsPdf* suffixPdfAndNodes(RooAbsPdf* pdf, RooRealVar* observable, const char* suffix);
+    static void setRooRealVarValueLimits(RooRealVar* var, Double_t value, Double_t min, Double_t max);
 
 private:
     static TStopwatch* watch;

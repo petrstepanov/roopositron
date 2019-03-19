@@ -28,21 +28,21 @@ RooAbsPdf* ThreeExpSourceProvider::initPdf(int i) {
     RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
     
     // Instantiate RooRealVar parameters
-    RooRealVar* tau1 = new RooRealVar("#tau1", "1st positron lifetime", 0.2, 0.1, 2, "ns");
-    RooFormulaVar* tau1Ch = new RooFormulaVar("tau1Ch", "1st positron lifetime, channels", "@0/@1", RooArgList(*tau1, *channelWidth));
+    RooRealVar* tau1Source = new RooRealVar("#tau1_source", "1st positron lifetime in source", 0.2, 0.1, 2, "ns");
+    RooFormulaVar* tau1SourceCh = new RooFormulaVar("tau1SourceCh", "1st positron lifetime in source, channels", "@0/@1", RooArgList(*tau1Source, *channelWidth));
 
-    RooRealVar* tau2 = new RooRealVar("#tau2", "2nd positron lifetime", 0.5, 0.1, 5, "ns");
-    RooFormulaVar* tau2Ch = new RooFormulaVar("tau2Ch", "2nd positron lifetime, channels", "@0/@1", RooArgList(*tau2, *channelWidth));
+    RooRealVar* tau2Source = new RooRealVar("#tau2_source", "2nd positron lifetime in source", 0.5, 0.1, 5, "ns");
+    RooFormulaVar* tau2SourceCh = new RooFormulaVar("tau2SourceCh", "2nd positron lifetime in source, channels", "@0/@1", RooArgList(*tau2Source, *channelWidth));
 
-    RooRealVar* int2 = new RooRealVar("Int_exp2", "2nd exponent fraction", 1, 0, 50, "%");
-    RooFormulaVar* int2Norm = new RooFormulaVar("int2Norm", "@0/100", *int2);
+    RooRealVar* tau3Source = new RooRealVar("#tau3_source", "3rd positron lifetime in source", 1.0, 0.1, 10, "ns");
+    RooFormulaVar* tau3SourceCh = new RooFormulaVar("tau3SourceCh", "3rd positron lifetime in source, channels", "@0/@1", RooArgList(*tau3Source, *channelWidth));
 
-    RooRealVar* tau3 = new RooRealVar("#tau3", "3rd positron lifetime", 1.0, 0.1, 5, "ns");
-    RooFormulaVar* tau3Ch = new RooFormulaVar("tau3Ch", "2nd positron lifetime, channels", "@0/@1", RooArgList(*tau3, *channelWidth));
+    RooRealVar* Int_expSource2 = new RooRealVar("Int_expSource2", "2nd exponent intensity in source", 20, 0, 100, "%");
+    RooFormulaVar* intExpSource2Norm = new RooFormulaVar("intExpSource2Norm", "@0/100", *Int_expSource2);
 
-    RooRealVar* int3 = new RooRealVar("Int_exp3", "3rd exponent fraction", 1, 0, 20, "%");
-    RooFormulaVar* int3Norm = new RooFormulaVar("int2Norm", "@0/100", *int3);
+    RooRealVar* Int_expSource3= new RooRealVar("Int_expSource3", "3rd exponent intensity in source", 20, 0, 100, "%");
+    RooFormulaVar* intExpSource3Norm = new RooFormulaVar("intExpSource3Norm", "@0/100", *Int_expSource3);
 
-    // Instantinate model
-    return new ThreeExpPdf("threeExpComponent", "three exponential component", *observable, *tau1, *tau2, *tau3, *int2Norm, *int3Norm);
+    // Instantiate model
+    return new ThreeExpPdf("threeExpSource", "three exponential source pdf", *observable, *tau1SourceCh, *tau3SourceCh, *tau2SourceCh, *intExpSource3Norm, *intExpSource2Norm);
 }
