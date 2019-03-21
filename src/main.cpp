@@ -303,7 +303,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	RooMinimizer* m = new RooMinimizer(*simChi2);
 	m->setMinimizerType(constants->getMinimizerType());
 	// m->setEps(1000);
-	// m->setStrategy(RooMinimizer::Speed); // RooMinimizer::Speed (default), RooMinimizer::Balance, RooMinimizer::Robustness
+	// m->setStrategy(RooMinimizer::Speed); // RooMinimizer::Speed, RooMinimizer::Balance, RooMinimizer::Robustness
 	Int_t resultMigrad = m->migrad();
 	Int_t resultHesse = m->hesse();
 	Debug("main", "Fitting completed: migrad=" << resultMigrad << ", hesse=" << resultHesse);
