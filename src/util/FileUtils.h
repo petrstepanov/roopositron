@@ -14,16 +14,13 @@
 #ifndef MY_FILEUTILS
 #define MY_FILEUTILS
 
-#include "TH1F.h"
-#include "TCanvas.h"
-#include "TImage.h"
-#include "dirent.h"
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 #include <fstream>
-#include <list>
+#include <vector>
 #include <string>
+#include <TH1F.h>
 
 class FileUtils {
 public:

@@ -13,6 +13,9 @@
 
 #include "FileUtils.h"
 #include <TUnixSystem.h>
+#include <TSystemDirectory.h>
+#include <TSystemFile.h>
+#include <TList.h>
 #include "../model/Constants.h"
 #include "../util/StringUtils.h"
 #include "../util/Debug.h"
@@ -77,24 +80,22 @@ std::string FileUtils::getCurrentPath() {
 }
 
 std::vector<std::string> FileUtils::getFilenamesInCurrentDrectory(const char* ext) {
+	Debug("FileUtils::getFilenamesInCurrentDrectory", "Searching for \"" << ext << "\" files in current directory...");
 	// Grab spectra filenames from input directory
-	struct dirent *ent;
 	std::vector<std::string> lFileNames;
-	DIR *dir = opendir("./");
-	if (dir != NULL) {
-		while ((ent = readdir(dir)) != NULL) {
-			std::string filename(ent->d_name);
-			std::cout << filename << std::endl;
-			std::string extension = ext;
-			if (StringUtils::stringEnds(filename, extension)) {
-				lFileNames.push_back(filename);
-				printf("%s\n", ent->d_name);
+	TSystemDirectory *dir = new TSystemDirectory(".", gSystem->WorkingDirectory());
+	if (TList *files = dir->GetListOfFiles()){
+		TIter next(files);
+		while (TSystemFile* file = (TSystemFile*)next()){
+			TString fileName = file->GetName();
+			if (!file->IsDirectory() && fileName.EndsWith(ext)) {
+				std::cout << "* " << fileName << std::endl;
+				std::string fN = fileName.Data();
+				lFileNames.push_back(fN);
+			} else {
+				std::cout << "  " << fileName << std::endl;
 			}
 		}
-		closedir(dir);
-	} else {
-		// Could not open directory
-		perror("");
 	}
 	return lFileNames;
 }
