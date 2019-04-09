@@ -101,8 +101,8 @@ Bool_t ParametersPool::containsAllParameters(RooArgSet* modelParameters){
 }
 
 //		int a; std::cin >> a;
-void ParametersPool::updateModelParametersValuesFromPool(RooArgSet* modelParameters) {
-	Debug("ParametersPool::updateModelParametersValuesFromPool", "Hit ENTER to use default parameter values.");
+void ParametersPool::updateModelParametersFromPool(RooArgSet* modelParameters) {
+	Debug("ParametersPool::updateModelParametersFromPool", "Hit ENTER to use default parameter values.");
 
 	// Iterate through model parameters. Either extend values from pool parameters from hard drive.
 	TIterator* it = modelParameters->createIterator();
@@ -110,10 +110,11 @@ void ParametersPool::updateModelParametersValuesFromPool(RooArgSet* modelParamet
 		if (RooRealVar* parameter = dynamic_cast<RooRealVar*>(temp)) {
 			// Either set model parameter value, error etc
 			if (RooRealVar* poolParameter = (RooRealVar*) parametersPool->find(parameter->GetName())) {
-				Debug("Parameter " << poolParameter->GetName() << " found");
-				RootHelper::setRooRealVarValueLimits(parameter, poolParameter->getVal(), poolParameter->getMin(), poolParameter->getMax());
-				// TODO: set error if not constant?
-				parameter->setConstant(poolParameter->isConstant());
+				if (!StringUtils::stringContainsToken(poolParameter->GetName(), parametersExcludedFromSave)) {
+					RootHelper::setRooRealVarValueLimits(parameter, poolParameter->getVal(), poolParameter->getMin(), poolParameter->getMax());
+					// TODO: set error if not constant?
+					parameter->setConstant(poolParameter->isConstant());
+				}
 			} else {
 				if (!StringUtils::stringContainsToken(parameter->GetName(), parametersExcludedFromInput)) {
 					userInput(parameter);

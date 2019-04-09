@@ -134,13 +134,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		AdditiveConvolutionPdf* acp = new AdditiveConvolutionPdf(constants->getDecayModels(), constants->getResolutionFunctionModel(), constants->getSourceComponentsNumber(), channels);
 		RooAbsPdf* pdf = acp->getPdf();
 		// Update pdf's starting values from pool
-		storage->updateModelParametersValuesFromPool(pdf->getParameters(RooArgSet(*channels)));
+		storage->updateModelParametersFromPool(pdf->getParameters(RooArgSet(*channels)));
 
 		// Set mean gauss values
 		if (RooRealVar* gaussMean = (RooRealVar*) (pdf->getParameters(*channels))->find("mean_gauss")) {
 			gaussMean->setConstant(kFALSE);
 			RootHelper::setRooRealVarValueLimits(gaussMean, spectra[i].binWithMaximumCount, spectra[i].binWithMaximumCount - 50, spectra[i].binWithMaximumCount + 50);
-//			gaussMean->setBins(50, "cache");
 		}
 
 		// Set average background counts
@@ -275,7 +274,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 	// Read models' parameters from the pool file.
 	// User input parameter values from keyboard if not found in the pool
-	storage->updateModelParametersValuesFromPool(simPdf->getParameters(*channels));
+	storage->updateModelParametersFromPool(simPdf->getParameters(*channels));
 
 	// Save storage before fitting to create file with parameters
 	// in case user doesn't want to wait till fitting ends
