@@ -46,7 +46,7 @@ RooAbsPdf* PowderProvider::initPdf(int i) {
 	RooRealVar* Vth = new RooRealVar("Vth", "Thermalized Ps speed ", 8E5, "A/ns");
 	Vth->setConstant(kTRUE);
 
-	RooRealVar* L = new RooRealVar("L", "Powder diameter", 50, 1, 50000, "nm"); // 1nm - 50mkm
+	RooRealVar* L = new RooRealVar("l", "Distance between powders", 50, 1, 50000, "nm"); // 1nm - 50mkm
 	RooFormulaVar* Langstrom = new RooFormulaVar("Langstrom", "10*@0", *L);
 
 	RooRealVar* pPs = new RooRealVar("pPs", "Probability of forming qf-Ps", 0.5, 0, 1, "");
