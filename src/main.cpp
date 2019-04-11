@@ -120,99 +120,63 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		s.maximumCount = s.histogram->GetBinContent(s.binWithMaximumCount);
 		s.averageBackground = HistProcessor::getAverageBackground(s.histogram);
 		spectra.push_back(s);
-		Debug(
-				"Spectrum " << i+1 << " file is \"" << s.filename << "\"" << std::endl << "  bins: " << s.numberOfBins << std::endl << "  integral: " << s.integral << std::endl << "  bin with minimum count: " << s.binWithMinimumCount << std::endl << "  bin with maximum count: " << s.binWithMaximumCount << std::endl << "  minimum count: " << s.minimumCount << std::endl << "  maximum count: " << s.maximumCount << std::endl << "  average background: " << s.averageBackground);
+		Debug("Spectrum " << i+1 << " file is \"" << s.filename << "\"" << std::endl << "  bins: " << s.numberOfBins << std::endl << "  integral: " << s.integral << std::endl << "  bin with minimum count: " << s.binWithMinimumCount << std::endl << "  bin with maximum count: " << s.binWithMaximumCount << std::endl << "  minimum count: " << s.minimumCount << std::endl << "  maximum count: " << s.maximumCount << std::endl << "  average background: " << s.averageBackground);
 	}
 
 	// Initialize output path and storage for model parameters
 	std::string outputPath = "./" + StringUtils::joinStrings(constants->getDecayModels()) + "-" + constants->getResolutionFunctionModel(); // + "-" + minimizerType.Data();
 	FileUtils::createDirectory(outputPath);
-	ParametersPool* storage = new ParametersPool(outputPath);
+	ParametersPool* pool = new ParametersPool(outputPath);
+
 
 	// Construct additive decay models
 	for (unsigned i = 0; i < spectra.size(); i++) {
 		AdditiveConvolutionPdf* acp = new AdditiveConvolutionPdf(constants->getDecayModels(), constants->getResolutionFunctionModel(), constants->getSourceComponentsNumber(), channels);
 		RooAbsPdf* pdf = acp->getPdf();
-		// Update pdf's starting values from pool
-		storage->updateModelParametersFromPool(pdf->getParameters(RooArgSet(*channels)));
+
+		// Starting values for fitting parameters are taken from pool (if exist in pool)
+		pool->updateModelParameters(pdf->getParameters(RooArgSet(*channels)));
 
 		// Set mean gauss values
 		if (RooRealVar* gaussMean = (RooRealVar*) (pdf->getParameters(*channels))->find("mean_gauss")) {
 			gaussMean->setConstant(kFALSE);
 			RootHelper::setRooRealVarValueLimits(gaussMean, spectra[i].binWithMaximumCount, spectra[i].binWithMaximumCount - 50, spectra[i].binWithMaximumCount + 50);
 		}
-
 		// Set average background counts
 		if (RooRealVar* avgBgCount = (RooRealVar*) (pdf->getParameters(*channels))->find("background")) {
 			avgBgCount->setConstant(kTRUE);
 			RootHelper::setRooRealVarValueLimits(avgBgCount, spectra[i].averageBackground, spectra[i].averageBackground, spectra[i].averageBackground);
 		}
-
 		// Set bins
 		if (RooRealVar* bins = (RooRealVar*) (pdf->getParameters(*channels))->find("bins")) {
 			bins->setConstant(kTRUE);
 			RootHelper::setRooRealVarValueLimits(bins, spectra[i].numberOfBins, spectra[i].numberOfBins, spectra[i].numberOfBins);
 		}
-
 		// Set full integral
 		if (RooRealVar* fullIntegral = (RooRealVar*) (pdf->getParameters(*channels))->find("integral")) {
 			fullIntegral->setConstant(kTRUE);
 			RootHelper::setRooRealVarValueLimits(fullIntegral, spectra[i].integral, spectra[i].integral, spectra[i].integral);
 		}
 
-		// Assign model for first spectrum
 		if (i == 0) {
 			spectra[i].model = pdf;
-			// If fitting multiple spectra fit first spectrum and save its parameters
-			if (spectra.size() > 1) {
-				Bool_t firstSpectrumWasFitted = storage->containsAllParameters(pdf->getParameters(RooArgSet(*channels)));
-				if (!firstSpectrumWasFitted){
-					// Fit spectrum
-					pdf->chi2FitTo(*spectra[0].dataHistogram);
-
-					// Save first spectrum parameters to hard drive
-					storage->updatePoolParameters(pdf->getParameters(RooArgSet(*channels)));
-					storage->saveToFile();
-
-					// Create canvas first (prevents segfault)
-					TCanvas* firstCanvas = new TCanvas("firstCanvas", "Canvas for first spectrum fit", constants->getImageWidth(), constants->getImageHeight()) ;
-					firstCanvas->SetLogy();
-
-					// Then proceed with plot
-					RooPlot* plot = channels->frame(RooFit::Title(spectra[0].filename));
-					spectra[0].dataHistogram->plotOn(plot);
-					pdf->plotOn(plot);
-					plot->Draw();
-					firstCanvas->Modified();
-					firstCanvas->Update();
-					gSystem->ProcessEvents(); // https://root-forum.cern.ch/t/threads-with-standalone-program/5642/3
-
-					// Ask user how the fit is. Interrupt if bad.
-					std::string input;
-					std::cout << "First spectrum fit complete. Does the fit look good? (y/n)" << std::endl;
-					std::getline(std::cin, input);
-					if (!input.empty()) {
-						char character = input.at(0);
-						if (character == 'n' || character == 'N') {
-							// If problem then exit.
-							std::cout << "Please try again with different starting parameters" << std::endl;
-							exit(1);
-						}
-					}
-					// ((TRootCanvas*)firstCanvas->GetCanvasImp())->UnmapWindow();
-					firstCanvas->Close();
-					gSystem->ProcessEvents();
-				}
-			}
 		}
-		// Use fit parameters from first spectrum fit as starting values for other spectra.
 		else {
+			// Prefix all parameters in not-first model
 			spectra[i].model = RootHelper::suffixPdfAndNodes(pdf, channels, TString::Format("%d", i+1));
-			storage->updatePoolParameters(spectra[i].model->getParameters(RooArgSet(*channels)));
 		}
 
 		// Save resolution function
 		spectra[i].resolutionFunction = acp->getResolutionFunction();
+	}
+
+	// When fitting multiple spectra perform single first spectrum fit (1st in the list)
+	// Erase all spectra from the list but first one
+	Bool_t firstSpectrumWasFitted = pool->containsAllParameters(spectra[0].model->getParameters(*channels));
+	if (spectra.size() > 1 && !firstSpectrumWasFitted){
+		while(spectra.size() > 1){
+			spectra.erase(spectra.end());
+		}
 	}
 
 	// Introduce common parameters if more than one spectrum (simultaneous fit).
@@ -221,7 +185,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		ModelCommonizer* commonizer = new ModelCommonizer(spectra[0].model, channels, constants->getCommonParameters());
 
 		// All other spectra
-		// ParametersPool* storage = new ParametersPool(outputPath);
+		// ParametersPool* pool = new ParametersPool(outputPath);
 		for (unsigned i = 1; i < spectra.size(); i++) {
 			RooAbsPdf* comminozedPdf = commonizer->replaceParametersWithCommon(spectra[i].model);
 			spectra[i].model = comminozedPdf;
@@ -248,7 +212,6 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 //	 \___  /   |__||__|  |__| |__|___|  /\___  /
 //	     \/                           \//_____/
 
-
 	// Make array of category names
 	TString* types = new TString[spectra.size()];
 	for (unsigned i = 0; i < spectra.size(); i++)
@@ -272,21 +235,26 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		simPdf->addPdf(*spectra[i].model, types[i].Data());
 	}
 
-	// Read models' parameters from the pool file.
-	// User input parameter values from keyboard if not found in the pool
-	storage->updateModelParametersFromPool(simPdf->getParameters(*channels));
+	if (spectra.size() > 1){
+		// Read simultaneous model parameters from the pool file.
+		// Important for non-common parameters that have prefix _#
+		pool->updateModelParameters(simPdf->getParameters(*channels));
+	}
 
-	// Save storage before fitting to create file with parameters
-	// in case user doesn't want to wait till fitting ends
-	storage->updatePoolParameters(simPdf->getParameters(*channels));
+	// User input parameter values from keyboard if not found in the pool
+	pool->addInputModelParameters(simPdf->getParameters(*channels));
+
+	// Save pool before fitting to create file with parameters
+	// pool->saveToFile();
 
 	// Use RooMinuit interface to minimize chi^2
-
 	RooChi2Var* simChi2;
 	if (DO_RANGE) {
 		channels->setRange("LEFT", 1, constants->getExcludeMinChannel());
 		channels->setRange("RIGHT", constants->getExcludeMaxChannel(), BINS);
 		Int_t numCpu = RootHelper::getNumCpu();
+
+		// Read models' parameters from the pool file. numCpu = RootHelper::getNumCpu();
 		// RooChi2Var don't support ranges https://sft.its.cern.ch/jira/browse/ROOT-10038
 		simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::Range("LEFT,RIGHT"), RooFit::NumCPU(numCpu));
 	} else {
@@ -307,11 +275,6 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	Int_t resultHesse = m->hesse();
 	Debug("main", "Fitting completed: migrad=" << resultMigrad << ", hesse=" << resultHesse);
 	stopWatch->Stop();
-
-	// Save parameters to file
-	storage->updatePoolParameters(simPdf->getParameters(*channels));
-	storage->saveToFile();
-
 
 //	  ________                    .__    .__
 //	 /  _____/___________  ______ |  |__ |__| ____   ______
@@ -503,6 +466,28 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	}
 	Debug("main", "Canvas images successfully exported.");
 
+	// Ask user how the fit is. Interrupt if bad.
+	std::string input;
+	if (spectra.size() > 1 && !firstSpectrumWasFitted){
+		std::cout << "First spectrum fit complete. Does the fit look good? (y/n)" << std::endl;
+	}
+	else {
+		std::cout << "Spectra fit complete. Does the fit look good? (y/n)" << std::endl;
+	}
+	std::getline(std::cin, input);
+	if (!input.empty()) {
+		char character = input.at(0);
+		if (character == 'n' || character == 'N') {
+			// If problem then exit.
+			std::cout << "Please try again with different starting parameters" << std::endl;
+			return 1;
+		}
+	}
+	for (unsigned i = 0; i < spectra.size(); i++) canvas[i]->Close();
+	gSystem->ProcessEvents();
+
+	// Save parameters to file if everything looks good
+	pool->saveToFile();
 
 //	________          __                 __
 //	\_____  \  __ ___/  |_______  __ ___/  |_

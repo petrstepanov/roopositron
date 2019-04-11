@@ -29,13 +29,13 @@ ParametersPool::ParametersPool(std::string ioPath) {
 
 void ParametersPool::constructExcludedParametersList() {
 	// Don't save mean value (not important for results)
-	parametersExcludedFromSave.push_back("mean_gauss"); // ? need this to redraw first plot
-	parametersExcludedFromSave.push_back("bins");
-	parametersExcludedFromSave.push_back("integral");
-	parametersExcludedFromSave.push_back("background");
+	parametersExcludedFromImport.push_back("mean_gauss");
+	parametersExcludedFromImport.push_back("bins");
+	parametersExcludedFromImport.push_back("integral");
+	parametersExcludedFromImport.push_back("background");
 
 // Don't user input gauss FWHM's and Intensities
-// Always use default values. Otherwise it's too much stuff
+// Always use default values. Otherwise it's too much input going on
 	parametersExcludedFromInput.push_back("mean_gauss");
 	parametersExcludedFromInput.push_back("background");
 	parametersExcludedFromInput.push_back("FWHM_gauss1");
@@ -50,12 +50,12 @@ void ParametersPool::constructExcludedParametersList() {
 RooArgSet* ParametersPool::readPoolParametersFromFile() {
 	std::cout << "ParametersPool::readPoolParametersFromFile" << std::endl;
 	std::cout << std::endl << "Reading parameters pool from hard drive (" << filePathName.c_str() << ")." << std::endl;
-	RooArgSet* parametersPool = new RooArgSet();
+	RooArgSet* params = new RooArgSet();
 	FILE * pFile;
 	pFile = fopen(filePathName.c_str(), "r");
 	if (pFile == NULL) {
 		std::cout << "\"" << filePathName.c_str() << "\" file not found." << std::endl;
-		return parametersPool;
+		return params;
 	}
 	char* name = new char[tab + 1];
 	char* description = new char[tab * 2 + 1];
@@ -65,7 +65,7 @@ RooArgSet* ParametersPool::readPoolParametersFromFile() {
 
 	// Skip header
 	char buffer[256];
-	if (fgets(buffer, 256, pFile) == NULL) return parametersPool;
+	if (fgets(buffer, 256, pFile) == NULL) return params;
 
 	// Read parameters
 	// Scanf with spaces. https://stackoverflow.com/questions/2854488/reading-a-string-with-spaces-with-sscanf
@@ -77,12 +77,20 @@ RooArgSet* ParametersPool::readPoolParametersFromFile() {
 			// parameter->setError(error);
 		}
 		parameter->Print();
-		parametersPool->add(*parameter);
+		if (!StringUtils::stringContainsToken(parameter->GetName(), parametersExcludedFromImport)) {
+			Debug("Parameter imported:");
+			params->add(*parameter);
+		}
+		else {
+			Debug("Parameter not imported (in excluded list):");
+		}
+#ifdef USEDEBUG
+		parameter->Print();
+#endif
 	}
 	fclose(pFile);
-
-	std::cout << "\"" << filePathName.c_str() << "\" found. Successfully read " << parametersPool->getSize() << " values." << std::endl;
-	return parametersPool;
+	std::cout << "\"" << filePathName.c_str() << "\" found. Successfully read " << params->getSize() << " values." << std::endl;
+	return params;
 }
 
 Bool_t ParametersPool::containsAllParameters(RooArgSet* modelParameters){
@@ -100,28 +108,78 @@ Bool_t ParametersPool::containsAllParameters(RooArgSet* modelParameters){
 	return kTRUE;
 }
 
-//		int a; std::cin >> a;
-void ParametersPool::updateModelParametersFromPool(RooArgSet* modelParameters) {
-	Debug("ParametersPool::updateModelParametersFromPool", "Hit ENTER to use default parameter values.");
+// Tips: RooArgSet works like a set of pointers to objects
+//       originally being read from a file it stores some RooRealVar variables.
+
+//       When updating model parameters from pool we have to:
+//		 1. set model parameter value and limits from pool parameter
+//       2. remove existing pool parameter from set.
+//		 3. add model parameter to set.
+
+//void ParametersPool::addUpdateModelParameters(RooArgSet* modelParameters) {
+//	Debug("ParametersPool::addUpdateModelParameters");
+//
+//	// Iterate through model parameters. Either extend values from pool parameters from hard drive.
+//	TIterator* it = modelParameters->createIterator();
+//	while (TObject* temp = it->Next()) {
+//		if (RooRealVar* modelParameter = dynamic_cast<RooRealVar*>(temp)) {
+//			// Either set model parameter value, error etc
+//			if (RooRealVar* poolParameter = (RooRealVar*) parametersPool->find(modelParameter->GetName())) {
+//				if (poolParameter != modelParameter){
+//					RootHelper::setRooRealVarValueLimits(modelParameter, poolParameter->getVal(), poolParameter->getMin(), poolParameter->getMax());
+//					// TODO: set error if not constant?
+//					modelParameter->setConstant(poolParameter->isConstant());
+//					parametersPool->remove(*poolParameter);
+//					parametersPool->add(*modelParameter);
+//				}
+//			} else {
+//				parametersPool->add(*modelParameter);
+//			}
+//		}
+//	}
+//}
+
+void ParametersPool::updateModelParameters(RooArgSet* modelParameters) {
+	Debug("ParametersPool::addUpdateModelParameters");
 
 	// Iterate through model parameters. Either extend values from pool parameters from hard drive.
 	TIterator* it = modelParameters->createIterator();
 	while (TObject* temp = it->Next()) {
-		if (RooRealVar* parameter = dynamic_cast<RooRealVar*>(temp)) {
+		if (RooRealVar* modelParameter = dynamic_cast<RooRealVar*>(temp)) {
 			// Either set model parameter value, error etc
-			if (RooRealVar* poolParameter = (RooRealVar*) parametersPool->find(parameter->GetName())) {
-				if (!StringUtils::stringContainsToken(poolParameter->GetName(), parametersExcludedFromSave)) {
-					RootHelper::setRooRealVarValueLimits(parameter, poolParameter->getVal(), poolParameter->getMin(), poolParameter->getMax());
+			if (RooRealVar* poolParameter = (RooRealVar*) parametersPool->find(modelParameter->GetName())) {
+				if (poolParameter != modelParameter){
+					RootHelper::setRooRealVarValueLimits(modelParameter, poolParameter->getVal(), poolParameter->getMin(), poolParameter->getMax());
 					// TODO: set error if not constant?
-					parameter->setConstant(poolParameter->isConstant());
+					modelParameter->setConstant(poolParameter->isConstant());
+				}
+			}
+		}
+	}
+}
+
+void ParametersPool::addInputModelParameters(RooArgSet* modelParameters) {
+	Debug("ParametersPool::inputMissingPoolParameters", "Hit ENTER to use default parameter values.");
+
+	// Iterate through model parameters. Either extend values from pool parameters from hard drive.
+	TIterator* it = modelParameters->createIterator();
+	while (TObject* temp = it->Next()) {
+		if (RooRealVar* modelParameter = dynamic_cast<RooRealVar*>(temp)) {
+			// Either set model parameter value, error etc
+			if (RooRealVar* poolParameter = (RooRealVar*) parametersPool->find(modelParameter->GetName())) {
+				if (poolParameter != modelParameter){
+					RootHelper::setRooRealVarValueLimits(modelParameter, poolParameter->getVal(), poolParameter->getMin(), poolParameter->getMax());
+					// TODO: set error if not constant?
+					modelParameter->setConstant(poolParameter->isConstant());
+					parametersPool->remove(*poolParameter);
+					parametersPool->add(*modelParameter);
+					poolParameter->Delete();
 				}
 			} else {
-				if (!StringUtils::stringContainsToken(parameter->GetName(), parametersExcludedFromInput)) {
-					userInput(parameter);
+				if (!StringUtils::stringContainsToken(modelParameter->GetName(), parametersExcludedFromInput)) {
+					userInput(modelParameter);
 				}
-				if (!StringUtils::stringContainsToken(parameter->GetName(), parametersExcludedFromSave)) {
-					parametersPool->add(*parameter);
-				}
+				parametersPool->add(*modelParameter);
 			}
 		}
 	}
@@ -170,25 +228,6 @@ void ParametersPool::userInput(RooRealVar* parameter) {
 	} else {
 		parameter->setMin(parameter->getVal());
 		parameter->setMax(parameter->getVal());
-	}
-}
-
-void ParametersPool::updatePoolParameters(RooArgSet* modelParameters) {
-	// Iterate through model parameters. Either extend values from pool parameters from hard drive.
-	TIterator* it = modelParameters->createIterator();
-	TObject* temp;
-	while ((temp = it->Next())) {
-		RooRealVar* modelParameter = dynamic_cast<RooRealVar*>(temp);
-		if (modelParameter) {
-			const char* name = modelParameter->GetName();
-			RooRealVar* poolParameter = (RooRealVar*) parametersPool->find(name);
-
-			// Either set model parameter value, error etc
-			if (poolParameter) {
-				parametersPool->remove(*poolParameter, kTRUE, kTRUE);
-			}
-			parametersPool->add(*modelParameter);
-		}
 	}
 }
 

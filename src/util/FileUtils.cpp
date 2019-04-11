@@ -85,6 +85,7 @@ std::vector<std::string> FileUtils::getFilenamesInCurrentDrectory(const char* ex
 	std::vector<std::string> lFileNames;
 	TSystemDirectory *dir = new TSystemDirectory(".", gSystem->WorkingDirectory());
 	if (TList *files = dir->GetListOfFiles()){
+		files->Sort();
 		TIter next(files);
 		while (TSystemFile* file = (TSystemFile*)next()){
 			TString fileName = file->GetName();
