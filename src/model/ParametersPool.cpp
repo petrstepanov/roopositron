@@ -22,20 +22,14 @@
 #include <iostream>
 
 ParametersPool::ParametersPool(std::string ioPath) {
-	filePathName = (ioPath == "") ? DEFAULT_FILENAME : ioPath + "/" + DEFAULT_FILENAME;
-	parametersPool = readPoolParametersFromFile();
-	constructExcludedParametersList();
-}
-
-void ParametersPool::constructExcludedParametersList() {
 	// Don't save mean value (not important for results)
 	parametersExcludedFromImport.push_back("mean_gauss");
 	parametersExcludedFromImport.push_back("bins");
 	parametersExcludedFromImport.push_back("integral");
 	parametersExcludedFromImport.push_back("background");
 
-// Don't user input gauss FWHM's and Intensities
-// Always use default values. Otherwise it's too much input going on
+	// Don't user input gauss FWHM's and Intensities
+	// Always use default values. Otherwise it's too much input going on
 	parametersExcludedFromInput.push_back("mean_gauss");
 	parametersExcludedFromInput.push_back("background");
 	parametersExcludedFromInput.push_back("FWHM_gauss1");
@@ -45,11 +39,13 @@ void ParametersPool::constructExcludedParametersList() {
 	parametersExcludedFromInput.push_back("Int_gauss3");
 	parametersExcludedFromInput.push_back("bins");
 	parametersExcludedFromInput.push_back("integral");
+
+	filePathName = (ioPath == "") ? DEFAULT_FILENAME : ioPath + "/" + DEFAULT_FILENAME;
+	parametersPool = readPoolParametersFromFile();
 }
 
 RooArgSet* ParametersPool::readPoolParametersFromFile() {
-	std::cout << "ParametersPool::readPoolParametersFromFile" << std::endl;
-	std::cout << std::endl << "Reading parameters pool from hard drive (" << filePathName.c_str() << ")." << std::endl;
+	Debug("ParametersPool::readPoolParametersFromFile" "Reading parameters pool from hard drive (" << filePathName.c_str() << ").");
 	RooArgSet* params = new RooArgSet();
 	FILE * pFile;
 	pFile = fopen(filePathName.c_str(), "r");
@@ -76,7 +72,6 @@ RooArgSet* ParametersPool::readPoolParametersFromFile() {
 		} else {
 			// parameter->setError(error);
 		}
-		parameter->Print();
 		if (!StringUtils::stringContainsToken(parameter->GetName(), parametersExcludedFromImport)) {
 			Debug("Parameter imported:");
 			params->add(*parameter);
@@ -89,7 +84,7 @@ RooArgSet* ParametersPool::readPoolParametersFromFile() {
 #endif
 	}
 	fclose(pFile);
-	std::cout << "\"" << filePathName.c_str() << "\" found. Successfully read " << params->getSize() << " values." << std::endl;
+	Debug("\"" << filePathName.c_str() << "\" found. Successfully read " << params->getSize() << " values.");
 	return params;
 }
 

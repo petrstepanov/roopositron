@@ -42,7 +42,6 @@ private:
     const std::string DEFAULT_FILENAME = "parameters.txt";
     const unsigned tab = 20;
     
-    void constructExcludedParametersList();
     Bool_t addParameterToPool(RooRealVar *);
     RooArgSet* readPoolParametersFromFile();   
     void userInput(RooRealVar* parameter);

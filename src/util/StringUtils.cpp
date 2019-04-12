@@ -17,7 +17,8 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
-#include "TString.h"
+#include <TString.h>
+#include "Debug.h"
 
 std::vector<std::string> StringUtils::parseString(const char* string, const char* delimeter) {
 	std::string s = string;
@@ -76,9 +77,10 @@ bool StringUtils::contains(const char* string, std::vector<std::string> vector) 
 //	return false;
 //}
 
-bool StringUtils::stringContainsToken(const char* string, std::vector<std::string> vector) {
+bool StringUtils::stringContainsToken(const char* str, std::vector<std::string> vector) {
 	for (std::vector<std::string>::iterator it = vector.begin(); it != vector.end(); ++it) {
-		if (isSubstring(string, (std::string) *it)) {
+		std::string s = str;
+		if (isSubstring(s, (std::string) *it)) {
 			return true;
 		}
 	}
@@ -106,8 +108,10 @@ bool StringUtils::isSubstring(const char* parent, const char* child) {
 bool StringUtils::isSubstring(std::string parent, std::string child) {
 	std::size_t found = parent.find(child);
 	if (found != std::string::npos) {
+//		Debug("parent \"" << parent << "\" contains child \"" << child << "\"");
 		return true;
 	}
+//	Debug("parent \"" << parent << "\" not contains child \"" << child << "\"");
 	return false;
 }
 
