@@ -103,7 +103,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 	// Set convolution bins same as real number of axis bins (notices it works nice)
 	channels->setBins(BINS);
-	channels->setBins(1024, "cache");
+	channels->setBins(constants->getConvolutionBins(), "cache");
 
 	// Construct a list of Spectrum struct     	 s to store individual spectra information
 	std::vector<Spectrum> spectra;
@@ -465,26 +465,25 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		canvas[i]->Print(epsURI, "eps");
 	}
 	Debug("main", "Canvas images successfully exported.");
+	gSystem->ProcessEvents();
 
 	// Ask user how the fit is. Interrupt if bad.
-	std::string input;
-	if (spectra.size() > 1 && !firstSpectrumWasFitted){
-		std::cout << "First spectrum fit complete. Does the fit look good? (y/n)" << std::endl;
-	}
-	else {
-		std::cout << "Spectra fit complete. Does the fit look good? (y/n)" << std::endl;
-	}
-	std::getline(std::cin, input);
-	if (!input.empty()) {
-		char character = input.at(0);
-		if (character == 'n' || character == 'N') {
-			// If problem then exit.
-			std::cout << "Please try again with different starting parameters" << std::endl;
-			return 1;
-		}
-	}
-	for (unsigned i = 0; i < spectra.size(); i++) canvas[i]->Close();
-	gSystem->ProcessEvents();
+//	std::string input;
+//	if (spectra.size() > 1 && !firstSpectrumWasFitted){
+//		std::cout << "First spectrum fit complete. Save fit parameters? (y/n)" << std::endl;
+//	}
+//	else {
+//		std::cout << "Spectra fit complete. Save fit parameters? (y/n)" << std::endl;
+//	}
+//	std::getline(std::cin, input);
+//	if (!input.empty()) {
+//		char character = input.at(0);
+//		if (character == 'n' || character == 'N') {
+//			// If problem then exit.
+//			std::cout << "Please try again with different starting parameters" << std::endl;
+//			return 1;
+//		}
+//	}
 
 	// Save parameters to file if everything looks good
 	pool->saveToFile();

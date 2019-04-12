@@ -38,6 +38,7 @@ public:
     std::vector<std::string> getDecayModels();
     std::vector<std::string> getCommonParameters();
     double getBufferFraction();
+    int getConvolutionBins();
     int getImageWidth();
     int getImageHeight();
     void print();
