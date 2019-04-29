@@ -81,6 +81,10 @@ struct Spectrum {
 
 // ASCII font generator is here: http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Resolution%0AFunction
 int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
+
+	// Change integrator steps to 30 (default 20)
+	RooAbsReal::defaultIntegratorConfig()->getConfigSection("RooIntegrator1D").setRealValue("maxSteps", 30);
+
 	// Scan current directory for '.Spe' files; exit if nothing found
 	const std::vector<std::string> filenames = FileUtils::getFilenamesInCurrentDrectory(".Spe");
 	if (filenames.size() < 1) {
