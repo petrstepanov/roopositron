@@ -83,6 +83,8 @@ RooArgList* Constants::initDefaultValues() {
 	constants->add(*constant);
 	constant = new RooStringVar("convolutionBins", " # number of bins for convolution (reduce for speed, increase for fit quality)", "1024");
 	constants->add(*constant);
+	constant = new RooStringVar("backgroundBins", " # number of left bins for fixed background calculation; set 0 for free background", "150");
+	constants->add(*constant);
 	constant = new RooStringVar("imageWidth", " # output image width", "1200");
 	constants->add(*constant);
 	constant = new RooStringVar("imageHeight", " # output image height", "800");
@@ -240,6 +242,11 @@ double Constants::getBufferFraction() {
 
 int Constants::getConvolutionBins() {
 	RooStringVar* var = (RooStringVar*) constants->find("convolutionBins");
+	return atoi(var->getVal());
+}
+
+int Constants::getBackgroundBins() {
+	RooStringVar* var = (RooStringVar*) constants->find("backgroundBins");
 	return atoi(var->getVal());
 }
 

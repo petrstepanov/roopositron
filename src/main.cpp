@@ -107,7 +107,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 	// Set convolution bins same as real number of axis bins (notices it works nice)
 	channels->setBins(BINS);
-	channels->setBins(constants->getConvolutionBins(), "cache");
+	channels->setBins(constants->getConvolutionBins() != 0 ? constants->getConvolutionBins() : BINS, "cache");
 
 	// Construct a list of Spectrum struct     	 s to store individual spectra information
 	std::vector<Spectrum> spectra;
@@ -122,7 +122,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		s.binWithMaximumCount = s.histogram->GetMaximumBin();
 		s.minimumCount = s.histogram->GetBinContent(s.binWithMinimumCount);
 		s.maximumCount = s.histogram->GetBinContent(s.binWithMaximumCount);
-		s.averageBackground = HistProcessor::getAverageBackground(s.histogram);
+		s.averageBackground = HistProcessor::getAverageBackground(s.histogram, Constants::getInstance()->getBackgroundBins());
 		spectra.push_back(s);
 		Debug("Spectrum " << i+1 << " file is \"" << s.filename << "\"" << std::endl << "  bins: " << s.numberOfBins << std::endl << "  integral: " << s.integral << std::endl << "  bin with minimum count: " << s.binWithMinimumCount << std::endl << "  bin with maximum count: " << s.binWithMaximumCount << std::endl << "  minimum count: " << s.minimumCount << std::endl << "  maximum count: " << s.maximumCount << std::endl << "  average background: " << s.averageBackground);
 	}
@@ -148,18 +148,17 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		}
 		// Set average background counts
 		if (RooRealVar* avgBgCount = (RooRealVar*) (pdf->getParameters(*channels))->find("background")) {
-			avgBgCount->setConstant(kTRUE);
-			RootHelper::setRooRealVarValueLimits(avgBgCount, spectra[i].averageBackground, spectra[i].averageBackground, spectra[i].averageBackground);
+			RootHelper::setRooRealVarValueLimits(avgBgCount, spectra[i].averageBackground, spectra[i].averageBackground/2, spectra[i].averageBackground*2);
 		}
 		// Set bins
 		if (RooRealVar* bins = (RooRealVar*) (pdf->getParameters(*channels))->find("bins")) {
-			bins->setConstant(kTRUE);
 			RootHelper::setRooRealVarValueLimits(bins, spectra[i].numberOfBins, spectra[i].numberOfBins, spectra[i].numberOfBins);
+			bins->setConstant(kTRUE);
 		}
 		// Set full integral
 		if (RooRealVar* fullIntegral = (RooRealVar*) (pdf->getParameters(*channels))->find("integral")) {
-			fullIntegral->setConstant(kTRUE);
 			RootHelper::setRooRealVarValueLimits(fullIntegral, spectra[i].integral, spectra[i].integral, spectra[i].integral);
+			fullIntegral->setConstant(kTRUE);
 		}
 
 		if (i == 0) {
@@ -327,7 +326,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(GraphicsHelper::GRAPH_COLOR), RooFit::LineWidth(2), RooFit::LineStyle(kDashed));
 			spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(GraphicsHelper::GRAPH_COLOR), RooFit::LineWidth(2), RooFit::Name("fit"), RooFit::Range("LEFT,RIGHT"), RooFit::NormRange("LEFT,RIGHT"));
 		} else {
-			spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(GraphicsHelper::GRAPH_COLOR), RooFit::LineWidth(2), RooFit::Name("fit"));
+			spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(GraphicsHelper::GRAPH_COLOR), RooFit::LineWidth(2), RooFit::Name("fit"), RooFit::Normalization(spectra[i].integral, RooAbsReal::NumEvent));
 		}
 
 		// Add legend with list of model parameters

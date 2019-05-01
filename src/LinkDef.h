@@ -14,4 +14,5 @@
 #pragma link C++ class TrapPdf;
 #pragma link C++ class TwoExpPdf;
 #pragma link C++ class TwoGaussian;
+#pragma link C++ class ConstantPdf;
 #endif

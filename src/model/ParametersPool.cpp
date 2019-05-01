@@ -22,7 +22,7 @@
 #include <iostream>
 
 ParametersPool::ParametersPool(std::string ioPath) {
-	// Don't save mean value (not important for results)
+	// Calculated parameters - aren't saved to file to avoid confusion
 	parametersExcludedFromImport.push_back("mean_gauss");
 	parametersExcludedFromImport.push_back("bins");
 	parametersExcludedFromImport.push_back("integral");
@@ -241,6 +241,7 @@ Bool_t ParametersPool::saveToFile() {
 	TIterator* it = parametersPool->createIterator();
 	while (TObject* temp = it->Next()) {
 		if (RooRealVar* parameter = dynamic_cast<RooRealVar*>(temp)) {
+			if (!StringUtils::stringContainsToken(parameter->GetName(), parametersExcludedFromImport)) {
 			std::string freeOrFixed = parameter->isConstant() ? "fixed" : "free";
 
 			// To prevent reading error from parameters file - we replace empty parameter units with "-"
@@ -253,6 +254,7 @@ Bool_t ParametersPool::saveToFile() {
 			// https://stackoverflow.com/questions/23776824/what-is-the-meaning-of-s-in-a-printf-format-string/23777065
 			fprintf(pFile, "%-*s%-*f%-*f%-*f%-*f%-*s%-*s%s\n", tab, parameter->GetName(), tab, parameter->getVal(), tab, parameter->getMin(), tab, parameter->getMax(), tab, parameterErr, tab,
 					safeUnit.c_str(), tab, freeOrFixed.c_str(), parameter->GetTitle());
+			}
 		}
 	}
 

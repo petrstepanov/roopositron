@@ -25,7 +25,7 @@ public:
     virtual ~HistProcessor();
     
     static Double_t getConstBackgroundFraction(TH1F* hist);
-    static Double_t getAverageBackground(TH1F* hist);
+    static Double_t getAverageBackground(TH1F* hist, Int_t lwftWingBins = 150);
     static void setZeroErrors(RooHist* hist);
 private:
 

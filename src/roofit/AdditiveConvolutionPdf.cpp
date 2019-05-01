@@ -38,11 +38,10 @@ AdditiveConvolutionPdf::AdditiveConvolutionPdf(std::vector<std::string> componen
 	Debug("AdditiveConvolutionPdf::AdditiveConvolutionPdf");
 	this->observable = observable;
 	pdfServer = new PdfServer();
+
 	initComponents(componentIds, sourceComponents);
 	initResolutionModel(resolutionId);
-//	convoluteComponents();
 	constructModel();
-	addBackground();
 }
 
 AdditiveConvolutionPdf::~AdditiveConvolutionPdf() {
@@ -109,110 +108,40 @@ void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentId
 }
 
 void AdditiveConvolutionPdf::initResolutionModel(const char* resolutionId) {
-	// std::cout << std::endl << "AdditiveConvolutionPdf::initResolutionModel" << std::endl;
 	resolutionFunction = pdfServer->getPdf(resolutionId, observable);
-	// resolutionFunction->Print();
 }
-
-//void AdditiveConvolutionPdf::convoluteComponents() {
-//
-//	// Convolute components
-//	double bufferFraction = Constants::getInstance()->getBufferFraction();
-//	for (unsigned i = 0; i < componentsList->getSize(); i++) {
-//		RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(componentsList->at(i));
-//		const char* componentName = component->GetName();
-//		const char* componentTitle = component->GetTitle();
-//		RooFFTConvPdf* pdf = new RooFFTConvPdf(Form("%sConv", componentName), Form("%s convoluted", componentTitle), *observable, *component, *resolutionFunction);
-//		pdf->setCacheObservables(RooArgSet(*observable));
-//		pdf->setBufferFraction(bufferFraction);
-//		convolutedComponentsList->add(*pdf);
-//	}
-//	Debug("AdditiveConvolutionPdf::convoluteComponents", "convolutedComponentsList");
-//	#ifdef USEDEBUG
-//		convolutedComponentsList->Print();
-//	#endif
-//
-//	// Convolute source components
-//	for (unsigned i = 0; i < sourceComponentsList->getSize(); i++) {
-//		RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(sourceComponentsList->at(i));
-//		const char* componentName = component->GetName();
-//		const char* componentTitle = component->GetTitle();
-//		RooFFTConvPdf* pdf = new RooFFTConvPdf(Form("%sConv", componentName), Form("%s convoluted", componentTitle), *observable, *component, *resolutionFunction);
-//		pdf->setCacheObservables(RooArgSet(*observable));
-//		pdf->setBufferFraction(bufferFraction); // because sometimes (on some ranges) convolution produced PDF with weird peak
-//		convolutedSourceComponentsList->add(*pdf);
-//	}
-//	Debug("AdditiveConvolutionPdf::convoluteComponents", "convolutedSourceComponentsList");
-//	#ifdef USEDEBUG
-//		convolutedSourceComponentsList->Print();
-//	#endif
-//}
 
 void AdditiveConvolutionPdf::constructModel() {
 	Debug("AdditiveConvolutionPdf::constructModel");
-	// Sum components
+	// Sum theoretical components
 	RooAbsPdf* sumComponents = ReverseAddPdf::add(componentsList, observable);
+
+	// Source contribution
+	RooRealVar* Int_source = new RooRealVar("Int_source", "Source contribution", 11, 5, 20, "%");
+	RooFormulaVar* Int_sourceNorm = new RooFormulaVar("sourceContributionNorm", "@0/100", *Int_source);
 	RooAbsPdf* sumSourceComponents = ReverseAddPdf::add(sourceComponentsList, observable, "Source");
 
-	// Initialize source contribution coefficient
-	Int_source = new RooRealVar("Int_source", "Source contribution", 11, 5, 20, "%");
-	Int_sourceNorm = new RooFormulaVar("sourceContributionNorm", "@0/100", *Int_source);
+	// Flat background
+	RooRealVar* background = new RooRealVar("background", "Average background counts", 100, "counts");
+	RooRealVar* bins = new RooRealVar("bins", "Histogram bins", 1E3);
+	RooRealVar* integral = new RooRealVar("integral", "Full histogram integral", 1E6);
+	RooFormulaVar* Int_bg = new RooFormulaVar("Int_bg", "@0*@1/@2", RooArgList(*background, *bins, *integral));
+	RooPolynomial* bg = new RooPolynomial("bg", "y=1", *observable, RooArgSet());
 
 	// Add source and sample components together
-	modelNonConvoluted = new RooAddPdf("modelNonConvoluted", "Components model with source", RooArgList(*sumSourceComponents, *sumComponents), RooArgList(*Int_sourceNorm));
-	modelNonConvoluted->fixAddCoefNormalization(RooArgSet(*observable)); // Fix RooAddPdf coefficients normalization
+	modelNonConvoluted = new RooAddPdf("modelNonConvoluted", "Components model with source and background", RooArgList(*bg, *sumSourceComponents, *sumComponents), RooArgList(*Int_bg, *Int_sourceNorm), kTRUE);
+	modelNonConvoluted->fixAddCoefNormalization(RooArgSet(*observable));
 
 	// Convolute model
 	model = new RooFFTConvPdf("model", "Convoluted model with source contribution", *observable, *modelNonConvoluted, *resolutionFunction);
-
-	// Configure convolution to construct a 2-D cache in (channels, mean_gauss)
-	// rather than a 1-d cache in (channels) that needs to be recalculated
-	// if (RooAbsArg* mean = model->getParameters(RooArgSet(*observable))->find("mean_gauss")){
-	//   ((RooFFTConvPdf*)model)->setCacheObservables(RooArgSet(*mean));
-	// }
-	double bufferFraction = Constants::getInstance()->getBufferFraction();
-	// On some ranges convolution produced PDF with weird peak
+	Double_t bufferFraction = Constants::getInstance()->getBufferFraction();
 	((RooFFTConvPdf*)model)->setBufferFraction(bufferFraction);
-
-	// Try different integrator
-	// RooAbsReal::defaultIntegratorConfig()->method1D().setLabel("RooAdaptiveGaussKronrodIntegrator1D") ;
-}
-
-void AdditiveConvolutionPdf::addBackground() {
-	Debug("AdditiveConvolutionPdf::addBackground");
-	// Initialize background here
-	RooPolynomial* bg = new RooPolynomial("bg", "y=1", *observable, RooArgSet());
-
-	// Parameterize background as counts, (use arbitrary values here)
-	RooRealVar* avgBgCount = new RooRealVar("background", "Background level counts", 100, "counts");
-	RooRealVar* bins = new RooRealVar("bins", "Histogram bins", 1E3);
-	RooRealVar* fullIntegral = new RooRealVar("integral", "Full histogram integral", 1E6);
-	RooFormulaVar* intBg = new RooFormulaVar("intBg", "@0*@1/@2", RooArgList(*avgBgCount, *bins, *fullIntegral));
-
-	// Sum convoluted model with background
-	modelWithBg = new RooAddPdf("modelWithBg", "Convoluted model with background", RooArgList(*bg, *model), *intBg);
 }
 
 RooAbsPdf* AdditiveConvolutionPdf::getPdf() {
-	return modelWithBg;
+	return model;
 }
 
 RooAbsPdf* AdditiveConvolutionPdf::getResolutionFunction() {
 	return resolutionFunction;
-}
-
-RooArgList* AdditiveConvolutionPdf::getAllComponents() {
-	return componentsList;
-}
-
-RooArgList* AdditiveConvolutionPdf::getConvolutedComponents() {
-	return convolutedComponentsList;
-}
-
-RooAbsPdf* AdditiveConvolutionPdf::getSourceCompoment() {
-	return sourcePdf;
-}
-
-RooAbsPdf* AdditiveConvolutionPdf::getConvolutedSourceComponent() {
-	return convolutedSourcePdf;
 }

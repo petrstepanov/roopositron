@@ -13,6 +13,8 @@
 
 #include "TwoGaussProvider.h"
 #include "RooFormulaVar.h"
+#include "RooGaussian.h"
+#include "RooAddPdf.h"
 #include "../pdfs/TwoGaussian.h"
 #include "../../model/Constants.h"
 
@@ -47,5 +49,14 @@ RooAbsPdf* TwoGaussProvider::initPdf(int i) {
 
     // Zero channel start values are assigned later (relative to the MIN_CHANNEL value)
     RooRealVar* gMean = new RooRealVar("mean_gauss", "Resolution function mean", 1, "ch");
+
+//    RooGaussian* gauss1 = new RooGaussian("gauss1", "1st gauss", *observable, *gMean, *g1Dispersion);
+//    RooGaussian* gauss2 = new RooGaussian("gauss2", "2nd gauss", *observable, *gMean, *g2Dispersion);
+
+//    RooAddPdf* gauss = new RooAddPdf("twoGauss", "Two gauss model", RooArgList(*gauss2, *gauss1), RooArgList(*g2FractionNorm));
+//    gauss->fixAddCoefNormalization(RooArgSet(*observable));
+//	return gauss;
+
+    // Works much faster with TwoGaussian rather than with sum of two RooGaussian
     return new TwoGaussian("twoGauss", "Two gauss model", *observable, *gMean, *g1Dispersion, *g2Dispersion, *g2FractionNorm);
 }

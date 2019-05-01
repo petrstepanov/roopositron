@@ -30,6 +30,7 @@ public:
     int getSkipLines();
     int getMinChannel();
     int getMaxChannel();
+    int getBackgroundBins();
     int getExcludeMinChannel();
     int getExcludeMaxChannel();    
     const char* getResolutionFunctionModel();
