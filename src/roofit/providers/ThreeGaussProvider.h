@@ -19,7 +19,7 @@
 
 class ThreeGaussProvider : public AbstractProvider {
 public:
-    ThreeGaussProvider(RooRealVar* observable);
+    ThreeGaussProvider(RooRealVar* observable, RooRealVar* channelWidth);
     virtual ~ThreeGaussProvider();
     
 private:

@@ -19,14 +19,12 @@
 #include "../../util/StringUtils.h"
 #include <iostream>
 
-ExpProvider::ExpProvider(RooRealVar* _observable) : AbstractProvider(_observable) {}
+ExpProvider::ExpProvider(RooRealVar* _observable, RooRealVar* _channelWidth) : AbstractProvider(_observable, _channelWidth) {}
 
 ExpProvider::~ExpProvider() {
 }
 
 RooAbsPdf* ExpProvider::initPdf(int i) {
-    RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
-    
     // Instantiate RooRealVar parameters
     Double_t tauVal=0.2;
     Double_t tauValMin=0.1;

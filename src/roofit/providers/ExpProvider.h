@@ -20,7 +20,7 @@
 
 class ExpProvider : public AbstractProvider {
 public:
-    ExpProvider(RooRealVar* observable);
+    ExpProvider(RooRealVar* observable, RooRealVar* channelWidth);
     virtual ~ExpProvider();
 
     RooAbsPdf* initPdf(int i);

@@ -19,13 +19,12 @@
 #include "../../util/StringUtils.h"
 #include <iostream>
 
-ThreeExpProvider::ThreeExpProvider(RooRealVar* _observable) : AbstractProvider(_observable) {}
+ThreeExpProvider::ThreeExpProvider(RooRealVar* _observable, RooRealVar* _channelWidth) : AbstractProvider(_observable, _channelWidth) {}
 
 ThreeExpProvider::~ThreeExpProvider() {
 }
 
 RooAbsPdf* ThreeExpProvider::initPdf(int i) {
-    RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
     
     // Instantiate RooRealVar parameters
     RooRealVar* tau1 = new RooRealVar("#tau1", "1st positron lifetime", 0.2, 0.1, 2, "ns");

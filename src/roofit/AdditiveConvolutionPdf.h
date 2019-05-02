@@ -15,10 +15,10 @@
 #define ADDITIVECONVOLUTIONPDF_H
 
 #include "../model/ParametersPool.h"
-#include "../roofit/PdfServer.h"
 #include "RooAbsPdf.h"
 #include "RooFormulaVar.h"
 #include <vector>
+#include "PdfFactory.h"
 
 class AdditiveConvolutionPdf {
 public:
@@ -36,12 +36,14 @@ private:
     void initComponents(std::vector<std::string> componentIds, int sourceComponents);
     void initResolutionModel(const char* resolutionId);
 
-    PdfServer* pdfServer;
+    PdfFactory* pdfFactory;
     RooRealVar* observable;
+
+    RooRealVar* channelWidth;
 
     RooArgList* componentsList = new RooArgList();
     RooArgList* sourceComponentsList = new RooArgList();
-    RooAbsPdf* resolutionFunction; 
+    RooAbsPdf* resolutionFunction;
     
     RooAbsPdf* modelNonConvoluted;
     RooAbsPdf* model;

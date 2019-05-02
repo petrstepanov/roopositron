@@ -17,14 +17,12 @@
 #include "../../util/StringUtils.h"
 #include "ExpSourceProvider.h"
 
-ExpSourceProvider::ExpSourceProvider(RooRealVar* _observable) : AbstractProvider(_observable) {}
+ExpSourceProvider::ExpSourceProvider(RooRealVar* _observable, RooRealVar* _channelWidth) : AbstractProvider(_observable, _channelWidth) {}
 
 ExpSourceProvider::~ExpSourceProvider() {
 }
 
 RooAbsPdf* ExpSourceProvider::initPdf(int i) {
-    RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
-
     Double_t tauVal=0.385;
     Double_t tauValMin=0.1;
     Double_t tauValMax=3;

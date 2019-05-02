@@ -19,7 +19,7 @@
 
 class ParaProvider : public AbstractProvider{
 public:
-    ParaProvider(RooRealVar *observable);
+    ParaProvider(RooRealVar* observable, RooRealVar* channelWidth);
     virtual ~ParaProvider();
 
 private:

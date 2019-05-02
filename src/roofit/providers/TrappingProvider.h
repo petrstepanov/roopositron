@@ -19,7 +19,7 @@
 
 class TrappingProvider : public AbstractProvider {
 public:
-    TrappingProvider(RooRealVar* observable);
+    TrappingProvider(RooRealVar* observable, RooRealVar* channelWidth);
     virtual ~TrappingProvider();
     
 private:

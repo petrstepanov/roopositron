@@ -17,16 +17,12 @@
 #include "../pdfs/PowderPdf.h"
 #include "../../model/Constants.h"
 
-PowderProvider::PowderProvider(RooRealVar* observable) :
-		AbstractProvider(observable) {
-}
+PowderProvider::PowderProvider(RooRealVar* _observable, RooRealVar* _channelWidth) : AbstractProvider(_observable, _channelWidth) {}
 
 PowderProvider::~PowderProvider() {
 }
 
 RooAbsPdf* PowderProvider::initPdf(int i) {
-	RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
-
 	// L("L", this, other.L),
 	// kv("kv", this, other.kv),
 	// Pps("Pps", this, other.Pps),

@@ -13,8 +13,9 @@
 
 #include "AbstractProvider.h"
 
-AbstractProvider::AbstractProvider(RooRealVar* _observable) {
+AbstractProvider::AbstractProvider(RooRealVar* _observable, RooRealVar* _channelWidth) {
 	observable = _observable;
+	channelWidth = _channelWidth;
 }
 
 AbstractProvider::~AbstractProvider() {

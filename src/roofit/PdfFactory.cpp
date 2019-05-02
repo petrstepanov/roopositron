@@ -11,7 +11,8 @@
  * Created on December 6, 2018, 4:53 AM
  */
 
-#include "PdfServer.h"
+#include "PdfFactory.h"
+
 #include "providers/OneGaussProvider.h"
 #include "providers/TwoGaussProvider.h"
 #include "providers/ThreeGaussProvider.h"
@@ -24,10 +25,10 @@
 #include "providers/ParaProvider.h"
 #include "providers/TrappingProvider.h"
 
-PdfServer::PdfServer(){};
-PdfServer::~PdfServer(){};
+PdfFactory::PdfFactory(){};
+PdfFactory::~PdfFactory(){};
 
-PdfHashNames PdfServer::hashPdfName(const char* pdfName) {
+PdfHashNames PdfFactory::hashPdfName(const char* pdfName) {
 	std::string name = pdfName;
 	if (name == "1gauss")
 		return kOneGaussPdf;
@@ -54,63 +55,63 @@ PdfHashNames PdfServer::hashPdfName(const char* pdfName) {
 	return kExponentPdf;
 }
 
-RooAbsPdf* PdfServer::getPdf(const char* name, RooRealVar* observable) {
+RooAbsPdf* PdfFactory::getPdf(const char* name, RooRealVar* observable, RooRealVar* channelWidth) {
 	int hashName = hashPdfName(name);
 	pdfIndexes[hashName]++;
 
 	switch (hashPdfName(name)) {
 		case kOneGaussPdf: {
-			OneGaussProvider* ogp = new OneGaussProvider(observable);
+			OneGaussProvider* ogp = new OneGaussProvider(observable, channelWidth);
 			return ogp->getPdf(pdfIndexes[kOneGaussPdf]);
 			break;
 		}
 		case kTwoGaussPdf: {
-			TwoGaussProvider* tgp = new TwoGaussProvider(observable);
+			TwoGaussProvider* tgp = new TwoGaussProvider(observable, channelWidth);
 			return tgp->getPdf(pdfIndexes[kTwoGaussPdf]);
 			break;
 		}
 		case kThreeGaussPdf: {
-			ThreeGaussProvider* tgp = new ThreeGaussProvider(observable);
+			ThreeGaussProvider* tgp = new ThreeGaussProvider(observable, channelWidth);
 			return tgp->getPdf(pdfIndexes[kThreeGaussPdf]);
 			break;
 		}
 		case kExponentPdf: {
-			ExpProvider* ep = new ExpProvider(observable);
+			ExpProvider* ep = new ExpProvider(observable, channelWidth);
 			return ep->getPdf(pdfIndexes[kExponentPdf]);
 			break;
 		}
 		case kTwoExponentPdf: {
-			TwoExpProvider* tep = new TwoExpProvider(observable);
+			TwoExpProvider* tep = new TwoExpProvider(observable, channelWidth);
 			return tep->getPdf(pdfIndexes[kTwoExponentPdf]);
 			break;
 		}
 		case kThreeExponentPdf: {
-			ThreeExpProvider* thep = new ThreeExpProvider(observable);
+			ThreeExpProvider* thep = new ThreeExpProvider(observable, channelWidth);
 			return thep->getPdf(pdfIndexes[kThreeExponentPdf]);
 			break;
 		}
 		case kTrappingPdf: {
-			TrappingProvider* tp = new TrappingProvider(observable);
+			TrappingProvider* tp = new TrappingProvider(observable, channelWidth);
 			return tp->getPdf(pdfIndexes[kTrappingPdf]);
 			break;
 		}
 		case kGrainPdf: {
-			GrainProvider* gp = new GrainProvider(observable);
+			GrainProvider* gp = new GrainProvider(observable, channelWidth);
 			return gp->getPdf(pdfIndexes[kGrainPdf]);
 			break;
 		}
 		case kPowderPdf: {
-			PowderProvider* pp = new PowderProvider(observable);
+			PowderProvider* pp = new PowderProvider(observable, channelWidth);
 			return pp->getPdf(pdfIndexes[kPowderPdf]);
 			break;
 		}
 		case kPowder2Pdf: {
-			Powder2Provider* pp = new Powder2Provider(observable);
+			Powder2Provider* pp = new Powder2Provider(observable, channelWidth);
 			return pp->getPdf(pdfIndexes[kPowder2Pdf]);
 			break;
 		}
 		case kParamagneticPdf: {
-			ParaProvider* pp = new ParaProvider(observable);
+			ParaProvider* pp = new ParaProvider(observable, channelWidth);
 			return pp->getPdf(pdfIndexes[kParamagneticPdf]);
 			break;
 		}

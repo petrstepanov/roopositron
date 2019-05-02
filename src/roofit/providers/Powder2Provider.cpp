@@ -11,16 +11,12 @@
 #include "../pdfs/Powder2Pdf.h"
 #include "../../model/Constants.h"
 
-Powder2Provider::Powder2Provider(RooRealVar* observable) :
-		AbstractProvider(observable) {
-}
+Powder2Provider::Powder2Provider(RooRealVar* _observable, RooRealVar* _channelWidth) : AbstractProvider(_observable, _channelWidth) {}
 
 Powder2Provider::~Powder2Provider() {
 }
 
 RooAbsPdf* Powder2Provider::initPdf(int i) {
-	RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
-
 	RooRealVar* l2g = new RooRealVar("#lambda_2#gamma", "Two-gamma annihilation rate", 8, "1/ns");
 	l2g->setConstant(kTRUE);
 

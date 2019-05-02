@@ -14,9 +14,9 @@
 #include "RootHelper.h"
 #include "TString.h"
 #include "StringUtils.h"
+#include "Debug.h"
 #include <TUnixSystem.h>
 #include <RooWorkspace.h>
-#include "Debug.h"
 #include <iostream>
 
 //void RootHelper::deleteObject(const char* name){
@@ -86,3 +86,20 @@ void RootHelper::setRooRealVarValueLimits(RooRealVar* var, Double_t value, Doubl
 	var->setMax(max);
 	var->setVal(value);
 }
+
+RooRealVar* RootHelper::getParameterNameContains(RooArgSet* rooRealVarSet, const char* nameSubstring){
+	TIterator* it = rooRealVarSet->createIterator();
+	while (TObject* temp = it->Next()) {
+		if (RooRealVar* rrv = dynamic_cast<RooRealVar*>(temp)) {
+			if (StringUtils::isSubstring(rrv->GetName(), nameSubstring)){
+				return rrv;
+			}
+		}
+	}
+	return nullptr;
+}
+
+
+
+
+//

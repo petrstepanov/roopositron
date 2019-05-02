@@ -32,8 +32,8 @@ Constants::Constants() {
 	extendFromFile(constants, DEFAULT_FILENAME);
 	writeToFile(constants, DEFAULT_FILENAME);
 
-	RooStringVar* var = (RooStringVar*) constants->find("channelWidth");
-	channelWidth = new RooConstVar("channelWidth", "Width of channel, ns", atof(var->getVal()));
+//	RooStringVar* var = (RooStringVar*) constants->find("channelWidth");
+//	channelWidth = new RooConstVar("channelWidth", "Width of channel, ns", atof(var->getVal()));
 }
 
 Constants* Constants::instance = NULL;
@@ -53,9 +53,9 @@ Constants::~Constants() {
 RooArgList* Constants::initDefaultValues() {
 	RooArgList* constants = new RooArgList();
 	RooStringVar* constant;
-//    constant = new RooStringVar("channels", " # entries in maestro file", "8192");
-//    constants->add(*constant);
-	constant = new RooStringVar("channelWidth", " # channel width, ns", "0.006186");
+    constant = new RooStringVar("channels", " # entries in maestro file", "8192");
+    constants->add(*constant);
+	constant = new RooStringVar("defaultChannelWidth", " # channel width, ns", "0.006186");
 	constants->add(*constant);
 	constant = new RooStringVar("skipLines", " # spectrum header lines", "12");
 	constants->add(*constant);
@@ -77,7 +77,7 @@ RooArgList* Constants::initDefaultValues() {
 	constants->add(*constant);
 	constant =
 			new RooStringVar("commonParameters", " # comma-separated parameters of simultaneous fit",
-					"FWHM_gauss1,FWHM_gauss2,FWHM_gauss3,Int_gauss2,Int_gauss3,#tau_source,Int_source,#tau1_source,#tau2_source,#tau3_source,Int_expSource2,Int_expSource3");
+					"channelWidth,FWHM_gauss1,FWHM_gauss2,FWHM_gauss3,Int_gauss2,Int_gauss3,#tau_source,Int_source,#tau1_source,#tau2_source,#tau3_source,Int_expSource2,Int_expSource3");
 	constants->add(*constant);
 	constant = new RooStringVar("bufferFraction", " # set to about 1.5-2 when dealing with larger lifetime components ~5ns", "0.2");
 	constants->add(*constant);
@@ -177,14 +177,14 @@ void Constants::writeToFile(RooArgList* constants, std::string filename) {
 //    return atoi(var->getVal());
 //}
 
-double Constants::getChannelWidth() {
-	RooStringVar* var = (RooStringVar*) constants->find("channelWidth");
+double Constants::getDefaultChannelWidth() {
+	RooStringVar* var = (RooStringVar*) constants->find("defaultChannelWidth");
 	return atof(var->getVal());
 }
 
-RooConstVar* Constants::getRooChannelWidth() {
-	return channelWidth;
-}
+//RooConstVar* Constants::getRooChannelWidth() {
+//	return channelWidth;
+//}
 
 int Constants::getSkipLines() {
 	RooStringVar* var = (RooStringVar*) constants->find("skipLines");

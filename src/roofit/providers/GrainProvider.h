@@ -19,7 +19,7 @@
 
 class GrainProvider : public AbstractProvider{
 public:
-    GrainProvider(RooRealVar *observable);
+    GrainProvider(RooRealVar* observable, RooRealVar* channelWidth);
     virtual ~GrainProvider();
 
 private:

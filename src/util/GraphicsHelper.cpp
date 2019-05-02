@@ -124,11 +124,17 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
 	}
 
+	sigDigits = 5;
+	if (RooRealVar* var = findRooRealVarInList(paramsList, "channelWidth")) {
+		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
+	}
+
 	// Add horizontal rule
 	hrLineNumbers.push_back(linesNumber);
 	box->AddText("");
 	linesNumber++;
 
+	sigDigits = 3;
 	// Print source contribution related variables
 	while (RooRealVar* var = findRooRealVarInList(paramsList, "ource")) {
 		printVariable(sigDigits, options, linesNumber, var, box, paramsList);

@@ -12,7 +12,6 @@
  */
 
 #include "AdditiveConvolutionPdf.h"
-#include "PdfServer.h"
 #include "../util/ObjectNamer.h"
 #include "ReverseAddPdf.h"
 #include "../util/StringUtils.h"
@@ -33,12 +32,17 @@
 #include <RooWorkspace.h>
 #include <RooPolynomial.h>
 #include "providers/ExpSourceProvider.h"
+#include "PdfFactory.h"
 
 AdditiveConvolutionPdf::AdditiveConvolutionPdf(std::vector<std::string> componentIds, const char* resolutionId, int sourceComponents, RooRealVar* observable) {
 	Debug("AdditiveConvolutionPdf::AdditiveConvolutionPdf");
 	this->observable = observable;
-	pdfServer = new PdfServer();
 
+	Double_t channelWidthValue = Constants::getInstance()->getDefaultChannelWidth();
+	this->channelWidth = new RooRealVar("channelWidth", "Width of channel", channelWidthValue, 0, 0.1, "ns");
+	this->channelWidth->setConstant(kTRUE);
+
+	pdfFactory = new PdfFactory();
 	initComponents(componentIds, sourceComponents);
 	initResolutionModel(resolutionId);
 	constructModel();
@@ -52,7 +56,7 @@ void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentId
 	// Build component PDFs
 	for (std::vector<std::string>::const_iterator it = componentIds.begin(); it != componentIds.end(); ++it) {
 		const char* componentId = ((std::string) *it).c_str();
-		RooAbsPdf* pdf = pdfServer->getPdf(componentId, observable);
+		RooAbsPdf* pdf = pdfFactory->getPdf(componentId, observable, channelWidth);
 		componentsList->add(*pdf);
 	}
 	#ifdef USEDEBUG
@@ -65,7 +69,7 @@ void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentId
 		RooAbsPdf* sourceComponent = nullptr;
 		switch(sourceComponents) {
 		    case 1: {
-				ExpSourceProvider* esp = new ExpSourceProvider(observable);
+				ExpSourceProvider* esp = new ExpSourceProvider(observable, channelWidth);
 				sourceComponent = esp->getPdf();
 				// if one component fix it at 385 ps
 //				if (RooRealVar* tauSource = (RooRealVar*) (sourceComponent->getParameters(*observable))->find("#tau")) {
@@ -75,12 +79,12 @@ void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentId
 				break;
 	        }
 		    case 2: {
-				TwoExpSourceProvider* tesp = new TwoExpSourceProvider(observable);
+				TwoExpSourceProvider* tesp = new TwoExpSourceProvider(observable, channelWidth);
 				sourceComponent = tesp->getPdf();
 				break;
 	        }
 		    case 3: {
-				ThreeExpSourceProvider* tesp = new ThreeExpSourceProvider(observable);
+				ThreeExpSourceProvider* tesp = new ThreeExpSourceProvider(observable, channelWidth);
 				sourceComponent = tesp->getPdf();
 				break;
 	        }
@@ -93,7 +97,7 @@ void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentId
 	// Use sum of ExpPdfs each convoluted with resolution (think its slower)
 	else {
 		for (unsigned i = 1; i <= sourceComponents; i++) {
-			ExpSourceProvider* esp = new ExpSourceProvider(observable);
+			ExpSourceProvider* esp = new ExpSourceProvider(observable, channelWidth);
 			RooAbsPdf* sourceComponent = esp->getPdf(i);
 			sourceComponentsList->add(*sourceComponent);
 
@@ -108,7 +112,7 @@ void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentId
 }
 
 void AdditiveConvolutionPdf::initResolutionModel(const char* resolutionId) {
-	resolutionFunction = pdfServer->getPdf(resolutionId, observable);
+	resolutionFunction = pdfFactory->getPdf(resolutionId, observable, channelWidth);
 }
 
 void AdditiveConvolutionPdf::constructModel() {
@@ -128,9 +132,12 @@ void AdditiveConvolutionPdf::constructModel() {
 	RooFormulaVar* Int_bg = new RooFormulaVar("Int_bg", "@0*@1/@2", RooArgList(*background, *bins, *integral));
 	RooPolynomial* bg = new RooPolynomial("bg", "y=1", *observable, RooArgSet());
 
+
+
 	// Add source and sample components together
 	modelNonConvoluted = new RooAddPdf("modelNonConvoluted", "Components model with source and background", RooArgList(*bg, *sumSourceComponents, *sumComponents), RooArgList(*Int_bg, *Int_sourceNorm), kTRUE);
 	modelNonConvoluted->fixAddCoefNormalization(RooArgSet(*observable));
+
 
 	// Convolute model
 	model = new RooFFTConvPdf("model", "Convoluted model with source contribution", *observable, *modelNonConvoluted, *resolutionFunction);

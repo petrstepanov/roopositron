@@ -20,7 +20,7 @@
 
 class ThreeExpSourceProvider : public AbstractProvider {
 public:
-	ThreeExpSourceProvider(RooRealVar* observable);
+	ThreeExpSourceProvider(RooRealVar* observable, RooRealVar* channelWidth);
     virtual ~ThreeExpSourceProvider();
 
     RooAbsPdf* initPdf(int i);

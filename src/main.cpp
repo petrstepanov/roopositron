@@ -247,6 +247,21 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	// User input parameter values from keyboard if not found in the pool
 	pool->addInputModelParameters(simPdf->getParameters(*channels));
 
+	if (spectra.size() > 1){
+		// Proceed with fit or save "parameters.txt" file and quit
+		std::cout << std::endl << "Simultaneous model is ready. Proceed with fit?" << std::endl;
+		std::cout << "[y] start fitting." << std::endl << "[n] revise simultaneous parameters" << std::endl;
+		std::string input;
+		std::getline(std::cin, input);
+		if (!input.empty()) {
+			char character = input.at(0);
+			if (character == 'n' || character == 'N') {
+				pool->saveToFile();
+				return 0;
+			}
+		}
+	}
+
 	// Save pool before fitting to create file with parameters
 	// pool->saveToFile();
 
@@ -343,7 +358,14 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		Double_t scaleFactor = GraphicsHelper::getSpectrumPadFontFactor();
 		if (RooRealVar* rooRealVar = RootHelper::findParameterNameContains(spectra[i].model, channels, "mean_gauss")) {
 			Double_t zeroChannel = rooRealVar->getVal();
-			Double_t channelWidth = Constants::getInstance()->getChannelWidth();
+
+			// Get channel width for current spectrum
+			Double_t channelWidth = 0;
+			RooArgSet* parameters = spectra[i].model->getParameters(*channels);
+			if (RooRealVar* channelWidthVar = RootHelper::getParameterNameContains(parameters, "channelWidth")){
+				channelWidth = channelWidthVar->getVal();
+			}
+
 			Double_t timeMin = -channelWidth * zeroChannel;
 			Double_t timeMax = (channels->getMax() - zeroChannel) * channelWidth;
 			TGaxis *timeAxis = new TGaxis(0, yMin, channels->getMax(), yMin, timeMin, timeMax, 510, "+L");
@@ -517,7 +539,15 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		const Int_t minChannel = constants->getMinChannel();
 		const Int_t maxChannel = constants->getMaxChannel();
 		for (unsigned j = minChannel; j <= maxChannel; j++) {
-			Double_t time = (double) (j - minChannel) * (constants->getChannelWidth());
+
+			// Get channel width for current spectrum
+			Double_t channelWidth = 0;
+			RooArgSet* parameters = spectra[i].model->getParameters(*channels);
+			if (RooRealVar* channelWidthVar = RootHelper::getParameterNameContains(parameters, "channelWidth")){
+				channelWidth = channelWidthVar->getVal();
+			}
+
+			Double_t time = (double) (j - minChannel) * channelWidth;
 			Double_t count = spectra[i].histogram->GetBinContent(j - minChannel + 1);
 			Double_t error = spectra[i].histogram->GetBinError(j - minChannel + 1);
 			Double_t resolution = spectraPlot[i]->getCurve("resolution")->Eval(j - minChannel + 0.5);

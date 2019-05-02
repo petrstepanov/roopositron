@@ -30,12 +30,12 @@ enum PdfHashNames {
 	kParamagneticPdf
 };
 
-class PdfServer {
+class PdfFactory {
 public:   
-    PdfServer();
-    virtual ~PdfServer();
-    RooAbsPdf* getPdf(const char* name, RooRealVar* observable);
-    RooAbsPdf* getPdf(Int_t name, RooRealVar* observable);
+    PdfFactory();
+    virtual ~PdfFactory();
+    RooAbsPdf* getPdf(const char* name, RooRealVar* observable, RooRealVar* channelWidth);
+//    RooAbsPdf* getPdf(Int_t name, RooRealVar* observable, RooRealVar* channelWidth);
 
 private:
     static PdfHashNames hashPdfName(const char* pdfName);

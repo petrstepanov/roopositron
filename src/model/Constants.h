@@ -25,8 +25,8 @@ public:
     virtual ~Constants();
     
 //    int getNumberOfChannels();
-    double getChannelWidth();
-    RooConstVar* getRooChannelWidth();
+    double getDefaultChannelWidth();
+//    RooConstVar* getRooChannelWidth();
     int getSkipLines();
     int getMinChannel();
     int getMaxChannel();
@@ -56,7 +56,7 @@ private:
     bool extendFromFile(RooArgList* constants, std::string filename);
     void writeToFile(RooArgList* constants, std::string filename);
     
-    RooConstVar* channelWidth;
+//    RooConstVar* channelWidth;
     const std::string DEFAULT_FILENAME = "constants.txt";
     const int TAB_SIZE = 20; 
 };

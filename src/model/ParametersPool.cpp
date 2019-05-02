@@ -94,9 +94,11 @@ Bool_t ParametersPool::containsAllParameters(RooArgSet* modelParameters){
 	while (TObject* temp = it->Next()) {
 		if (RooRealVar* parameter = dynamic_cast<RooRealVar*>(temp)) {
 			const char* name = parameter->GetName();
-			RooRealVar* poolParameter = (RooRealVar*) parametersPool->find(name);
-			if (!poolParameter) {
-				return kFALSE;
+			if (!StringUtils::stringContainsToken(parameter->GetName(), parametersExcludedFromImport)) {
+				RooRealVar* poolParameter = (RooRealVar*) parametersPool->find(name);
+				if (!poolParameter) {
+					return kFALSE;
+				}
 			}
 		}
 	}
@@ -156,7 +158,7 @@ void ParametersPool::updateModelParameters(RooArgSet* modelParameters) {
 void ParametersPool::addInputModelParameters(RooArgSet* modelParameters) {
 	Debug("ParametersPool::inputMissingPoolParameters", "Hit ENTER to use default parameter values.");
 
-	// Iterate through model parameters. Either extend values from pool parameters from hard drive.
+	// Iterate through model parameters. Either extend values from existing pool or user input and add to pool.
 	TIterator* it = modelParameters->createIterator();
 	while (TObject* temp = it->Next()) {
 		if (RooRealVar* modelParameter = dynamic_cast<RooRealVar*>(temp)) {
@@ -193,6 +195,7 @@ void ParametersPool::userInput(RooRealVar* parameter) {
 		stream >> value;
 		parameter->setVal(value);
 	}
+//	parameter->Print();
 	std::cout << "Parameter is " << (parameter->isConstant() ? "fixed" : "free") << ". Ok (y/n)? ";
 	std::getline(std::cin, input);
 	if (!input.empty()) {
@@ -220,10 +223,11 @@ void ParametersPool::userInput(RooRealVar* parameter) {
 			stream >> value;
 			parameter->setMax(value);
 		}
-	} else {
-		parameter->setMin(parameter->getVal());
-		parameter->setMax(parameter->getVal());
 	}
+//	else {
+//		parameter->setMin(parameter->getVal());
+//		parameter->setMax(parameter->getVal());
+//	}
 }
 
 // TODO: separate add and save()

@@ -17,16 +17,12 @@
 #include "../pdfs/ParaPdf.h"
 #include "../../model/Constants.h"
 
-ParaProvider::ParaProvider(RooRealVar* observable) :
-		AbstractProvider(observable) {
-}
+ParaProvider::ParaProvider(RooRealVar* _observable, RooRealVar* _channelWidth) : AbstractProvider(_observable, _channelWidth) {}
 
 ParaProvider::~ParaProvider() {
 }
 
 RooAbsPdf* ParaProvider::initPdf(int i) {
-	RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
-
 //	Pps("Pps", this, other.Pps),
 //	lplus("lplus", this, other.lplus),
 //	lpo("lpo", this, other.lpo),
