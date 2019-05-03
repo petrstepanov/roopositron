@@ -22,7 +22,7 @@ ParaPdf::ParaPdf(const char *name, const char *title,
     RooAbsReal& _lpo,
     RooAbsReal& _l2g,
     RooAbsReal& _lopc,
-    Double_t _chW
+	RooAbsReal& _chW
     ) :
     RooAbsPdf(name, title),
     t("t", "t", this, _t),
@@ -31,7 +31,7 @@ ParaPdf::ParaPdf(const char *name, const char *title,
     lpo("lpo", "lpo", this, _lpo),
     l2g("l2g", "l2g", this, _l2g),
     lopc("lopc", "lopc", this, _lopc),
-    chW(_chW) {
+	chW("chW", "chW", this, _chW) {
 }
 
 ParaPdf::ParaPdf(const ParaPdf& other, const char* name) :
@@ -42,7 +42,7 @@ lplus("lplus", this, other.lplus),
 lpo("lpo", this, other.lpo),
 l2g("l2g", this, other.l2g),
 lopc("lpoc", this, other.lopc),
-chW(other.chW){
+chW("chW", this, other.chW){
 }
 
 Double_t ParaPdf::evaluate() const {

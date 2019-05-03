@@ -24,7 +24,7 @@ Powder2Pdf::Powder2Pdf(const char *name, const char *title,
     RooAbsReal& _l2g,
     RooAbsReal& _V0,
     RooAbsReal& _Vth,
-    Double_t _chW
+	RooAbsReal& _chW
     ) :
     RooAbsPdf(name, title),
     t("t", "t", this, _t),
@@ -41,7 +41,7 @@ Powder2Pdf::Powder2Pdf(const char *name, const char *title,
     l2g("l2g", "l2g", this, _l2g),
     V0("V0", "V0", this, _V0),
     Vth("Vth", "Vth", this, _Vth),
-    chW(_chW) {
+	chW("chW", "chW", this, _chW) {
 }
 
 Powder2Pdf::Powder2Pdf(const Powder2Pdf& other, const char* name) :
@@ -60,7 +60,7 @@ mu("mu", this, other.mu),
 l2g("l2g", this, other.l2g),
 V0("V0", this, other.V0),
 Vth("Vth", this, other.Vth),
-chW(other.chW){
+chW("chW", this, other.chW){
 }
 
 Double_t Powder2Pdf::evaluate() const {

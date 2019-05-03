@@ -33,7 +33,7 @@ public:
 			RooAbsReal& _lpo,          // Pick-off annihilation speed
 			RooAbsReal& _l2g,          // Two-gamma annihilation rate
 			RooAbsReal& _lopc,         // Ortho-para conversion speed
-			Double_t chW);
+			RooAbsReal& _chW);
 	ParaPdf(const ParaPdf& other, const char* name = 0);
 	virtual TObject* clone(const char* newname) const {
 		return new ParaPdf(*this, newname);
@@ -52,8 +52,8 @@ protected:
 	RooRealProxy lpo;
 	RooRealProxy l2g;
 	RooRealProxy lopc;
+	RooRealProxy chW;
 
-	Double_t chW = 0;
 	Double_t evaluate() const;
 	Double_t sum(Double_t a) const;
 	Double_t Power(Double_t a, Double_t b) const;

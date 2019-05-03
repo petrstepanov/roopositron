@@ -34,7 +34,7 @@ RooAbsPdf* TwoExpProvider::initPdf(int i) {
     RooRealVar* tau2 = new RooRealVar("#tau2", "2nd positron lifetime", 0.5, 0.3, 10, "ns");
     RooFormulaVar* tau2Ch = new RooFormulaVar("tau2Ch", "2nd positron lifetime, channels", "@0/@1", RooArgList(*tau2, *channelWidth));
 
-    RooRealVar* int2 = new RooRealVar("Int2", "2nd exponent intensity", 20, 0, 100, "%");
+    RooRealVar* int2 = new RooRealVar("Int_exp2", "2nd exponent intensity", 20, 0, 100, "%");
     RooFormulaVar* int2Norm = new RooFormulaVar("int2Norm", "@0/100", *int2);
 
     // Instantinate model

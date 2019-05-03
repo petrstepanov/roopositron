@@ -40,7 +40,7 @@ public:
 //			RooAbsReal& _l3g,          // Three-gamma annihilation rate
 			RooAbsReal& _V0,          // Two-gamma annihilation rate
 			RooAbsReal& _Vth,          // Three-gamma annihilation rate
-			Double_t chW);
+			RooAbsReal& _chW);
 	PowderPdf(const PowderPdf& other, const char* name = 0);
 	virtual TObject* clone(const char* newname) const {
 		return new PowderPdf(*this, newname);
@@ -66,8 +66,8 @@ protected:
 //	RooRealProxy l3g;
 	RooRealProxy V0;
 	RooRealProxy Vth;
+	RooRealProxy chW;
 
-	Double_t chW = 0;
 	Double_t evaluate() const;
 	Double_t sum(Double_t a) const;
 	Double_t Power(Double_t a, Double_t b) const;
