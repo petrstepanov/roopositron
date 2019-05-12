@@ -485,9 +485,11 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		TString imageFilePathName = TString::Format("%s/fit-%s-%s-%d", outputPath.c_str(), (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
 				constants->getResolutionFunctionModel(), i + 1);
 		TString pngURI = imageFilePathName + ".png";
-		TString epsURI = imageFilePathName + ".eps";
-		canvas[i]->Print(pngURI, "png");
-		canvas[i]->Print(epsURI, "eps");
+		// TString epsURI = imageFilePathName + ".eps";
+		TString rootURI = imageFilePathName + ".root";
+
+		canvas[i]->SaveAs(pngURI);
+		canvas[i]->SaveAs(rootURI);
 	}
 	Debug("main", "Canvas images successfully exported.");
 	gSystem->ProcessEvents();
