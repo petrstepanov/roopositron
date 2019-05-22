@@ -1,0 +1,4335 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.3' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[    181848,       4327]
+NotebookOptionsPosition[    179882,       4286]
+NotebookOutlinePosition[    180235,       4302]
+CellTagsIndexPosition[    180192,       4299]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Clear", "[", "\"\<Global`*\>\"", "]"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"$Assumptions", ":=", 
+  RowBox[{
+   RowBox[{"t", ">", "0"}], "&&", 
+   RowBox[{"t", "\[Element]", "Reals"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{"$Assumptions", ":=", 
+  RowBox[{
+   RowBox[{"Pqf", ">", "0"}], "&&", 
+   RowBox[{"Pqf", "<", "1"}], "&&", 
+   RowBox[{"Pqf", "\[Element]", "Reals"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{"$Assumptions", ":=", 
+  RowBox[{
+   RowBox[{"lb", ">", "0"}], "&&", 
+   RowBox[{"lb", "\[Element]", "Reals"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{"$Assumptions", ":=", 
+  RowBox[{
+   RowBox[{"lqf", ">", "0"}], "&&", 
+   RowBox[{"lqf", "\[Element]", "Reals"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{"$Assumptions", ":=", 
+  RowBox[{
+   RowBox[{"lpo", ">", "0"}], "&&", 
+   RowBox[{"lpo", "\[Element]", "Reals"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{"$Assumptions", ":=", 
+  RowBox[{
+   RowBox[{"lopc", ">", "0"}], "&&", 
+   RowBox[{"lopc", "\[Element]", "Reals"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{"$Assumptions", ":=", 
+  RowBox[{
+   RowBox[{"lox", ">", "0"}], "&&", 
+   RowBox[{"lox", "\[Element]", "Reals"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"$Assumptions", ":=", 
+   RowBox[{
+    RowBox[{"l2g", ">", "0"}], "&&", 
+    RowBox[{"l2g", "\[Element]", "Reals"}]}]}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"$Assumptions", ":=", 
+  RowBox[{
+   RowBox[{"x", ">", "0"}], "&&", 
+   RowBox[{"x", "\[Element]", "Reals"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{"$Assumptions", ":=", 
+  RowBox[{
+   RowBox[{"x1", ">", "0"}], "&&", 
+   RowBox[{"x1", "\[Element]", "Reals"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{"$Assumptions", ":=", 
+  RowBox[{
+   RowBox[{"x2", ">", "0"}], "&&", 
+   RowBox[{"x2", "\[Element]", "Reals"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{"$Assumptions", ":=", 
+  RowBox[{"x1", "<", "x2"}]}], "\[IndentingNewLine]"}], "Input",
+ CellChangeTimes->{{3.761696304006237*^9, 3.761696314599875*^9}, {
+   3.7616964276792*^9, 3.761696446880191*^9}, {3.761696533806089*^9, 
+   3.761696545668498*^9}, 3.7656577570855703`*^9, {3.765661879367649*^9, 
+   3.765661890372497*^9}, {3.76566234045748*^9, 3.7656623616284733`*^9}, {
+   3.765662655727824*^9, 3.765662659965234*^9}, 3.7656638104536247`*^9, {
+   3.7675415594544067`*^9, 3.7675415677417707`*^9}, {3.7675415990922832`*^9, 
+   3.767541669852742*^9}, {3.767551165504573*^9, 3.767551168579132*^9}},
+ CellLabel->"In[3]:=",ExpressionUUID->"e0e1a34f-e7fa-42c7-9da0-8b5101a10315"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{"l2g", ":=", "8"}], "*)"}], " ", 
+  RowBox[{"(*", " ", 
+   RowBox[{"1", "/", "ns"}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{"l3g", ":=", "0.007"}], "*)"}], " ", 
+  RowBox[{"(*", " ", 
+   RowBox[{"1", "/", "ns"}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"lq", ":=", 
+    RowBox[{"lqf", "+", "lb"}]}], " ", 
+   RowBox[{"(*", " ", 
+    RowBox[{"1", "/", "ns"}], " ", "*)"}], "\[IndentingNewLine]", 
+   RowBox[{"lo", ":=", 
+    RowBox[{"lpo", "+", 
+     RowBox[{"lopc", "/", "4"}], "+", "lox"}]}], "\[IndentingNewLine]", 
+   RowBox[{"lp", ":=", 
+    RowBox[{"l2g", "+", "lpo"}]}], "\[IndentingNewLine]", 
+   RowBox[{"nu", ":=", 
+    RowBox[{"3", "*", 
+     RowBox[{"Pqf", "/", "4"}], "*", 
+     RowBox[{"lb", "/", 
+      RowBox[{"(", 
+       RowBox[{"lq", "-", "lo"}], ")"}]}]}]}], "\[IndentingNewLine]", 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"nqf", "[", "t_", "]"}], ":=", 
+    RowBox[{"Pqf", "*", 
+     RowBox[{"Exp", "[", 
+      RowBox[{
+       RowBox[{"-", "lq"}], "*", "chW", "*", "t"}], "]"}]}]}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"Print", "[", 
+    RowBox[{"\"\<nqf(t)=\>\"", ",", 
+     RowBox[{"nqf", "[", "t", "]"}]}], "]"}], "\[IndentingNewLine]", 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"no", "[", "t_", "]"}], ":=", 
+    RowBox[{"nu", "*", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"Exp", "[", 
+        RowBox[{
+         RowBox[{"-", "lo"}], "*", "chW", "*", "t"}], "]"}], "-", 
+       RowBox[{"Exp", "[", 
+        RowBox[{
+         RowBox[{"-", "lq"}], "*", "chW", "*", "t"}], "]"}]}], ")"}]}]}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"Print", "[", 
+    RowBox[{"\"\<no(t)=\>\"", ",", 
+     RowBox[{"nqf", "[", "t", "]"}]}], "]"}], "\[IndentingNewLine]", 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"nplus", "[", "t_", "]"}], ":=", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{"1", "-", "Pqf"}], ")"}], "*", 
+      RowBox[{"Exp", "[", 
+       RowBox[{
+        RowBox[{"-", "lplus"}], "*", "chW", "*", "t"}], "]"}]}], "+", 
+     RowBox[{"nu", "*", 
+      RowBox[{"lox", "/", 
+       RowBox[{"(", 
+        RowBox[{"lplus", "-", "lo"}], ")"}]}], "*", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"Exp", "[", 
+         RowBox[{
+          RowBox[{"-", "lo"}], "*", "chW", "*", "t"}], "]"}], "-", 
+        RowBox[{"Exp", "[", 
+         RowBox[{
+          RowBox[{"-", "lplus"}], "*", "chW", "*", "t"}], "]"}]}], ")"}]}], 
+     "-", 
+     RowBox[{"nu", "*", 
+      RowBox[{"lox", "/", 
+       RowBox[{"(", 
+        RowBox[{"lq", "-", "lplus"}], ")"}]}], "*", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"Exp", "[", 
+         RowBox[{
+          RowBox[{"-", "lplus"}], "*", "chW", "*", "t"}], "]"}], "-", 
+        RowBox[{"Exp", "[", 
+         RowBox[{
+          RowBox[{"-", "lq"}], "*", "chW", "*", "t"}], "]"}]}], ")"}]}]}]}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"Print", "[", 
+    RowBox[{"\"\<nplus(t)=\>\"", ",", 
+     RowBox[{"nplus", "[", "t", "]"}]}], "]"}], "\[IndentingNewLine]", 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"np", "[", "t_", "]"}], ":=", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Pqf", "/", "4"}], "*", 
+      RowBox[{"lb", "/", 
+       RowBox[{"(", 
+        RowBox[{"lq", "-", "lp"}], ")"}]}], "*", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"Exp", "[", 
+         RowBox[{
+          RowBox[{"-", "lp"}], "*", "chW", "*", "t"}], "]"}], "-", 
+        RowBox[{"Exp", "[", 
+         RowBox[{
+          RowBox[{"-", "lq"}], "*", "chW", "*", "t"}], "]"}]}], ")"}]}], "+", 
+     
+     RowBox[{"nu", "*", 
+      RowBox[{
+       RowBox[{"lopc", "/", 
+        RowBox[{"(", 
+         RowBox[{"lp", "-", "lo"}], ")"}]}], "/", "4"}], "*", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"Exp", "[", 
+         RowBox[{
+          RowBox[{"-", "lo"}], "*", "chW", "*", "t"}], "]"}], "-", 
+        RowBox[{"Exp", "[", 
+         RowBox[{
+          RowBox[{"-", "lp"}], "*", "chW", "*", "t"}], "]"}]}], ")"}]}], "-", 
+     
+     RowBox[{"nu", "*", 
+      RowBox[{
+       RowBox[{"lopc", "/", 
+        RowBox[{"(", 
+         RowBox[{"lq", "-", "lp"}], ")"}]}], "/", "4"}], "*", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"Exp", "[", 
+         RowBox[{
+          RowBox[{"-", "lp"}], "*", "chW", "*", "t"}], "]"}], "-", 
+        RowBox[{"Exp", "[", 
+         RowBox[{
+          RowBox[{"-", "lq"}], "*", "chW", "*", "t"}], "]"}]}], ")"}]}]}]}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"Print", "[", 
+    RowBox[{"\"\<np(t)=\>\"", ",", 
+     RowBox[{"np", "[", "t", "]"}]}], "]"}], 
+   "\[IndentingNewLine]"}]}]], "Input",
+ CellChangeTimes->{{3.767541841373136*^9, 3.767541973387155*^9}, {
+   3.767542105932437*^9, 3.76754213409295*^9}, {3.7675430346135817`*^9, 
+   3.76754305364552*^9}, {3.767543987150412*^9, 3.767544110225358*^9}, {
+   3.7675494586422157`*^9, 3.767549515081139*^9}, {3.767549566263442*^9, 
+   3.767549588528675*^9}, {3.767549626324079*^9, 3.767549646814651*^9}, 
+   3.767549686956702*^9, {3.7675497249884253`*^9, 3.767549727169496*^9}, {
+   3.767549800315536*^9, 3.767549807381942*^9}, {3.7675498432550983`*^9, 
+   3.76754991355765*^9}, {3.7675500103168173`*^9, 3.767550090257666*^9}, {
+   3.767550155758304*^9, 3.767550165312107*^9}, {3.7675509006939297`*^9, 
+   3.7675509744729958`*^9}, 3.7675524078599167`*^9},
+ CellLabel->"In[16]:=",ExpressionUUID->"f956deea-5065-4918-b6ea-fbaa06ca54e7"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"nqf(t)=\"\>", "\[InvisibleSpace]", 
+   RowBox[{
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{"chW", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"-", "lb"}], "-", "lqf"}], ")"}], " ", "t"}]], " ", "Pqf"}]}],
+  
+  SequenceForm[
+  "nqf(t)=", 
+   E^($CellContext`chW (-$CellContext`lb - $CellContext`lqf) $CellContext`t) \
+$CellContext`Pqf],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.7675514425950108`*^9, 3.7675516080608473`*^9, 
+  3.767551709861364*^9, 3.767552202800666*^9, 3.767552590202458*^9, 
+  3.767552662077539*^9},
+ CellLabel->
+  "During evaluation of \
+In[16]:=",ExpressionUUID->"1e43d1f9-079d-4f9f-8efc-e6fa70f03661"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"no(t)=\"\>", "\[InvisibleSpace]", 
+   RowBox[{
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{"chW", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"-", "lb"}], "-", "lqf"}], ")"}], " ", "t"}]], " ", "Pqf"}]}],
+  
+  SequenceForm[
+  "no(t)=", 
+   E^($CellContext`chW (-$CellContext`lb - $CellContext`lqf) $CellContext`t) \
+$CellContext`Pqf],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.7675514425950108`*^9, 3.7675516080608473`*^9, 
+  3.767551709861364*^9, 3.767552202800666*^9, 3.767552590202458*^9, 
+  3.7675526620866547`*^9},
+ CellLabel->
+  "During evaluation of \
+In[16]:=",ExpressionUUID->"cfc675dc-4675-47a3-8eeb-910431e35dc3"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"nplus(t)=\"\>", "\[InvisibleSpace]", 
+   RowBox[{
+    RowBox[{
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       RowBox[{"-", "chW"}], " ", "lplus", " ", "t"}]], " ", 
+     RowBox[{"(", 
+      RowBox[{"1", "-", "Pqf"}], ")"}]}], "+", 
+    FractionBox[
+     RowBox[{"3", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"-", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{
+           RowBox[{"-", "chW"}], " ", "lplus", " ", "t"}]]}], "+", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"chW", " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", 
+             FractionBox["lopc", "4"]}], "-", "lox", "-", "lpo"}], ")"}], " ",
+           "t"}]]}], ")"}], " ", "lb", " ", "lox", " ", "Pqf"}], 
+     RowBox[{"4", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"-", 
+         FractionBox["lopc", "4"]}], "-", "lox", "+", "lplus", "-", "lpo"}], 
+       ")"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"lb", "-", 
+        FractionBox["lopc", "4"], "-", "lox", "-", "lpo", "+", "lqf"}], 
+       ")"}]}]], "-", 
+    FractionBox[
+     RowBox[{"3", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "chW"}], " ", "lplus", " ", "t"}]], "-", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"chW", " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", "lb"}], "-", "lqf"}], ")"}], " ", "t"}]]}], ")"}], 
+      " ", "lb", " ", "lox", " ", "Pqf"}], 
+     RowBox[{"4", " ", 
+      RowBox[{"(", 
+       RowBox[{"lb", "-", "lplus", "+", "lqf"}], ")"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"lb", "-", 
+        FractionBox["lopc", "4"], "-", "lox", "-", "lpo", "+", "lqf"}], 
+       ")"}]}]]}]}],
+  SequenceForm[
+  "nplus(t)=", 
+   E^(-$CellContext`chW $CellContext`lplus $CellContext`t) (
+     1 - $CellContext`Pqf) + 
+   Rational[3, 4] (-E^(-$CellContext`chW $CellContext`lplus $CellContext`t) + 
+     E^($CellContext`chW (
+        Rational[-1, 
+           4] $CellContext`lopc - $CellContext`lox - $CellContext`lpo) \
+$CellContext`t)) $CellContext`lb $CellContext`lox (
+      Rational[-1, 
+         4] $CellContext`lopc - $CellContext`lox + $CellContext`lplus - \
+$CellContext`lpo)^(-1) ($CellContext`lb + 
+      Rational[-1, 
+         4] $CellContext`lopc - $CellContext`lox - $CellContext`lpo + \
+$CellContext`lqf)^(-1) $CellContext`Pqf + 
+   Rational[-3, 4] (E^(-$CellContext`chW $CellContext`lplus $CellContext`t) - 
+     E^($CellContext`chW (-$CellContext`lb - $CellContext`lqf) \
+$CellContext`t)) $CellContext`lb $CellContext`lox ($CellContext`lb - \
+$CellContext`lplus + $CellContext`lqf)^(-1) ($CellContext`lb + 
+      Rational[-1, 
+         4] $CellContext`lopc - $CellContext`lox - $CellContext`lpo + \
+$CellContext`lqf)^(-1) $CellContext`Pqf],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.7675514425950108`*^9, 3.7675516080608473`*^9, 
+  3.767551709861364*^9, 3.767552202800666*^9, 3.767552590202458*^9, 
+  3.767552662096942*^9},
+ CellLabel->
+  "During evaluation of \
+In[16]:=",ExpressionUUID->"b1b4863e-ba45-479e-b848-8c990afb3463"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"np(t)=\"\>", "\[InvisibleSpace]", 
+   RowBox[{
+    FractionBox[
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"chW", " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", "l2g"}], "-", "lpo"}], ")"}], " ", "t"}]], "-", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"chW", " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", "lb"}], "-", "lqf"}], ")"}], " ", "t"}]]}], ")"}], 
+      " ", "lb", " ", "Pqf"}], 
+     RowBox[{"4", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"-", "l2g"}], "+", "lb", "-", "lpo", "+", "lqf"}], ")"}]}]], 
+    "+", 
+    FractionBox[
+     RowBox[{"3", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"-", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"chW", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", "l2g"}], "-", "lpo"}], ")"}], " ", "t"}]]}], "+", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"chW", " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", 
+             FractionBox["lopc", "4"]}], "-", "lox", "-", "lpo"}], ")"}], " ",
+           "t"}]]}], ")"}], " ", "lb", " ", "lopc", " ", "Pqf"}], 
+     RowBox[{"16", " ", 
+      RowBox[{"(", 
+       RowBox[{"l2g", "-", 
+        FractionBox["lopc", "4"], "-", "lox"}], ")"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"lb", "-", 
+        FractionBox["lopc", "4"], "-", "lox", "-", "lpo", "+", "lqf"}], 
+       ")"}]}]], "-", 
+    FractionBox[
+     RowBox[{"3", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"chW", " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", "l2g"}], "-", "lpo"}], ")"}], " ", "t"}]], "-", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"chW", " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", "lb"}], "-", "lqf"}], ")"}], " ", "t"}]]}], ")"}], 
+      " ", "lb", " ", "lopc", " ", "Pqf"}], 
+     RowBox[{"16", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"-", "l2g"}], "+", "lb", "-", "lpo", "+", "lqf"}], ")"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"lb", "-", 
+        FractionBox["lopc", "4"], "-", "lox", "-", "lpo", "+", "lqf"}], 
+       ")"}]}]]}]}],
+  SequenceForm[
+  "np(t)=", 
+   Rational[1, 4] (
+     E^($CellContext`chW (-$CellContext`l2g - $CellContext`lpo) \
+$CellContext`t) - 
+     E^($CellContext`chW (-$CellContext`lb - $CellContext`lqf) \
+$CellContext`t)) $CellContext`lb (-$CellContext`l2g + $CellContext`lb - \
+$CellContext`lpo + $CellContext`lqf)^(-1) $CellContext`Pqf + 
+   Rational[3, 16] (-
+      E^($CellContext`chW (-$CellContext`l2g - $CellContext`lpo) \
+$CellContext`t) + 
+     E^($CellContext`chW (
+        Rational[-1, 
+           4] $CellContext`lopc - $CellContext`lox - $CellContext`lpo) \
+$CellContext`t)) $CellContext`lb $CellContext`lopc ($CellContext`l2g + 
+      Rational[-1, 
+         4] $CellContext`lopc - $CellContext`lox)^(-1) ($CellContext`lb + 
+      Rational[-1, 
+         4] $CellContext`lopc - $CellContext`lox - $CellContext`lpo + \
+$CellContext`lqf)^(-1) $CellContext`Pqf + 
+   Rational[-3, 16] (
+     E^($CellContext`chW (-$CellContext`l2g - $CellContext`lpo) \
+$CellContext`t) - 
+     E^($CellContext`chW (-$CellContext`lb - $CellContext`lqf) \
+$CellContext`t)) $CellContext`lb $CellContext`lopc (-$CellContext`l2g + \
+$CellContext`lb - $CellContext`lpo + $CellContext`lqf)^(-1) ($CellContext`lb + 
+      Rational[-1, 
+         4] $CellContext`lopc - $CellContext`lox - $CellContext`lpo + \
+$CellContext`lqf)^(-1) $CellContext`Pqf],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.7675514425950108`*^9, 3.7675516080608473`*^9, 
+  3.767551709861364*^9, 3.767552202800666*^9, 3.767552590202458*^9, 
+  3.767552662102502*^9},
+ CellLabel->
+  "During evaluation of \
+In[16]:=",ExpressionUUID->"4a7f1f05-d4bb-41c0-9d68-2170e66f48e4"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Cth", "[", "t_", "]"}], "=", 
+  RowBox[{
+   RowBox[{"lqf", "*", 
+    RowBox[{"nqf", "[", "t", "]"}]}], "+", 
+   RowBox[{"lplus", "*", 
+    RowBox[{"nplus", "[", "t", "]"}], "*", "lp", "*", 
+    RowBox[{"np", "[", "t", "]"}]}], "+", 
+   RowBox[{"lpo", "*", 
+    RowBox[{"no", "[", "t", "]"}]}]}]}], "\[IndentingNewLine]", 
+ RowBox[{"FullSimplify", "[", "%", "]"}], "\[IndentingNewLine]", 
+ RowBox[{"CForm", "[", "%", "]"}]}], "Input",
+ CellChangeTimes->{{3.767550172814652*^9, 3.767550173164413*^9}, {
+  3.7675503558268137`*^9, 3.7675504337175407`*^9}, {3.7675509893346653`*^9, 
+  3.7675509981119823`*^9}, {3.767551692556636*^9, 3.767551695027779*^9}, {
+  3.767552582676474*^9, 3.7675525869473047`*^9}},
+ CellLabel->"In[28]:=",ExpressionUUID->"a92aeb96-5146-46a7-b50c-21034fde9e1b"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   SuperscriptBox["\[ExponentialE]", 
+    RowBox[{"chW", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", "lb"}], "-", "lqf"}], ")"}], " ", "t"}]], " ", "lqf", " ",
+    "Pqf"}], "+", 
+  FractionBox[
+   RowBox[{"3", " ", 
+    RowBox[{"(", 
+     RowBox[{
+      SuperscriptBox["\[ExponentialE]", 
+       RowBox[{"chW", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", 
+           FractionBox["lopc", "4"]}], "-", "lox", "-", "lpo"}], ")"}], " ", 
+        "t"}]], "-", 
+      SuperscriptBox["\[ExponentialE]", 
+       RowBox[{"chW", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lb"}], "-", "lqf"}], ")"}], " ", "t"}]]}], ")"}], " ",
+     "lb", " ", "lpo", " ", "Pqf"}], 
+   RowBox[{"4", " ", 
+    RowBox[{"(", 
+     RowBox[{"lb", "-", 
+      FractionBox["lopc", "4"], "-", "lox", "-", "lpo", "+", "lqf"}], 
+     ")"}]}]], "+", 
+  RowBox[{"lplus", " ", 
+   RowBox[{"(", 
+    RowBox[{"l2g", "+", "lpo"}], ")"}], " ", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{
+      SuperscriptBox["\[ExponentialE]", 
+       RowBox[{
+        RowBox[{"-", "chW"}], " ", "lplus", " ", "t"}]], " ", 
+      RowBox[{"(", 
+       RowBox[{"1", "-", "Pqf"}], ")"}]}], "+", 
+     FractionBox[
+      RowBox[{"3", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"-", 
+          SuperscriptBox["\[ExponentialE]", 
+           RowBox[{
+            RowBox[{"-", "chW"}], " ", "lplus", " ", "t"}]]}], "+", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"chW", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", 
+              FractionBox["lopc", "4"]}], "-", "lox", "-", "lpo"}], ")"}], 
+           " ", "t"}]]}], ")"}], " ", "lb", " ", "lox", " ", "Pqf"}], 
+      RowBox[{"4", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"-", 
+          FractionBox["lopc", "4"]}], "-", "lox", "+", "lplus", "-", "lpo"}], 
+        ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{"lb", "-", 
+         FractionBox["lopc", "4"], "-", "lox", "-", "lpo", "+", "lqf"}], 
+        ")"}]}]], "-", 
+     FractionBox[
+      RowBox[{"3", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{
+           RowBox[{"-", "chW"}], " ", "lplus", " ", "t"}]], "-", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"chW", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", "lb"}], "-", "lqf"}], ")"}], " ", "t"}]]}], ")"}], 
+       " ", "lb", " ", "lox", " ", "Pqf"}], 
+      RowBox[{"4", " ", 
+       RowBox[{"(", 
+        RowBox[{"lb", "-", "lplus", "+", "lqf"}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{"lb", "-", 
+         FractionBox["lopc", "4"], "-", "lox", "-", "lpo", "+", "lqf"}], 
+        ")"}]}]]}], ")"}], " ", 
+   RowBox[{"(", 
+    RowBox[{
+     FractionBox[
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"chW", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", "l2g"}], "-", "lpo"}], ")"}], " ", "t"}]], "-", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"chW", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", "lb"}], "-", "lqf"}], ")"}], " ", "t"}]]}], ")"}], 
+       " ", "lb", " ", "Pqf"}], 
+      RowBox[{"4", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"-", "l2g"}], "+", "lb", "-", "lpo", "+", "lqf"}], ")"}]}]], 
+     "+", 
+     FractionBox[
+      RowBox[{"3", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"-", 
+          SuperscriptBox["\[ExponentialE]", 
+           RowBox[{"chW", " ", 
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{"-", "l2g"}], "-", "lpo"}], ")"}], " ", "t"}]]}], "+", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"chW", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", 
+              FractionBox["lopc", "4"]}], "-", "lox", "-", "lpo"}], ")"}], 
+           " ", "t"}]]}], ")"}], " ", "lb", " ", "lopc", " ", "Pqf"}], 
+      RowBox[{"16", " ", 
+       RowBox[{"(", 
+        RowBox[{"l2g", "-", 
+         FractionBox["lopc", "4"], "-", "lox"}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{"lb", "-", 
+         FractionBox["lopc", "4"], "-", "lox", "-", "lpo", "+", "lqf"}], 
+        ")"}]}]], "-", 
+     FractionBox[
+      RowBox[{"3", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"chW", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", "l2g"}], "-", "lpo"}], ")"}], " ", "t"}]], "-", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"chW", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", "lb"}], "-", "lqf"}], ")"}], " ", "t"}]]}], ")"}], 
+       " ", "lb", " ", "lopc", " ", "Pqf"}], 
+      RowBox[{"16", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"-", "l2g"}], "+", "lb", "-", "lpo", "+", "lqf"}], ")"}], 
+       " ", 
+       RowBox[{"(", 
+        RowBox[{"lb", "-", 
+         FractionBox["lopc", "4"], "-", "lox", "-", "lpo", "+", "lqf"}], 
+        ")"}]}]]}], ")"}]}]}]], "Output",
+ CellChangeTimes->{
+  3.7675514426376038`*^9, 3.76755160809699*^9, {3.7675516970064697`*^9, 
+   3.767551714469502*^9}, 3.76755220981457*^9, 3.767552590333907*^9, 
+   3.7675526622081833`*^9},
+ CellLabel->"Out[28]=",ExpressionUUID->"f5363144-9fe8-4a11-8628-e672bbc963c0"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"-", 
+   FractionBox[
+    RowBox[{"3", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", 
+          FractionBox["1", "4"]}], " ", "chW", " ", 
+         RowBox[{"(", 
+          RowBox[{"lopc", "+", 
+           RowBox[{"4", " ", 
+            RowBox[{"(", 
+             RowBox[{"lox", "+", "lpo"}], ")"}]}]}], ")"}], " ", "t"}]], "-", 
+       
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", "chW"}], " ", 
+         RowBox[{"(", 
+          RowBox[{"lb", "+", "lqf"}], ")"}], " ", "t"}]]}], ")"}], " ", "lb", 
+     " ", "lpo", " ", "Pqf"}], 
+    RowBox[{
+     RowBox[{
+      RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+     RowBox[{"4", " ", 
+      RowBox[{"(", 
+       RowBox[{"lox", "+", "lpo", "-", "lqf"}], ")"}]}]}]]}], "+", 
+  RowBox[{
+   SuperscriptBox["\[ExponentialE]", 
+    RowBox[{
+     RowBox[{"-", "chW"}], " ", 
+     RowBox[{"(", 
+      RowBox[{"lb", "+", "lqf"}], ")"}], " ", "t"}]], " ", "lqf", " ", 
+   "Pqf"}], "+", 
+  RowBox[{
+   FractionBox["1", "4"], " ", 
+   SuperscriptBox["\[ExponentialE]", 
+    RowBox[{
+     RowBox[{"-", "chW"}], " ", "lplus", " ", "t"}]], " ", "lb", " ", "lplus",
+    " ", 
+   RowBox[{"(", 
+    RowBox[{"l2g", "+", "lpo"}], ")"}], " ", 
+   RowBox[{"(", 
+    RowBox[{
+     FractionBox[
+      RowBox[{"12", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", 
+          FractionBox["1", "4"]}], " ", "chW", " ", 
+         RowBox[{"(", 
+          RowBox[{"lopc", "+", 
+           RowBox[{"4", " ", 
+            RowBox[{"(", 
+             RowBox[{"lox", "+", "lpo"}], ")"}]}]}], ")"}], " ", "t"}]], " ", 
+       "lopc"}], 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+         RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+         RowBox[{"4", " ", 
+          RowBox[{"(", 
+           RowBox[{"lox", "+", "lpo", "-", "lqf"}], ")"}]}]}], ")"}]}]], "+", 
+     
+     FractionBox[
+      RowBox[{"4", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", "chW"}], " ", 
+         RowBox[{"(", 
+          RowBox[{"l2g", "+", "lpo"}], ")"}], " ", "t"}]], " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"-", "l2g"}], "+", "lopc", "+", "lox"}], ")"}]}], 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"4", " ", "l2g"}], "-", "lopc", "-", 
+         RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}]}]], "+", 
+     FractionBox[
+      RowBox[{
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", "chW"}], " ", 
+         RowBox[{"(", 
+          RowBox[{"lb", "+", "lqf"}], ")"}], " ", "t"}]], " ", 
+       RowBox[{"(", 
+        RowBox[{"1", "+", 
+         FractionBox[
+          RowBox[{"3", " ", "lopc"}], 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+           RowBox[{"4", " ", 
+            RowBox[{"(", 
+             RowBox[{"lox", "+", "lpo", "-", "lqf"}], ")"}]}]}]]}], ")"}]}], 
+      RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}]]}], ")"}], " ", 
+   "Pqf", " ", 
+   RowBox[{"(", 
+    RowBox[{"1", "-", "Pqf", "+", 
+     FractionBox[
+      RowBox[{"12", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"-", "1"}], "+", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{
+           RowBox[{"-", 
+            FractionBox["1", "4"]}], " ", "chW", " ", 
+           RowBox[{"(", 
+            RowBox[{"lopc", "+", 
+             RowBox[{"4", " ", 
+              RowBox[{"(", 
+               RowBox[{"lox", "-", "lplus", "+", "lpo"}], ")"}]}]}], ")"}], 
+           " ", "t"}]]}], ")"}], " ", "lb", " ", "lox", " ", "Pqf"}], 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{"lopc", "+", 
+         RowBox[{"4", " ", 
+          RowBox[{"(", 
+           RowBox[{"lox", "-", "lplus", "+", "lpo"}], ")"}]}]}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+         RowBox[{"4", " ", 
+          RowBox[{"(", 
+           RowBox[{"lox", "+", "lpo", "-", "lqf"}], ")"}]}]}], ")"}]}]], "+", 
+     
+     FractionBox[
+      RowBox[{"3", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"-", "1"}], "+", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{
+           RowBox[{"-", "chW"}], " ", 
+           RowBox[{"(", 
+            RowBox[{"lb", "-", "lplus", "+", "lqf"}], ")"}], " ", "t"}]]}], 
+        ")"}], " ", "lb", " ", "lox", " ", "Pqf"}], 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"4", " ", "lb"}], "-", "lopc", "-", 
+         RowBox[{"4", " ", 
+          RowBox[{"(", 
+           RowBox[{"lox", "+", "lpo", "-", "lqf"}], ")"}]}]}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{"lb", "-", "lplus", "+", "lqf"}], ")"}]}]]}], 
+    ")"}]}]}]], "Output",
+ CellChangeTimes->{
+  3.7675514426376038`*^9, 3.76755160809699*^9, {3.7675516970064697`*^9, 
+   3.767551714469502*^9}, 3.76755220981457*^9, 3.767552590333907*^9, 
+   3.767552874411583*^9},
+ CellLabel->"Out[29]=",ExpressionUUID->"9ffad435-61d0-4928-ab8f-99312753c7a5"],
+
+Cell["\<\
+(-3*(Power(E,-(chW*(lopc + 4*(lox + lpo))*t)/4.) - Power(E,-(chW*(lb + \
+lqf)*t)))*lb*lpo*Pqf)/(-4*lb + lopc + 4*(lox + lpo - lqf)) + \
+(lqf*Pqf)/Power(E,chW*(lb + lqf)*t) + 
+   (lb*lplus*(l2g + lpo)*((12*lopc)/(Power(E,(chW*(lopc + 4*(lox + \
+lpo))*t)/4.)*(-4*l2g + lopc + 4*lox)*(-4*lb + lopc + 4*(lox + lpo - lqf))) + 
+        (4*(-l2g + lopc + lox))/(Power(E,chW*(l2g + lpo)*t)*(4*l2g - lopc - \
+4*lox)*(l2g - lb + lpo - lqf)) + (1 + (3*lopc)/(-4*lb + lopc + 4*(lox + lpo - \
+lqf)))/(Power(E,chW*(lb + lqf)*t)*(l2g - lb + lpo - lqf)))*
+      Pqf*(1 - Pqf + (12*(-1 + Power(E,-(chW*(lopc + 4*(lox - lplus + \
+lpo))*t)/4.))*lb*lox*Pqf)/((lopc + 4*(lox - lplus + lpo))*(-4*lb + lopc + \
+4*(lox + lpo - lqf))) + 
+        (3*(-1 + Power(E,-(chW*(lb - lplus + lqf)*t)))*lb*lox*Pqf)/((4*lb - \
+lopc - 4*(lox + lpo - lqf))*(lb - lplus + lqf))))/(4.*Power(E,chW*lplus*t))\
+\>", "Output",
+ CellChangeTimes->{
+  3.7675514426376038`*^9, 3.76755160809699*^9, {3.7675516970064697`*^9, 
+   3.767551714469502*^9}, 3.76755220981457*^9, 3.767552590333907*^9, 
+   3.767552874419333*^9},
+ CellLabel->
+  "Out[30]//CForm=",ExpressionUUID->"b1d02bcc-24cb-46ba-9fea-787509ff97cc"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"indIntPdf", "[", "x_", "]"}], "=", 
+  RowBox[{"Integrate", "[", 
+   RowBox[{
+    RowBox[{"Cth", "[", "x", "]"}], ",", "x"}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.76169646992463*^9, 3.76169648828144*^9}, {
+   3.761696547175263*^9, 3.761696585335474*^9}, 3.7616969508105793`*^9, {
+   3.761696994006967*^9, 3.761696994122046*^9}, 3.765657685451033*^9, {
+   3.765657765691695*^9, 3.765657770756506*^9}, {3.765657865913413*^9, 
+   3.765657915914226*^9}, {3.765657951994424*^9, 3.765657974155452*^9}, {
+   3.7656599921866407`*^9, 3.765660028116428*^9}, {3.7656615479015102`*^9, 
+   3.765661552240143*^9}, {3.7656621603803263`*^9, 3.765662163614025*^9}, {
+   3.7656623660542383`*^9, 3.7656623667765923`*^9}, {3.765662513173468*^9, 
+   3.7656625135567093`*^9}, {3.7656635169076138`*^9, 3.765663517189431*^9}, {
+   3.7656635673540583`*^9, 3.765663584037105*^9}, {3.767551221685034*^9, 
+   3.767551223675585*^9}, {3.7675516643665*^9, 3.767551664722415*^9}, {
+   3.767551971362957*^9, 3.767551972416552*^9}},
+ CellLabel->"In[31]:=",ExpressionUUID->"b79579ed-a75e-43fb-b857-cdd222bbc933"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"-", 
+   FractionBox[
+    RowBox[{
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       RowBox[{"-", "chW"}], " ", 
+       RowBox[{"(", 
+        RowBox[{"lb", "+", "lqf"}], ")"}], " ", "x"}]], " ", "lqf", " ", 
+     "Pqf"}], 
+    RowBox[{"chW", " ", 
+     RowBox[{"(", 
+      RowBox[{"lb", "+", "lqf"}], ")"}]}]]}], "-", 
+  FractionBox[
+   RowBox[{"12", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", 
+       FractionBox["1", "4"]}], " ", "chW", " ", 
+      RowBox[{"(", 
+       RowBox[{"lopc", "+", 
+        RowBox[{"4", " ", "lox"}], "+", 
+        RowBox[{"4", " ", "lpo"}]}], ")"}], " ", "x"}]], " ", "lb", " ", 
+    "lpo", " ", "Pqf"}], 
+   RowBox[{"chW", " ", 
+    RowBox[{"(", 
+     RowBox[{"lopc", "+", 
+      RowBox[{"4", " ", "lox"}], "+", 
+      RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{"4", " ", "lb"}], "-", "lopc", "-", 
+      RowBox[{"4", " ", "lox"}], "-", 
+      RowBox[{"4", " ", "lpo"}], "+", 
+      RowBox[{"4", " ", "lqf"}]}], ")"}]}]], "+", 
+  FractionBox[
+   RowBox[{"3", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "chW"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"lb", "+", "lqf"}], ")"}], " ", "x"}]], " ", "lb", " ", "lpo", 
+    " ", "Pqf"}], 
+   RowBox[{"chW", " ", 
+    RowBox[{"(", 
+     RowBox[{"lb", "+", "lqf"}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{"4", " ", "lb"}], "-", "lopc", "-", 
+      RowBox[{"4", " ", "lox"}], "-", 
+      RowBox[{"4", " ", "lpo"}], "+", 
+      RowBox[{"4", " ", "lqf"}]}], ")"}]}]], "-", 
+  FractionBox[
+   RowBox[{"72", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", 
+       FractionBox["1", "2"]}], " ", "chW", " ", 
+      RowBox[{"(", 
+       RowBox[{"lopc", "+", 
+        RowBox[{"4", " ", "lox"}], "+", 
+        RowBox[{"4", " ", "lpo"}]}], ")"}], " ", "x"}]], " ", 
+    SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lplus", " ", 
+    RowBox[{"(", 
+     RowBox[{"l2g", "+", "lpo"}], ")"}], " ", 
+    SuperscriptBox["Pqf", "2"]}], 
+   RowBox[{"chW", " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+      RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"lopc", "+", 
+      RowBox[{"4", " ", "lox"}], "+", 
+      RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"lopc", "+", 
+      RowBox[{"4", " ", "lox"}], "-", 
+      RowBox[{"4", " ", "lplus"}], "+", 
+      RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+    SuperscriptBox[
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+       RowBox[{"4", " ", "lox"}], "+", 
+       RowBox[{"4", " ", "lpo"}], "-", 
+       RowBox[{"4", " ", "lqf"}]}], ")"}], "2"]}]], "+", 
+  FractionBox[
+   RowBox[{"3", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "2"}], " ", "chW", " ", 
+      RowBox[{"(", 
+       RowBox[{"lb", "+", "lqf"}], ")"}], " ", "x"}]], " ", "lplus", " ", 
+    RowBox[{"(", 
+     RowBox[{"l2g", "+", "lpo"}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"-", 
+        SuperscriptBox["lb", "3"]}], " ", "lox", " ", 
+       SuperscriptBox["Pqf", "2"]}], "+", 
+      RowBox[{
+       SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+       SuperscriptBox["Pqf", "2"]}], "+", 
+      RowBox[{
+       SuperscriptBox["lb", "2"], " ", 
+       SuperscriptBox["lox", "2"], " ", 
+       SuperscriptBox["Pqf", "2"]}], "+", 
+      RowBox[{
+       SuperscriptBox["lb", "2"], " ", "lox", " ", "lpo", " ", 
+       SuperscriptBox["Pqf", "2"]}], "-", 
+      RowBox[{
+       SuperscriptBox["lb", "2"], " ", "lox", " ", "lqf", " ", 
+       SuperscriptBox["Pqf", "2"]}]}], ")"}]}], 
+   RowBox[{"2", " ", "chW", " ", 
+    SuperscriptBox[
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+       RowBox[{"4", " ", "lox"}], "+", 
+       RowBox[{"4", " ", "lpo"}], "-", 
+       RowBox[{"4", " ", "lqf"}]}], ")"}], "2"], " ", 
+    RowBox[{"(", 
+     RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"lb", "+", "lqf"}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"lb", "-", "lplus", "+", "lqf"}], ")"}]}]], "+", 
+  RowBox[{
+   RowBox[{"(", 
+    RowBox[{"12", " ", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "chW"}], " ", "lplus", " ", "x"}], "-", 
+       RowBox[{
+        FractionBox["1", "4"], " ", "chW", " ", 
+        RowBox[{"(", 
+         RowBox[{"lopc", "+", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lpo"}]}], ")"}], " ", "x"}]}]], " ", "lplus", 
+     " ", 
+     RowBox[{"(", 
+      RowBox[{"l2g", "+", "lpo"}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", 
+         SuperscriptBox["lb", "2"]}], " ", 
+        SuperscriptBox["lopc", "2"], " ", "Pqf"}], "-", 
+       RowBox[{"4", " ", 
+        SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "Pqf"}], "+", 
+       RowBox[{"4", " ", 
+        SuperscriptBox["lb", "2"], " ", "lopc", " ", "lplus", " ", "Pqf"}], 
+       "+", 
+       RowBox[{"lb", " ", 
+        SuperscriptBox["lopc", "2"], " ", "lplus", " ", "Pqf"}], "+", 
+       RowBox[{
+       "4", " ", "lb", " ", "lopc", " ", "lox", " ", "lplus", " ", "Pqf"}], 
+       "-", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", 
+        SuperscriptBox["lplus", "2"], " ", "Pqf"}], "-", 
+       RowBox[{"4", " ", 
+        SuperscriptBox["lb", "2"], " ", "lopc", " ", "lpo", " ", "Pqf"}], "+", 
+       RowBox[{
+       "4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lpo", " ", "Pqf"}], 
+       "-", 
+       RowBox[{"lb", " ", 
+        SuperscriptBox["lopc", "2"], " ", "lqf", " ", "Pqf"}], "-", 
+       RowBox[{
+       "4", " ", "lb", " ", "lopc", " ", "lox", " ", "lqf", " ", "Pqf"}], "+", 
+       RowBox[{
+       "4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lqf", " ", "Pqf"}], 
+       "-", 
+       RowBox[{
+       "4", " ", "lb", " ", "lopc", " ", "lpo", " ", "lqf", " ", "Pqf"}], "+", 
+       RowBox[{
+        SuperscriptBox["lb", "2"], " ", 
+        SuperscriptBox["lopc", "2"], " ", 
+        SuperscriptBox["Pqf", "2"]}], "+", 
+       RowBox[{
+        SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+        SuperscriptBox["Pqf", "2"]}], "-", 
+       RowBox[{"4", " ", 
+        SuperscriptBox["lb", "2"], " ", "lopc", " ", "lplus", " ", 
+        SuperscriptBox["Pqf", "2"]}], "-", 
+       RowBox[{"lb", " ", 
+        SuperscriptBox["lopc", "2"], " ", "lplus", " ", 
+        SuperscriptBox["Pqf", "2"]}], "-", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", "lox", " ", "lplus", " ", 
+        SuperscriptBox["Pqf", "2"]}], "+", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", 
+        SuperscriptBox["lplus", "2"], " ", 
+        SuperscriptBox["Pqf", "2"]}], "+", 
+       RowBox[{"4", " ", 
+        SuperscriptBox["lb", "2"], " ", "lopc", " ", "lpo", " ", 
+        SuperscriptBox["Pqf", "2"]}], "-", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lpo", " ", 
+        SuperscriptBox["Pqf", "2"]}], "+", 
+       RowBox[{"lb", " ", 
+        SuperscriptBox["lopc", "2"], " ", "lqf", " ", 
+        SuperscriptBox["Pqf", "2"]}], "+", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", "lox", " ", "lqf", " ", 
+        SuperscriptBox["Pqf", "2"]}], "-", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lqf", " ", 
+        SuperscriptBox["Pqf", "2"]}], "+", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", "lpo", " ", "lqf", " ", 
+        SuperscriptBox["Pqf", "2"]}]}], ")"}]}], ")"}], "/", 
+   RowBox[{"(", 
+    RowBox[{"chW", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+       RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", "lopc"}], "-", 
+       RowBox[{"4", " ", "lox"}], "+", 
+       RowBox[{"4", " ", "lplus"}], "-", 
+       RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{"lopc", "+", 
+       RowBox[{"4", " ", "lox"}], "+", 
+       RowBox[{"4", " ", "lplus"}], "+", 
+       RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+       RowBox[{"4", " ", "lox"}], "+", 
+       RowBox[{"4", " ", "lpo"}], "-", 
+       RowBox[{"4", " ", "lqf"}]}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", "lb"}], "+", "lplus", "-", "lqf"}], ")"}]}], ")"}]}], "+", 
+  RowBox[{
+   SuperscriptBox["\[ExponentialE]", 
+    RowBox[{
+     RowBox[{"-", "chW"}], " ", 
+     RowBox[{"(", 
+      RowBox[{"l2g", "+", "lpo"}], ")"}], " ", "x"}]], " ", "lplus", " ", 
+   RowBox[{"(", 
+    RowBox[{"l2g", "+", "lpo"}], ")"}], " ", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"-", 
+      FractionBox[
+       RowBox[{"48", " ", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", 
+           FractionBox["1", "4"]}], " ", "chW", " ", 
+          RowBox[{"(", 
+           RowBox[{"lopc", "+", 
+            RowBox[{"4", " ", "lox"}], "+", 
+            RowBox[{"4", " ", "lpo"}]}], ")"}], " ", "x"}]], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "l2g"}], " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}]}], ")"}]}], 
+       RowBox[{"chW", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lopc"}], "-", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lplus"}], "-", 
+          RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"4", " ", "l2g"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"8", " ", "lpo"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lpo"}], "-", 
+          RowBox[{"4", " ", "lqf"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}]}]]}], "-", 
+     
+     FractionBox[
+      RowBox[{"3", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", "chW"}], " ", 
+         RowBox[{"(", 
+          RowBox[{"lb", "+", "lqf"}], ")"}], " ", "x"}]], " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"-", "l2g"}], " ", 
+          SuperscriptBox["lb", "2"], " ", "lox", " ", 
+          SuperscriptBox["Pqf", "2"]}], "+", 
+         RowBox[{
+          SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+          SuperscriptBox["Pqf", "2"]}], "+", 
+         RowBox[{
+          SuperscriptBox["lb", "2"], " ", 
+          SuperscriptBox["lox", "2"], " ", 
+          SuperscriptBox["Pqf", "2"]}]}], ")"}]}], 
+      RowBox[{"chW", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+         RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+         RowBox[{"4", " ", "lox"}], "+", 
+         RowBox[{"4", " ", "lpo"}], "-", 
+         RowBox[{"4", " ", "lqf"}]}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{"lb", "-", "lplus", "+", "lqf"}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{"l2g", "+", "lb", "+", "lpo", "+", "lqf"}], ")"}]}]], "+", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "chW"}], " ", "lplus", " ", "x"}]], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "l2g"}], " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "Pqf"}], "+", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "Pqf"}], "+", 
+          RowBox[{"5", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "Pqf"}], 
+          "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lplus", " ", "Pqf"}], "+", 
+          RowBox[{"l2g", " ", "lb", " ", "lopc", " ", "lplus", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lplus", " ", "Pqf"}],
+           "-", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lplus", " ", "Pqf"}], "+", 
+          RowBox[{
+          "4", " ", "l2g", " ", "lb", " ", "lox", " ", "lplus", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lplus", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lox", " ", "lplus", " ", "Pqf"}],
+           "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", 
+           SuperscriptBox["lplus", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lopc", " ", 
+           SuperscriptBox["lplus", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", 
+           SuperscriptBox["lplus", "2"], " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lpo", " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lpo", " ", "Pqf"}], 
+          "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lpo", " ", "Pqf"}], 
+          "+", 
+          RowBox[{
+          "4", " ", "l2g", " ", "lb", " ", "lplus", " ", "lpo", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lpo", " ", "Pqf"}],
+           "-", 
+          RowBox[{
+          "4", " ", "lb", " ", "lox", " ", "lplus", " ", "lpo", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"l2g", " ", "lb", " ", "lopc", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lqf", " ", "Pqf"}], "-", 
+          RowBox[{
+          "4", " ", "l2g", " ", "lb", " ", "lox", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lox", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", "Pqf"}], "+", 
+          RowBox[{
+          "4", " ", "l2g", " ", "lb", " ", "lplus", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lqf", " ", "Pqf"}],
+           "-", 
+          RowBox[{
+          "4", " ", "lb", " ", "lox", " ", "lplus", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "4", " ", "l2g", " ", "lb", " ", "lpo", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{
+          "4", " ", "lb", " ", "lopc", " ", "lpo", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{
+          "4", " ", "lb", " ", "lox", " ", "lpo", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{"l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"2", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"l2g", " ", "lb", " ", "lopc", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", "lox", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lox", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", 
+           SuperscriptBox["lplus", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lopc", " ", 
+           SuperscriptBox["lplus", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", 
+           SuperscriptBox["lplus", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", "lplus", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+          "4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", "lplus", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"l2g", " ", "lb", " ", "lopc", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", "lox", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"5", " ", "lb", " ", "lopc", " ", "lox", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", "lplus", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+          "4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", "lplus", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lopc", " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}]}], ")"}]}], ")"}], "/", 
+      RowBox[{"(", 
+       RowBox[{"chW", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lopc"}], "-", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lplus"}], "-", 
+          RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"l2g", "+", "lplus", "+", "lpo"}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lb"}], "+", "lplus", "-", "lqf"}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}]}], 
+       ")"}]}]}], ")"}]}], "+", 
+  RowBox[{
+   SuperscriptBox["\[ExponentialE]", 
+    RowBox[{
+     RowBox[{"-", "chW"}], " ", 
+     RowBox[{"(", 
+      RowBox[{"lb", "+", "lqf"}], ")"}], " ", "x"}]], " ", "lplus", " ", 
+   RowBox[{"(", 
+    RowBox[{"l2g", "+", "lpo"}], ")"}], " ", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{"12", " ", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", 
+           FractionBox["1", "4"]}], " ", "chW", " ", 
+          RowBox[{"(", 
+           RowBox[{"lopc", "+", 
+            RowBox[{"4", " ", "lox"}], "+", 
+            RowBox[{"4", " ", "lpo"}]}], ")"}], " ", "x"}]], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "16"}], " ", "l2g", " ", 
+           SuperscriptBox["lb", "4"], " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "4"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"3", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"7", " ", 
+           SuperscriptBox["lb", "3"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "3"], " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "4"], " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"12", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"32", " ", 
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "3"], " ", 
+           SuperscriptBox["lox", "3"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "3"], " ", "lox", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"28", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lplus", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", "lox", " ", "lplus", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "lox", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "3"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"20", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "3"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "3"], " ", "lox", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"12", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lpo", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", "lox", " ", "lpo", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"3", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "lox", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "3"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"12", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", 
+           SuperscriptBox["lox", "2"], " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lplus", " ", "lpo", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lplus", 
+           " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"12", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["lpo", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"32", " ", "l2g", " ", 
+           SuperscriptBox["lb", "3"], " ", "lox", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lqf", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", "lox", " ", "lqf", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"7", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "lox", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"32", " ", 
+           SuperscriptBox["lb", "3"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"32", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "3"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lplus", " ", "lqf", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lplus", 
+           " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lpo", 
+           " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}]}], ")"}]}], ")"}], "/", 
+      RowBox[{"(", 
+       RowBox[{"chW", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lopc"}], "-", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lplus"}], "-", 
+          RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+        SuperscriptBox[
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+           RowBox[{"4", " ", "lox"}], "+", 
+           RowBox[{"4", " ", "lpo"}], "-", 
+           RowBox[{"4", " ", "lqf"}]}], ")"}], "2"], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lb"}], "+", "lplus", "-", "lqf"}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"4", " ", "lb"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lpo"}], "+", 
+          RowBox[{"4", " ", "lqf"}]}], ")"}]}], ")"}]}], "+", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "chW"}], " ", "lplus", " ", "x"}]], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", "Pqf"}], "-", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "3"], " ", "lox", " ", "Pqf"}], "-", 
+          RowBox[{"5", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "3"], " ", "lplus", " ", "Pqf"}], "+", 
+          RowBox[{"3", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lplus", " ", "Pqf"}],
+           "+", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lplus", " ", "Pqf"}], "+", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lox", " ", "lplus", " ", "Pqf"}],
+           "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lplus", "2"], " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lopc", " ", 
+           SuperscriptBox["lplus", "2"], " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", 
+           SuperscriptBox["lplus", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "3"], " ", "lpo", " ", "Pqf"}], "-", 
+          RowBox[{"5", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lpo", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lpo", " ", "Pqf"}], 
+          "+", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lplus", " ", "lpo", " ", "Pqf"}],
+           "+", 
+          RowBox[{
+          "8", " ", "lb", " ", "lox", " ", "lplus", " ", "lpo", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lplus", "2"], " ", "lpo", " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lpo", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lplus", " ", 
+           SuperscriptBox["lpo", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"2", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lqf", " ", "Pqf"}], "+", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lox", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", "Pqf"}], "-", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lplus", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{
+          "3", " ", "lb", " ", "lopc", " ", "lplus", " ", "lqf", " ", "Pqf"}],
+           "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lplus", "2"], " ", "lqf", " ", "Pqf"}], "+", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lpo", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lpo", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "8", " ", "lb", " ", "lox", " ", "lpo", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lpo", "2"], " ", "lqf", " ", "Pqf"}], "+", 
+          RowBox[{"lb", " ", "lopc", " ", 
+           SuperscriptBox["lqf", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", 
+           SuperscriptBox["lqf", "2"], " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lplus", " ", 
+           SuperscriptBox["lqf", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lpo", " ", 
+           SuperscriptBox["lqf", "2"], " ", "Pqf"}], "-", 
+          RowBox[{
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{
+           SuperscriptBox["lb", "3"], " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"2", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "3"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"3", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lox", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lplus", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lopc", " ", 
+           SuperscriptBox["lplus", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", 
+           SuperscriptBox["lplus", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "3"], " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"5", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"5", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lplus", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"8", " ", "lb", " ", "lox", " ", "lplus", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lplus", "2"], " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lpo", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lplus", " ", 
+           SuperscriptBox["lpo", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"2", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"5", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"5", " ", "lb", " ", "lopc", " ", "lox", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lplus", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{
+          "3", " ", "lb", " ", "lopc", " ", "lplus", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lplus", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"5", " ", "lb", " ", "lopc", " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"8", " ", "lb", " ", "lox", " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lpo", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"lb", " ", "lopc", " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lplus", " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lpo", " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}]}], ")"}]}], ")"}], "/", 
+      RowBox[{"(", 
+       RowBox[{"chW", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lopc"}], "-", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lplus"}], "-", 
+          RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lpo"}], "-", 
+          RowBox[{"4", " ", "lqf"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lb"}], "+", "lplus", "-", "lqf"}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"lb", "+", "lplus", "+", "lqf"}], ")"}]}], ")"}]}]}], 
+    ")"}]}]}]], "Output",
+ CellChangeTimes->{3.767552294435257*^9, 3.767552956082828*^9},
+ CellLabel->"Out[31]=",ExpressionUUID->"68eb4292-e6bb-4bf7-86d4-a20471567785"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"definIntPdf", "[", 
+   RowBox[{"x1_", ",", "x2_"}], "]"}], "=", " ", 
+  RowBox[{
+   RowBox[{"indIntPdf", "[", "x2", "]"}], "-", 
+   RowBox[{"indIntPdf", "[", "x1", "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.765663604494553*^9, 3.765663637234548*^9}, {
+  3.767551763700789*^9, 3.767551763732244*^9}, {3.767552636370792*^9, 
+  3.767552638834549*^9}},
+ CellLabel->"In[32]:=",ExpressionUUID->"0d8efaa6-7fbe-4373-8abe-9119c057537b"],
+
+Cell[BoxData[
+ RowBox[{
+  FractionBox[
+   RowBox[{
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "chW"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"lb", "+", "lqf"}], ")"}], " ", "x1"}]], " ", "lqf", " ", 
+    "Pqf"}], 
+   RowBox[{"chW", " ", 
+    RowBox[{"(", 
+     RowBox[{"lb", "+", "lqf"}], ")"}]}]], "-", 
+  FractionBox[
+   RowBox[{
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "chW"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"lb", "+", "lqf"}], ")"}], " ", "x2"}]], " ", "lqf", " ", 
+    "Pqf"}], 
+   RowBox[{"chW", " ", 
+    RowBox[{"(", 
+     RowBox[{"lb", "+", "lqf"}], ")"}]}]], "+", 
+  FractionBox[
+   RowBox[{"12", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", 
+       FractionBox["1", "4"]}], " ", "chW", " ", 
+      RowBox[{"(", 
+       RowBox[{"lopc", "+", 
+        RowBox[{"4", " ", "lox"}], "+", 
+        RowBox[{"4", " ", "lpo"}]}], ")"}], " ", "x1"}]], " ", "lb", " ", 
+    "lpo", " ", "Pqf"}], 
+   RowBox[{"chW", " ", 
+    RowBox[{"(", 
+     RowBox[{"lopc", "+", 
+      RowBox[{"4", " ", "lox"}], "+", 
+      RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{"4", " ", "lb"}], "-", "lopc", "-", 
+      RowBox[{"4", " ", "lox"}], "-", 
+      RowBox[{"4", " ", "lpo"}], "+", 
+      RowBox[{"4", " ", "lqf"}]}], ")"}]}]], "-", 
+  FractionBox[
+   RowBox[{"12", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", 
+       FractionBox["1", "4"]}], " ", "chW", " ", 
+      RowBox[{"(", 
+       RowBox[{"lopc", "+", 
+        RowBox[{"4", " ", "lox"}], "+", 
+        RowBox[{"4", " ", "lpo"}]}], ")"}], " ", "x2"}]], " ", "lb", " ", 
+    "lpo", " ", "Pqf"}], 
+   RowBox[{"chW", " ", 
+    RowBox[{"(", 
+     RowBox[{"lopc", "+", 
+      RowBox[{"4", " ", "lox"}], "+", 
+      RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{"4", " ", "lb"}], "-", "lopc", "-", 
+      RowBox[{"4", " ", "lox"}], "-", 
+      RowBox[{"4", " ", "lpo"}], "+", 
+      RowBox[{"4", " ", "lqf"}]}], ")"}]}]], "-", 
+  FractionBox[
+   RowBox[{"3", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "chW"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"lb", "+", "lqf"}], ")"}], " ", "x1"}]], " ", "lb", " ", "lpo",
+     " ", "Pqf"}], 
+   RowBox[{"chW", " ", 
+    RowBox[{"(", 
+     RowBox[{"lb", "+", "lqf"}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{"4", " ", "lb"}], "-", "lopc", "-", 
+      RowBox[{"4", " ", "lox"}], "-", 
+      RowBox[{"4", " ", "lpo"}], "+", 
+      RowBox[{"4", " ", "lqf"}]}], ")"}]}]], "+", 
+  FractionBox[
+   RowBox[{"3", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "chW"}], " ", 
+      RowBox[{"(", 
+       RowBox[{"lb", "+", "lqf"}], ")"}], " ", "x2"}]], " ", "lb", " ", "lpo",
+     " ", "Pqf"}], 
+   RowBox[{"chW", " ", 
+    RowBox[{"(", 
+     RowBox[{"lb", "+", "lqf"}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{"4", " ", "lb"}], "-", "lopc", "-", 
+      RowBox[{"4", " ", "lox"}], "-", 
+      RowBox[{"4", " ", "lpo"}], "+", 
+      RowBox[{"4", " ", "lqf"}]}], ")"}]}]], "+", 
+  FractionBox[
+   RowBox[{"72", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", 
+       FractionBox["1", "2"]}], " ", "chW", " ", 
+      RowBox[{"(", 
+       RowBox[{"lopc", "+", 
+        RowBox[{"4", " ", "lox"}], "+", 
+        RowBox[{"4", " ", "lpo"}]}], ")"}], " ", "x1"}]], " ", 
+    SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lplus", " ", 
+    RowBox[{"(", 
+     RowBox[{"l2g", "+", "lpo"}], ")"}], " ", 
+    SuperscriptBox["Pqf", "2"]}], 
+   RowBox[{"chW", " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+      RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"lopc", "+", 
+      RowBox[{"4", " ", "lox"}], "+", 
+      RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"lopc", "+", 
+      RowBox[{"4", " ", "lox"}], "-", 
+      RowBox[{"4", " ", "lplus"}], "+", 
+      RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+    SuperscriptBox[
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+       RowBox[{"4", " ", "lox"}], "+", 
+       RowBox[{"4", " ", "lpo"}], "-", 
+       RowBox[{"4", " ", "lqf"}]}], ")"}], "2"]}]], "-", 
+  FractionBox[
+   RowBox[{"72", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", 
+       FractionBox["1", "2"]}], " ", "chW", " ", 
+      RowBox[{"(", 
+       RowBox[{"lopc", "+", 
+        RowBox[{"4", " ", "lox"}], "+", 
+        RowBox[{"4", " ", "lpo"}]}], ")"}], " ", "x2"}]], " ", 
+    SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lplus", " ", 
+    RowBox[{"(", 
+     RowBox[{"l2g", "+", "lpo"}], ")"}], " ", 
+    SuperscriptBox["Pqf", "2"]}], 
+   RowBox[{"chW", " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+      RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"lopc", "+", 
+      RowBox[{"4", " ", "lox"}], "+", 
+      RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"lopc", "+", 
+      RowBox[{"4", " ", "lox"}], "-", 
+      RowBox[{"4", " ", "lplus"}], "+", 
+      RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+    SuperscriptBox[
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+       RowBox[{"4", " ", "lox"}], "+", 
+       RowBox[{"4", " ", "lpo"}], "-", 
+       RowBox[{"4", " ", "lqf"}]}], ")"}], "2"]}]], "-", 
+  FractionBox[
+   RowBox[{"3", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "2"}], " ", "chW", " ", 
+      RowBox[{"(", 
+       RowBox[{"lb", "+", "lqf"}], ")"}], " ", "x1"}]], " ", "lplus", " ", 
+    RowBox[{"(", 
+     RowBox[{"l2g", "+", "lpo"}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"-", 
+        SuperscriptBox["lb", "3"]}], " ", "lox", " ", 
+       SuperscriptBox["Pqf", "2"]}], "+", 
+      RowBox[{
+       SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+       SuperscriptBox["Pqf", "2"]}], "+", 
+      RowBox[{
+       SuperscriptBox["lb", "2"], " ", 
+       SuperscriptBox["lox", "2"], " ", 
+       SuperscriptBox["Pqf", "2"]}], "+", 
+      RowBox[{
+       SuperscriptBox["lb", "2"], " ", "lox", " ", "lpo", " ", 
+       SuperscriptBox["Pqf", "2"]}], "-", 
+      RowBox[{
+       SuperscriptBox["lb", "2"], " ", "lox", " ", "lqf", " ", 
+       SuperscriptBox["Pqf", "2"]}]}], ")"}]}], 
+   RowBox[{"2", " ", "chW", " ", 
+    SuperscriptBox[
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+       RowBox[{"4", " ", "lox"}], "+", 
+       RowBox[{"4", " ", "lpo"}], "-", 
+       RowBox[{"4", " ", "lqf"}]}], ")"}], "2"], " ", 
+    RowBox[{"(", 
+     RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"lb", "+", "lqf"}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"lb", "-", "lplus", "+", "lqf"}], ")"}]}]], "+", 
+  FractionBox[
+   RowBox[{"3", " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "2"}], " ", "chW", " ", 
+      RowBox[{"(", 
+       RowBox[{"lb", "+", "lqf"}], ")"}], " ", "x2"}]], " ", "lplus", " ", 
+    RowBox[{"(", 
+     RowBox[{"l2g", "+", "lpo"}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"-", 
+        SuperscriptBox["lb", "3"]}], " ", "lox", " ", 
+       SuperscriptBox["Pqf", "2"]}], "+", 
+      RowBox[{
+       SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+       SuperscriptBox["Pqf", "2"]}], "+", 
+      RowBox[{
+       SuperscriptBox["lb", "2"], " ", 
+       SuperscriptBox["lox", "2"], " ", 
+       SuperscriptBox["Pqf", "2"]}], "+", 
+      RowBox[{
+       SuperscriptBox["lb", "2"], " ", "lox", " ", "lpo", " ", 
+       SuperscriptBox["Pqf", "2"]}], "-", 
+      RowBox[{
+       SuperscriptBox["lb", "2"], " ", "lox", " ", "lqf", " ", 
+       SuperscriptBox["Pqf", "2"]}]}], ")"}]}], 
+   RowBox[{"2", " ", "chW", " ", 
+    SuperscriptBox[
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+       RowBox[{"4", " ", "lox"}], "+", 
+       RowBox[{"4", " ", "lpo"}], "-", 
+       RowBox[{"4", " ", "lqf"}]}], ")"}], "2"], " ", 
+    RowBox[{"(", 
+     RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"lb", "+", "lqf"}], ")"}], " ", 
+    RowBox[{"(", 
+     RowBox[{"lb", "-", "lplus", "+", "lqf"}], ")"}]}]], "-", 
+  RowBox[{
+   RowBox[{"(", 
+    RowBox[{"12", " ", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "chW"}], " ", "lplus", " ", "x1"}], "-", 
+       RowBox[{
+        FractionBox["1", "4"], " ", "chW", " ", 
+        RowBox[{"(", 
+         RowBox[{"lopc", "+", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lpo"}]}], ")"}], " ", "x1"}]}]], " ", "lplus", 
+     " ", 
+     RowBox[{"(", 
+      RowBox[{"l2g", "+", "lpo"}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", 
+         SuperscriptBox["lb", "2"]}], " ", 
+        SuperscriptBox["lopc", "2"], " ", "Pqf"}], "-", 
+       RowBox[{"4", " ", 
+        SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "Pqf"}], "+", 
+       RowBox[{"4", " ", 
+        SuperscriptBox["lb", "2"], " ", "lopc", " ", "lplus", " ", "Pqf"}], 
+       "+", 
+       RowBox[{"lb", " ", 
+        SuperscriptBox["lopc", "2"], " ", "lplus", " ", "Pqf"}], "+", 
+       RowBox[{
+       "4", " ", "lb", " ", "lopc", " ", "lox", " ", "lplus", " ", "Pqf"}], 
+       "-", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", 
+        SuperscriptBox["lplus", "2"], " ", "Pqf"}], "-", 
+       RowBox[{"4", " ", 
+        SuperscriptBox["lb", "2"], " ", "lopc", " ", "lpo", " ", "Pqf"}], "+", 
+       RowBox[{
+       "4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lpo", " ", "Pqf"}], 
+       "-", 
+       RowBox[{"lb", " ", 
+        SuperscriptBox["lopc", "2"], " ", "lqf", " ", "Pqf"}], "-", 
+       RowBox[{
+       "4", " ", "lb", " ", "lopc", " ", "lox", " ", "lqf", " ", "Pqf"}], "+", 
+       RowBox[{
+       "4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lqf", " ", "Pqf"}], 
+       "-", 
+       RowBox[{
+       "4", " ", "lb", " ", "lopc", " ", "lpo", " ", "lqf", " ", "Pqf"}], "+", 
+       RowBox[{
+        SuperscriptBox["lb", "2"], " ", 
+        SuperscriptBox["lopc", "2"], " ", 
+        SuperscriptBox["Pqf", "2"]}], "+", 
+       RowBox[{
+        SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+        SuperscriptBox["Pqf", "2"]}], "-", 
+       RowBox[{"4", " ", 
+        SuperscriptBox["lb", "2"], " ", "lopc", " ", "lplus", " ", 
+        SuperscriptBox["Pqf", "2"]}], "-", 
+       RowBox[{"lb", " ", 
+        SuperscriptBox["lopc", "2"], " ", "lplus", " ", 
+        SuperscriptBox["Pqf", "2"]}], "-", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", "lox", " ", "lplus", " ", 
+        SuperscriptBox["Pqf", "2"]}], "+", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", 
+        SuperscriptBox["lplus", "2"], " ", 
+        SuperscriptBox["Pqf", "2"]}], "+", 
+       RowBox[{"4", " ", 
+        SuperscriptBox["lb", "2"], " ", "lopc", " ", "lpo", " ", 
+        SuperscriptBox["Pqf", "2"]}], "-", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lpo", " ", 
+        SuperscriptBox["Pqf", "2"]}], "+", 
+       RowBox[{"lb", " ", 
+        SuperscriptBox["lopc", "2"], " ", "lqf", " ", 
+        SuperscriptBox["Pqf", "2"]}], "+", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", "lox", " ", "lqf", " ", 
+        SuperscriptBox["Pqf", "2"]}], "-", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lqf", " ", 
+        SuperscriptBox["Pqf", "2"]}], "+", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", "lpo", " ", "lqf", " ", 
+        SuperscriptBox["Pqf", "2"]}]}], ")"}]}], ")"}], "/", 
+   RowBox[{"(", 
+    RowBox[{"chW", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+       RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", "lopc"}], "-", 
+       RowBox[{"4", " ", "lox"}], "+", 
+       RowBox[{"4", " ", "lplus"}], "-", 
+       RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{"lopc", "+", 
+       RowBox[{"4", " ", "lox"}], "+", 
+       RowBox[{"4", " ", "lplus"}], "+", 
+       RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+       RowBox[{"4", " ", "lox"}], "+", 
+       RowBox[{"4", " ", "lpo"}], "-", 
+       RowBox[{"4", " ", "lqf"}]}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", "lb"}], "+", "lplus", "-", "lqf"}], ")"}]}], ")"}]}], "+", 
+  RowBox[{
+   RowBox[{"(", 
+    RowBox[{"12", " ", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "chW"}], " ", "lplus", " ", "x2"}], "-", 
+       RowBox[{
+        FractionBox["1", "4"], " ", "chW", " ", 
+        RowBox[{"(", 
+         RowBox[{"lopc", "+", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lpo"}]}], ")"}], " ", "x2"}]}]], " ", "lplus", 
+     " ", 
+     RowBox[{"(", 
+      RowBox[{"l2g", "+", "lpo"}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", 
+         SuperscriptBox["lb", "2"]}], " ", 
+        SuperscriptBox["lopc", "2"], " ", "Pqf"}], "-", 
+       RowBox[{"4", " ", 
+        SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "Pqf"}], "+", 
+       RowBox[{"4", " ", 
+        SuperscriptBox["lb", "2"], " ", "lopc", " ", "lplus", " ", "Pqf"}], 
+       "+", 
+       RowBox[{"lb", " ", 
+        SuperscriptBox["lopc", "2"], " ", "lplus", " ", "Pqf"}], "+", 
+       RowBox[{
+       "4", " ", "lb", " ", "lopc", " ", "lox", " ", "lplus", " ", "Pqf"}], 
+       "-", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", 
+        SuperscriptBox["lplus", "2"], " ", "Pqf"}], "-", 
+       RowBox[{"4", " ", 
+        SuperscriptBox["lb", "2"], " ", "lopc", " ", "lpo", " ", "Pqf"}], "+", 
+       RowBox[{
+       "4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lpo", " ", "Pqf"}], 
+       "-", 
+       RowBox[{"lb", " ", 
+        SuperscriptBox["lopc", "2"], " ", "lqf", " ", "Pqf"}], "-", 
+       RowBox[{
+       "4", " ", "lb", " ", "lopc", " ", "lox", " ", "lqf", " ", "Pqf"}], "+", 
+       RowBox[{
+       "4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lqf", " ", "Pqf"}], 
+       "-", 
+       RowBox[{
+       "4", " ", "lb", " ", "lopc", " ", "lpo", " ", "lqf", " ", "Pqf"}], "+", 
+       RowBox[{
+        SuperscriptBox["lb", "2"], " ", 
+        SuperscriptBox["lopc", "2"], " ", 
+        SuperscriptBox["Pqf", "2"]}], "+", 
+       RowBox[{
+        SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+        SuperscriptBox["Pqf", "2"]}], "-", 
+       RowBox[{"4", " ", 
+        SuperscriptBox["lb", "2"], " ", "lopc", " ", "lplus", " ", 
+        SuperscriptBox["Pqf", "2"]}], "-", 
+       RowBox[{"lb", " ", 
+        SuperscriptBox["lopc", "2"], " ", "lplus", " ", 
+        SuperscriptBox["Pqf", "2"]}], "-", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", "lox", " ", "lplus", " ", 
+        SuperscriptBox["Pqf", "2"]}], "+", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", 
+        SuperscriptBox["lplus", "2"], " ", 
+        SuperscriptBox["Pqf", "2"]}], "+", 
+       RowBox[{"4", " ", 
+        SuperscriptBox["lb", "2"], " ", "lopc", " ", "lpo", " ", 
+        SuperscriptBox["Pqf", "2"]}], "-", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lpo", " ", 
+        SuperscriptBox["Pqf", "2"]}], "+", 
+       RowBox[{"lb", " ", 
+        SuperscriptBox["lopc", "2"], " ", "lqf", " ", 
+        SuperscriptBox["Pqf", "2"]}], "+", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", "lox", " ", "lqf", " ", 
+        SuperscriptBox["Pqf", "2"]}], "-", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lqf", " ", 
+        SuperscriptBox["Pqf", "2"]}], "+", 
+       RowBox[{"4", " ", "lb", " ", "lopc", " ", "lpo", " ", "lqf", " ", 
+        SuperscriptBox["Pqf", "2"]}]}], ")"}]}], ")"}], "/", 
+   RowBox[{"(", 
+    RowBox[{"chW", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+       RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", "lopc"}], "-", 
+       RowBox[{"4", " ", "lox"}], "+", 
+       RowBox[{"4", " ", "lplus"}], "-", 
+       RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{"lopc", "+", 
+       RowBox[{"4", " ", "lox"}], "+", 
+       RowBox[{"4", " ", "lplus"}], "+", 
+       RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+       RowBox[{"4", " ", "lox"}], "+", 
+       RowBox[{"4", " ", "lpo"}], "-", 
+       RowBox[{"4", " ", "lqf"}]}], ")"}], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"-", "lb"}], "+", "lplus", "-", "lqf"}], ")"}]}], ")"}]}], "-", 
+  RowBox[{
+   SuperscriptBox["\[ExponentialE]", 
+    RowBox[{
+     RowBox[{"-", "chW"}], " ", 
+     RowBox[{"(", 
+      RowBox[{"l2g", "+", "lpo"}], ")"}], " ", "x1"}]], " ", "lplus", " ", 
+   RowBox[{"(", 
+    RowBox[{"l2g", "+", "lpo"}], ")"}], " ", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"-", 
+      FractionBox[
+       RowBox[{"48", " ", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", 
+           FractionBox["1", "4"]}], " ", "chW", " ", 
+          RowBox[{"(", 
+           RowBox[{"lopc", "+", 
+            RowBox[{"4", " ", "lox"}], "+", 
+            RowBox[{"4", " ", "lpo"}]}], ")"}], " ", "x1"}]], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "l2g"}], " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}]}], ")"}]}], 
+       RowBox[{"chW", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lopc"}], "-", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lplus"}], "-", 
+          RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"4", " ", "l2g"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"8", " ", "lpo"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lpo"}], "-", 
+          RowBox[{"4", " ", "lqf"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}]}]]}], "-", 
+     
+     FractionBox[
+      RowBox[{"3", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", "chW"}], " ", 
+         RowBox[{"(", 
+          RowBox[{"lb", "+", "lqf"}], ")"}], " ", "x1"}]], " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"-", "l2g"}], " ", 
+          SuperscriptBox["lb", "2"], " ", "lox", " ", 
+          SuperscriptBox["Pqf", "2"]}], "+", 
+         RowBox[{
+          SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+          SuperscriptBox["Pqf", "2"]}], "+", 
+         RowBox[{
+          SuperscriptBox["lb", "2"], " ", 
+          SuperscriptBox["lox", "2"], " ", 
+          SuperscriptBox["Pqf", "2"]}]}], ")"}]}], 
+      RowBox[{"chW", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+         RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+         RowBox[{"4", " ", "lox"}], "+", 
+         RowBox[{"4", " ", "lpo"}], "-", 
+         RowBox[{"4", " ", "lqf"}]}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{"lb", "-", "lplus", "+", "lqf"}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{"l2g", "+", "lb", "+", "lpo", "+", "lqf"}], ")"}]}]], "+", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "chW"}], " ", "lplus", " ", "x1"}]], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "l2g"}], " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "Pqf"}], "+", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "Pqf"}], "+", 
+          RowBox[{"5", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "Pqf"}], 
+          "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lplus", " ", "Pqf"}], "+", 
+          RowBox[{"l2g", " ", "lb", " ", "lopc", " ", "lplus", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lplus", " ", "Pqf"}],
+           "-", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lplus", " ", "Pqf"}], "+", 
+          RowBox[{
+          "4", " ", "l2g", " ", "lb", " ", "lox", " ", "lplus", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lplus", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lox", " ", "lplus", " ", "Pqf"}],
+           "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", 
+           SuperscriptBox["lplus", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lopc", " ", 
+           SuperscriptBox["lplus", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", 
+           SuperscriptBox["lplus", "2"], " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lpo", " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lpo", " ", "Pqf"}], 
+          "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lpo", " ", "Pqf"}], 
+          "+", 
+          RowBox[{
+          "4", " ", "l2g", " ", "lb", " ", "lplus", " ", "lpo", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lpo", " ", "Pqf"}],
+           "-", 
+          RowBox[{
+          "4", " ", "lb", " ", "lox", " ", "lplus", " ", "lpo", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"l2g", " ", "lb", " ", "lopc", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lqf", " ", "Pqf"}], "-", 
+          RowBox[{
+          "4", " ", "l2g", " ", "lb", " ", "lox", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lox", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", "Pqf"}], "+", 
+          RowBox[{
+          "4", " ", "l2g", " ", "lb", " ", "lplus", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lqf", " ", "Pqf"}],
+           "-", 
+          RowBox[{
+          "4", " ", "lb", " ", "lox", " ", "lplus", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "4", " ", "l2g", " ", "lb", " ", "lpo", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{
+          "4", " ", "lb", " ", "lopc", " ", "lpo", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{
+          "4", " ", "lb", " ", "lox", " ", "lpo", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{"l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"2", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"l2g", " ", "lb", " ", "lopc", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", "lox", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lox", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", 
+           SuperscriptBox["lplus", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lopc", " ", 
+           SuperscriptBox["lplus", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", 
+           SuperscriptBox["lplus", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", "lplus", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+          "4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", "lplus", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"l2g", " ", "lb", " ", "lopc", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", "lox", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"5", " ", "lb", " ", "lopc", " ", "lox", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", "lplus", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+          "4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", "lplus", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lopc", " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}]}], ")"}]}], ")"}], "/", 
+      RowBox[{"(", 
+       RowBox[{"chW", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lopc"}], "-", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lplus"}], "-", 
+          RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"l2g", "+", "lplus", "+", "lpo"}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lb"}], "+", "lplus", "-", "lqf"}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}]}], 
+       ")"}]}]}], ")"}]}], "+", 
+  RowBox[{
+   SuperscriptBox["\[ExponentialE]", 
+    RowBox[{
+     RowBox[{"-", "chW"}], " ", 
+     RowBox[{"(", 
+      RowBox[{"l2g", "+", "lpo"}], ")"}], " ", "x2"}]], " ", "lplus", " ", 
+   RowBox[{"(", 
+    RowBox[{"l2g", "+", "lpo"}], ")"}], " ", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"-", 
+      FractionBox[
+       RowBox[{"48", " ", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", 
+           FractionBox["1", "4"]}], " ", "chW", " ", 
+          RowBox[{"(", 
+           RowBox[{"lopc", "+", 
+            RowBox[{"4", " ", "lox"}], "+", 
+            RowBox[{"4", " ", "lpo"}]}], ")"}], " ", "x2"}]], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "l2g"}], " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}]}], ")"}]}], 
+       RowBox[{"chW", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lopc"}], "-", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lplus"}], "-", 
+          RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"4", " ", "l2g"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"8", " ", "lpo"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lpo"}], "-", 
+          RowBox[{"4", " ", "lqf"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}]}]]}], "-", 
+     
+     FractionBox[
+      RowBox[{"3", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{
+         RowBox[{"-", "chW"}], " ", 
+         RowBox[{"(", 
+          RowBox[{"lb", "+", "lqf"}], ")"}], " ", "x2"}]], " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"-", "l2g"}], " ", 
+          SuperscriptBox["lb", "2"], " ", "lox", " ", 
+          SuperscriptBox["Pqf", "2"]}], "+", 
+         RowBox[{
+          SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+          SuperscriptBox["Pqf", "2"]}], "+", 
+         RowBox[{
+          SuperscriptBox["lb", "2"], " ", 
+          SuperscriptBox["lox", "2"], " ", 
+          SuperscriptBox["Pqf", "2"]}]}], ")"}]}], 
+      RowBox[{"chW", " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+         RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+         RowBox[{"4", " ", "lox"}], "+", 
+         RowBox[{"4", " ", "lpo"}], "-", 
+         RowBox[{"4", " ", "lqf"}]}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{"lb", "-", "lplus", "+", "lqf"}], ")"}], " ", 
+       RowBox[{"(", 
+        RowBox[{"l2g", "+", "lb", "+", "lpo", "+", "lqf"}], ")"}]}]], "+", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "chW"}], " ", "lplus", " ", "x2"}]], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "l2g"}], " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "Pqf"}], "+", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "Pqf"}], "+", 
+          RowBox[{"5", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "Pqf"}], 
+          "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lplus", " ", "Pqf"}], "+", 
+          RowBox[{"l2g", " ", "lb", " ", "lopc", " ", "lplus", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lplus", " ", "Pqf"}],
+           "-", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lplus", " ", "Pqf"}], "+", 
+          RowBox[{
+          "4", " ", "l2g", " ", "lb", " ", "lox", " ", "lplus", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lplus", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lox", " ", "lplus", " ", "Pqf"}],
+           "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", 
+           SuperscriptBox["lplus", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lopc", " ", 
+           SuperscriptBox["lplus", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", 
+           SuperscriptBox["lplus", "2"], " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lpo", " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lpo", " ", "Pqf"}], 
+          "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lpo", " ", "Pqf"}], 
+          "+", 
+          RowBox[{
+          "4", " ", "l2g", " ", "lb", " ", "lplus", " ", "lpo", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lpo", " ", "Pqf"}],
+           "-", 
+          RowBox[{
+          "4", " ", "lb", " ", "lox", " ", "lplus", " ", "lpo", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"l2g", " ", "lb", " ", "lopc", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lqf", " ", "Pqf"}], "-", 
+          RowBox[{
+          "4", " ", "l2g", " ", "lb", " ", "lox", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lox", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", "Pqf"}], "+", 
+          RowBox[{
+          "4", " ", "l2g", " ", "lb", " ", "lplus", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lqf", " ", "Pqf"}],
+           "-", 
+          RowBox[{
+          "4", " ", "lb", " ", "lox", " ", "lplus", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "4", " ", "l2g", " ", "lb", " ", "lpo", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{
+          "4", " ", "lb", " ", "lopc", " ", "lpo", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{
+          "4", " ", "lb", " ", "lox", " ", "lpo", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{"l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"2", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"l2g", " ", "lb", " ", "lopc", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", "lox", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lox", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", 
+           SuperscriptBox["lplus", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lopc", " ", 
+           SuperscriptBox["lplus", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", 
+           SuperscriptBox["lplus", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", "lplus", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+          "4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", "lplus", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"l2g", " ", "lb", " ", "lopc", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", "lox", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"5", " ", "lb", " ", "lopc", " ", "lox", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", "lplus", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+          "4", " ", "lb", " ", "lopc", " ", "lplus", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", "lplus", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "l2g", " ", "lb", " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lopc", " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}]}], ")"}]}], ")"}], "/", 
+      RowBox[{"(", 
+       RowBox[{"chW", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lopc"}], "-", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lplus"}], "-", 
+          RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"l2g", "+", "lplus", "+", "lpo"}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lb"}], "+", "lplus", "-", "lqf"}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}]}], 
+       ")"}]}]}], ")"}]}], "-", 
+  RowBox[{
+   SuperscriptBox["\[ExponentialE]", 
+    RowBox[{
+     RowBox[{"-", "chW"}], " ", 
+     RowBox[{"(", 
+      RowBox[{"lb", "+", "lqf"}], ")"}], " ", "x1"}]], " ", "lplus", " ", 
+   RowBox[{"(", 
+    RowBox[{"l2g", "+", "lpo"}], ")"}], " ", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{"12", " ", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", 
+           FractionBox["1", "4"]}], " ", "chW", " ", 
+          RowBox[{"(", 
+           RowBox[{"lopc", "+", 
+            RowBox[{"4", " ", "lox"}], "+", 
+            RowBox[{"4", " ", "lpo"}]}], ")"}], " ", "x1"}]], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "16"}], " ", "l2g", " ", 
+           SuperscriptBox["lb", "4"], " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "4"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"3", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"7", " ", 
+           SuperscriptBox["lb", "3"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "3"], " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "4"], " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"12", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"32", " ", 
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "3"], " ", 
+           SuperscriptBox["lox", "3"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "3"], " ", "lox", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"28", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lplus", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", "lox", " ", "lplus", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "lox", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "3"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"20", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "3"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "3"], " ", "lox", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"12", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lpo", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", "lox", " ", "lpo", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"3", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "lox", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "3"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"12", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", 
+           SuperscriptBox["lox", "2"], " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lplus", " ", "lpo", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lplus", 
+           " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"12", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["lpo", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"32", " ", "l2g", " ", 
+           SuperscriptBox["lb", "3"], " ", "lox", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lqf", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", "lox", " ", "lqf", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"7", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "lox", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"32", " ", 
+           SuperscriptBox["lb", "3"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"32", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "3"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lplus", " ", "lqf", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lplus", 
+           " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lpo", 
+           " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}]}], ")"}]}], ")"}], "/", 
+      RowBox[{"(", 
+       RowBox[{"chW", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lopc"}], "-", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lplus"}], "-", 
+          RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+        SuperscriptBox[
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+           RowBox[{"4", " ", "lox"}], "+", 
+           RowBox[{"4", " ", "lpo"}], "-", 
+           RowBox[{"4", " ", "lqf"}]}], ")"}], "2"], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lb"}], "+", "lplus", "-", "lqf"}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"4", " ", "lb"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lpo"}], "+", 
+          RowBox[{"4", " ", "lqf"}]}], ")"}]}], ")"}]}], "+", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "chW"}], " ", "lplus", " ", "x1"}]], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", "Pqf"}], "-", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "3"], " ", "lox", " ", "Pqf"}], "-", 
+          RowBox[{"5", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "3"], " ", "lplus", " ", "Pqf"}], "+", 
+          RowBox[{"3", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lplus", " ", "Pqf"}],
+           "+", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lplus", " ", "Pqf"}], "+", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lox", " ", "lplus", " ", "Pqf"}],
+           "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lplus", "2"], " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lopc", " ", 
+           SuperscriptBox["lplus", "2"], " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", 
+           SuperscriptBox["lplus", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "3"], " ", "lpo", " ", "Pqf"}], "-", 
+          RowBox[{"5", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lpo", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lpo", " ", "Pqf"}], 
+          "+", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lplus", " ", "lpo", " ", "Pqf"}],
+           "+", 
+          RowBox[{
+          "8", " ", "lb", " ", "lox", " ", "lplus", " ", "lpo", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lplus", "2"], " ", "lpo", " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lpo", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lplus", " ", 
+           SuperscriptBox["lpo", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"2", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lqf", " ", "Pqf"}], "+", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lox", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", "Pqf"}], "-", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lplus", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{
+          "3", " ", "lb", " ", "lopc", " ", "lplus", " ", "lqf", " ", "Pqf"}],
+           "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lplus", "2"], " ", "lqf", " ", "Pqf"}], "+", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lpo", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lpo", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "8", " ", "lb", " ", "lox", " ", "lpo", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lpo", "2"], " ", "lqf", " ", "Pqf"}], "+", 
+          RowBox[{"lb", " ", "lopc", " ", 
+           SuperscriptBox["lqf", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", 
+           SuperscriptBox["lqf", "2"], " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lplus", " ", 
+           SuperscriptBox["lqf", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lpo", " ", 
+           SuperscriptBox["lqf", "2"], " ", "Pqf"}], "-", 
+          RowBox[{
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{
+           SuperscriptBox["lb", "3"], " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"2", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "3"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"3", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lox", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lplus", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lopc", " ", 
+           SuperscriptBox["lplus", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", 
+           SuperscriptBox["lplus", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "3"], " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"5", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"5", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lplus", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"8", " ", "lb", " ", "lox", " ", "lplus", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lplus", "2"], " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lpo", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lplus", " ", 
+           SuperscriptBox["lpo", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"2", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"5", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"5", " ", "lb", " ", "lopc", " ", "lox", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lplus", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{
+          "3", " ", "lb", " ", "lopc", " ", "lplus", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lplus", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"5", " ", "lb", " ", "lopc", " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"8", " ", "lb", " ", "lox", " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lpo", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"lb", " ", "lopc", " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lplus", " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lpo", " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}]}], ")"}]}], ")"}], "/", 
+      RowBox[{"(", 
+       RowBox[{"chW", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lopc"}], "-", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lplus"}], "-", 
+          RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lpo"}], "-", 
+          RowBox[{"4", " ", "lqf"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lb"}], "+", "lplus", "-", "lqf"}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"lb", "+", "lplus", "+", "lqf"}], ")"}]}], ")"}]}]}], 
+    ")"}]}], "+", 
+  RowBox[{
+   SuperscriptBox["\[ExponentialE]", 
+    RowBox[{
+     RowBox[{"-", "chW"}], " ", 
+     RowBox[{"(", 
+      RowBox[{"lb", "+", "lqf"}], ")"}], " ", "x2"}]], " ", "lplus", " ", 
+   RowBox[{"(", 
+    RowBox[{"l2g", "+", "lpo"}], ")"}], " ", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{"12", " ", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", 
+           FractionBox["1", "4"]}], " ", "chW", " ", 
+          RowBox[{"(", 
+           RowBox[{"lopc", "+", 
+            RowBox[{"4", " ", "lox"}], "+", 
+            RowBox[{"4", " ", "lpo"}]}], ")"}], " ", "x2"}]], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "16"}], " ", "l2g", " ", 
+           SuperscriptBox["lb", "4"], " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "4"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"3", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"7", " ", 
+           SuperscriptBox["lb", "3"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "3"], " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "4"], " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"12", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"32", " ", 
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "3"], " ", 
+           SuperscriptBox["lox", "3"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "3"], " ", "lox", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"28", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lplus", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", "lox", " ", "lplus", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "lox", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "3"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"20", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "3"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "3"], " ", "lox", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"12", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lpo", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", "lox", " ", "lpo", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"3", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "lox", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "3"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"12", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", 
+           SuperscriptBox["lox", "2"], " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lplus", " ", "lpo", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lplus", 
+           " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"12", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["lpo", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"32", " ", "l2g", " ", 
+           SuperscriptBox["lb", "3"], " ", "lox", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lqf", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", "lox", " ", "lqf", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"7", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "lox", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"32", " ", 
+           SuperscriptBox["lb", "3"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"32", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "3"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lplus", " ", "lqf", 
+           " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lplus", 
+           " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "lpo", 
+           " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"16", " ", "l2g", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"16", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}]}], ")"}]}], ")"}], "/", 
+      RowBox[{"(", 
+       RowBox[{"chW", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "4"}], " ", "l2g"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lopc"}], "-", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lplus"}], "-", 
+          RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+        SuperscriptBox[
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+           RowBox[{"4", " ", "lox"}], "+", 
+           RowBox[{"4", " ", "lpo"}], "-", 
+           RowBox[{"4", " ", "lqf"}]}], ")"}], "2"], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lb"}], "+", "lplus", "-", "lqf"}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"4", " ", "lb"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lpo"}], "+", 
+          RowBox[{"4", " ", "lqf"}]}], ")"}]}], ")"}]}], "+", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"-", "chW"}], " ", "lplus", " ", "x2"}]], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", "Pqf"}], "-", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "3"], " ", "lox", " ", "Pqf"}], "-", 
+          RowBox[{"5", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "3"], " ", "lplus", " ", "Pqf"}], "+", 
+          RowBox[{"3", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lplus", " ", "Pqf"}],
+           "+", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lplus", " ", "Pqf"}], "+", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lox", " ", "lplus", " ", "Pqf"}],
+           "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lplus", "2"], " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lopc", " ", 
+           SuperscriptBox["lplus", "2"], " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", 
+           SuperscriptBox["lplus", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "3"], " ", "lpo", " ", "Pqf"}], "-", 
+          RowBox[{"5", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lpo", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lpo", " ", "Pqf"}], 
+          "+", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lplus", " ", "lpo", " ", "Pqf"}],
+           "+", 
+          RowBox[{
+          "8", " ", "lb", " ", "lox", " ", "lplus", " ", "lpo", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lplus", "2"], " ", "lpo", " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lpo", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lplus", " ", 
+           SuperscriptBox["lpo", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"2", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lqf", " ", "Pqf"}], "+", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lox", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", "Pqf"}], "-", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lplus", " ", "lqf", " ", "Pqf"}], 
+          "+", 
+          RowBox[{
+          "3", " ", "lb", " ", "lopc", " ", "lplus", " ", "lqf", " ", "Pqf"}],
+           "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lplus", "2"], " ", "lqf", " ", "Pqf"}], "+", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lpo", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lpo", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{
+          "8", " ", "lb", " ", "lox", " ", "lpo", " ", "lqf", " ", "Pqf"}], 
+          "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lpo", "2"], " ", "lqf", " ", "Pqf"}], "+", 
+          RowBox[{"lb", " ", "lopc", " ", 
+           SuperscriptBox["lqf", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", 
+           SuperscriptBox["lqf", "2"], " ", "Pqf"}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lplus", " ", 
+           SuperscriptBox["lqf", "2"], " ", "Pqf"}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lpo", " ", 
+           SuperscriptBox["lqf", "2"], " ", "Pqf"}], "-", 
+          RowBox[{
+           SuperscriptBox["lb", "3"], " ", "lopc", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lopc", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{
+           SuperscriptBox["lb", "3"], " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"2", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lox", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lox", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "3"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"3", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lox", " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lplus", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lplus", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lopc", " ", 
+           SuperscriptBox["lplus", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", 
+           SuperscriptBox["lplus", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "3"], " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"5", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"5", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{
+          "5", " ", "lb", " ", "lopc", " ", "lplus", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"8", " ", "lb", " ", "lox", " ", "lplus", " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lplus", "2"], " ", "lpo", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", 
+           SuperscriptBox["lb", "2"], " ", 
+           SuperscriptBox["lpo", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lplus", " ", 
+           SuperscriptBox["lpo", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"2", " ", 
+           SuperscriptBox["lb", "2"], " ", "lopc", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"lb", " ", 
+           SuperscriptBox["lopc", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"5", " ", 
+           SuperscriptBox["lb", "2"], " ", "lox", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"5", " ", "lb", " ", "lopc", " ", "lox", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lox", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lplus", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{
+          "3", " ", "lb", " ", "lopc", " ", "lplus", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lplus", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"8", " ", 
+           SuperscriptBox["lb", "2"], " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"5", " ", "lb", " ", "lopc", " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"8", " ", "lb", " ", "lox", " ", "lpo", " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", 
+           SuperscriptBox["lpo", "2"], " ", "lqf", " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"lb", " ", "lopc", " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lox", " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "+", 
+          RowBox[{"4", " ", "lb", " ", "lplus", " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}], "-", 
+          RowBox[{"4", " ", "lb", " ", "lpo", " ", 
+           SuperscriptBox["lqf", "2"], " ", 
+           SuperscriptBox["Pqf", "2"]}]}], ")"}]}], ")"}], "/", 
+      RowBox[{"(", 
+       RowBox[{"chW", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lopc"}], "-", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lplus"}], "-", 
+          RowBox[{"4", " ", "lpo"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "4"}], " ", "lb"}], "+", "lopc", "+", 
+          RowBox[{"4", " ", "lox"}], "+", 
+          RowBox[{"4", " ", "lpo"}], "-", 
+          RowBox[{"4", " ", "lqf"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "lb"}], "+", "lplus", "-", "lqf"}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"l2g", "-", "lb", "+", "lpo", "-", "lqf"}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"lb", "+", "lplus", "+", "lqf"}], ")"}]}], ")"}]}]}], 
+    ")"}]}]}]], "Output",
+ CellChangeTimes->{3.7675526438205853`*^9, 3.767552956339897*^9},
+ CellLabel->"Out[32]=",ExpressionUUID->"5a58e6e6-7a22-4e59-8b84-ff8299e71187"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"CForm", "[", "%", "]"}]], "Input",
+ CellChangeTimes->{{3.7656636671168613`*^9, 3.7656636695067253`*^9}},
+ CellLabel->"In[33]:=",ExpressionUUID->"328d6f6b-d25a-4b81-8dc4-0a3aa0550e54"],
+
+Cell["\<\
+(lqf*Pqf)/(chW*Power(E,chW*(lb + lqf)*x1)*(lb + lqf)) - \
+(lqf*Pqf)/(chW*Power(E,chW*(lb + lqf)*x2)*(lb + lqf)) + 
+   (12*lb*lpo*Pqf)/(chW*Power(E,(chW*(lopc + 4*lox + 4*lpo)*x1)/4.)*(lopc + \
+4*lox + 4*lpo)*(4*lb - lopc - 4*lox - 4*lpo + 4*lqf)) - 
+   (12*lb*lpo*Pqf)/(chW*Power(E,(chW*(lopc + 4*lox + 4*lpo)*x2)/4.)*(lopc + \
+4*lox + 4*lpo)*(4*lb - lopc - 4*lox - 4*lpo + 4*lqf)) - 
+   (3*lb*lpo*Pqf)/(chW*Power(E,chW*(lb + lqf)*x1)*(lb + lqf)*(4*lb - lopc - \
+4*lox - 4*lpo + 4*lqf)) + (3*lb*lpo*Pqf)/(chW*Power(E,chW*(lb + lqf)*x2)*(lb \
++ lqf)*(4*lb - lopc - 4*lox - 4*lpo + 4*lqf)) + 
+   (72*Power(lb,2)*lopc*lox*lplus*(l2g + lpo)*Power(Pqf,2))/
+    (chW*Power(E,(chW*(lopc + 4*lox + 4*lpo)*x1)/2.)*(-4*l2g + lopc + \
+4*lox)*(lopc + 4*lox + 4*lpo)*(lopc + 4*lox - 4*lplus + 4*lpo)*Power(-4*lb + \
+lopc + 4*lox + 4*lpo - 4*lqf,2)) - 
+   (72*Power(lb,2)*lopc*lox*lplus*(l2g + lpo)*Power(Pqf,2))/
+    (chW*Power(E,(chW*(lopc + 4*lox + 4*lpo)*x2)/2.)*(-4*l2g + lopc + \
+4*lox)*(lopc + 4*lox + 4*lpo)*(lopc + 4*lox - 4*lplus + 4*lpo)*Power(-4*lb + \
+lopc + 4*lox + 4*lpo - 4*lqf,2)) - 
+   (3*lplus*(l2g + lpo)*(-(Power(lb,3)*lox*Power(Pqf,2)) + \
+Power(lb,2)*lopc*lox*Power(Pqf,2) + Power(lb,2)*Power(lox,2)*Power(Pqf,2) + \
+Power(lb,2)*lox*lpo*Power(Pqf,2) - Power(lb,2)*lox*lqf*Power(Pqf,2)))/
+    (2.*chW*Power(E,2*chW*(lb + lqf)*x1)*Power(-4*lb + lopc + 4*lox + 4*lpo - \
+4*lqf,2)*(l2g - lb + lpo - lqf)*(lb + lqf)*(lb - lplus + lqf)) + 
+   (3*lplus*(l2g + lpo)*(-(Power(lb,3)*lox*Power(Pqf,2)) + \
+Power(lb,2)*lopc*lox*Power(Pqf,2) + Power(lb,2)*Power(lox,2)*Power(Pqf,2) + \
+Power(lb,2)*lox*lpo*Power(Pqf,2) - Power(lb,2)*lox*lqf*Power(Pqf,2)))/
+    (2.*chW*Power(E,2*chW*(lb + lqf)*x2)*Power(-4*lb + lopc + 4*lox + 4*lpo - \
+4*lqf,2)*(l2g - lb + lpo - lqf)*(lb + lqf)*(lb - lplus + lqf)) - 
+   (12*Power(E,-(chW*lplus*x1) - (chW*(lopc + 4*lox + \
+4*lpo)*x1)/4.)*lplus*(l2g + lpo)*
+      (-(Power(lb,2)*Power(lopc,2)*Pqf) - 4*Power(lb,2)*lopc*lox*Pqf + \
+4*Power(lb,2)*lopc*lplus*Pqf + lb*Power(lopc,2)*lplus*Pqf + \
+4*lb*lopc*lox*lplus*Pqf - 4*lb*lopc*Power(lplus,2)*Pqf - 
+        4*Power(lb,2)*lopc*lpo*Pqf + 4*lb*lopc*lplus*lpo*Pqf - \
+lb*Power(lopc,2)*lqf*Pqf - 4*lb*lopc*lox*lqf*Pqf + 4*lb*lopc*lplus*lqf*Pqf - \
+4*lb*lopc*lpo*lqf*Pqf + Power(lb,2)*Power(lopc,2)*Power(Pqf,2) + 
+        Power(lb,2)*lopc*lox*Power(Pqf,2) - \
+4*Power(lb,2)*lopc*lplus*Power(Pqf,2) - lb*Power(lopc,2)*lplus*Power(Pqf,2) - \
+4*lb*lopc*lox*lplus*Power(Pqf,2) + 4*lb*lopc*Power(lplus,2)*Power(Pqf,2) + 
+        4*Power(lb,2)*lopc*lpo*Power(Pqf,2) - \
+4*lb*lopc*lplus*lpo*Power(Pqf,2) + lb*Power(lopc,2)*lqf*Power(Pqf,2) + \
+4*lb*lopc*lox*lqf*Power(Pqf,2) - 4*lb*lopc*lplus*lqf*Power(Pqf,2) + 
+        4*lb*lopc*lpo*lqf*Power(Pqf,2)))/(chW*(-4*l2g + lopc + 4*lox)*(-lopc \
+- 4*lox + 4*lplus - 4*lpo)*(lopc + 4*lox + 4*lplus + 4*lpo)*(-4*lb + lopc + \
+4*lox + 4*lpo - 4*lqf)*(-lb + lplus - lqf)) + 
+   (12*Power(E,-(chW*lplus*x2) - (chW*(lopc + 4*lox + \
+4*lpo)*x2)/4.)*lplus*(l2g + lpo)*
+      (-(Power(lb,2)*Power(lopc,2)*Pqf) - 4*Power(lb,2)*lopc*lox*Pqf + \
+4*Power(lb,2)*lopc*lplus*Pqf + lb*Power(lopc,2)*lplus*Pqf + \
+4*lb*lopc*lox*lplus*Pqf - 4*lb*lopc*Power(lplus,2)*Pqf - 
+        4*Power(lb,2)*lopc*lpo*Pqf + 4*lb*lopc*lplus*lpo*Pqf - \
+lb*Power(lopc,2)*lqf*Pqf - 4*lb*lopc*lox*lqf*Pqf + 4*lb*lopc*lplus*lqf*Pqf - \
+4*lb*lopc*lpo*lqf*Pqf + Power(lb,2)*Power(lopc,2)*Power(Pqf,2) + 
+        Power(lb,2)*lopc*lox*Power(Pqf,2) - \
+4*Power(lb,2)*lopc*lplus*Power(Pqf,2) - lb*Power(lopc,2)*lplus*Power(Pqf,2) - \
+4*lb*lopc*lox*lplus*Power(Pqf,2) + 4*lb*lopc*Power(lplus,2)*Power(Pqf,2) + 
+        4*Power(lb,2)*lopc*lpo*Power(Pqf,2) - \
+4*lb*lopc*lplus*lpo*Power(Pqf,2) + lb*Power(lopc,2)*lqf*Power(Pqf,2) + \
+4*lb*lopc*lox*lqf*Power(Pqf,2) - 4*lb*lopc*lplus*lqf*Power(Pqf,2) + 
+        4*lb*lopc*lpo*lqf*Power(Pqf,2)))/(chW*(-4*l2g + lopc + 4*lox)*(-lopc \
+- 4*lox + 4*lplus - 4*lpo)*(lopc + 4*lox + 4*lplus + 4*lpo)*(-4*lb + lopc + \
+4*lox + 4*lpo - 4*lqf)*(-lb + lplus - lqf)) - 
+   (lplus*(l2g + lpo)*((-48*(-(l2g*Power(lb,2)*lox*Power(Pqf,2)) + \
+Power(lb,2)*lopc*lox*Power(Pqf,2) + Power(lb,2)*Power(lox,2)*Power(Pqf,2)))/
+         (chW*Power(E,(chW*(lopc + 4*lox + 4*lpo)*x1)/4.)*(-4*l2g + lopc + \
+4*lox)*(-lopc - 4*lox + 4*lplus - 4*lpo)*(4*l2g + lopc + 4*lox + \
+8*lpo)*(-4*lb + lopc + 4*lox + 4*lpo - 4*lqf)*(l2g - lb + lpo - lqf)) - 
+        (3*(-(l2g*Power(lb,2)*lox*Power(Pqf,2)) + \
+Power(lb,2)*lopc*lox*Power(Pqf,2) + Power(lb,2)*Power(lox,2)*Power(Pqf,2)))/
+         (chW*Power(E,chW*(lb + lqf)*x1)*(-4*l2g + lopc + 4*lox)*(-4*lb + \
+lopc + 4*lox + 4*lpo - 4*lqf)*(l2g - lb + lpo - lqf)*(lb - lplus + lqf)*(l2g \
++ lb + lpo + lqf)) + 
+        (-(l2g*Power(lb,2)*lopc*Pqf) + Power(lb,2)*Power(lopc,2)*Pqf - \
+4*l2g*Power(lb,2)*lox*Pqf + 5*Power(lb,2)*lopc*lox*Pqf + \
+4*Power(lb,2)*Power(lox,2)*Pqf + 4*l2g*Power(lb,2)*lplus*Pqf + 
+           l2g*lb*lopc*lplus*Pqf - 4*Power(lb,2)*lopc*lplus*Pqf - \
+lb*Power(lopc,2)*lplus*Pqf + 4*l2g*lb*lox*lplus*Pqf - \
+4*Power(lb,2)*lox*lplus*Pqf - 5*lb*lopc*lox*lplus*Pqf - \
+4*lb*Power(lox,2)*lplus*Pqf - 
+           4*l2g*lb*Power(lplus,2)*Pqf + 4*lb*lopc*Power(lplus,2)*Pqf + \
+4*lb*lox*Power(lplus,2)*Pqf - 4*l2g*Power(lb,2)*lpo*Pqf + \
+4*Power(lb,2)*lopc*lpo*Pqf + 4*Power(lb,2)*lox*lpo*Pqf + \
+4*l2g*lb*lplus*lpo*Pqf - 
+           4*lb*lopc*lplus*lpo*Pqf - 4*lb*lox*lplus*lpo*Pqf - \
+l2g*lb*lopc*lqf*Pqf + lb*Power(lopc,2)*lqf*Pqf - 4*l2g*lb*lox*lqf*Pqf + \
+5*lb*lopc*lox*lqf*Pqf + 4*lb*Power(lox,2)*lqf*Pqf + 4*l2g*lb*lplus*lqf*Pqf - 
+           4*lb*lopc*lplus*lqf*Pqf - 4*lb*lox*lplus*lqf*Pqf - \
+4*l2g*lb*lpo*lqf*Pqf + 4*lb*lopc*lpo*lqf*Pqf + 4*lb*lox*lpo*lqf*Pqf + \
+l2g*Power(lb,2)*lopc*Power(Pqf,2) - Power(lb,2)*Power(lopc,2)*Power(Pqf,2) + 
+           l2g*Power(lb,2)*lox*Power(Pqf,2) - \
+2*Power(lb,2)*lopc*lox*Power(Pqf,2) - Power(lb,2)*Power(lox,2)*Power(Pqf,2) - \
+4*l2g*Power(lb,2)*lplus*Power(Pqf,2) - l2g*lb*lopc*lplus*Power(Pqf,2) + 
+           4*Power(lb,2)*lopc*lplus*Power(Pqf,2) + \
+lb*Power(lopc,2)*lplus*Power(Pqf,2) - 4*l2g*lb*lox*lplus*Power(Pqf,2) + \
+4*Power(lb,2)*lox*lplus*Power(Pqf,2) + 5*lb*lopc*lox*lplus*Power(Pqf,2) + 
+           4*lb*Power(lox,2)*lplus*Power(Pqf,2) + \
+4*l2g*lb*Power(lplus,2)*Power(Pqf,2) - 4*lb*lopc*Power(lplus,2)*Power(Pqf,2) \
+- 4*lb*lox*Power(lplus,2)*Power(Pqf,2) + 4*l2g*Power(lb,2)*lpo*Power(Pqf,2) - \
+
+           4*Power(lb,2)*lopc*lpo*Power(Pqf,2) - \
+4*Power(lb,2)*lox*lpo*Power(Pqf,2) - 4*l2g*lb*lplus*lpo*Power(Pqf,2) + \
+4*lb*lopc*lplus*lpo*Power(Pqf,2) + 4*lb*lox*lplus*lpo*Power(Pqf,2) + 
+           l2g*lb*lopc*lqf*Power(Pqf,2) - lb*Power(lopc,2)*lqf*Power(Pqf,2) + \
+4*l2g*lb*lox*lqf*Power(Pqf,2) - 5*lb*lopc*lox*lqf*Power(Pqf,2) - \
+4*lb*Power(lox,2)*lqf*Power(Pqf,2) - 4*l2g*lb*lplus*lqf*Power(Pqf,2) + 
+           4*lb*lopc*lplus*lqf*Power(Pqf,2) + 4*lb*lox*lplus*lqf*Power(Pqf,2) \
++ 4*l2g*lb*lpo*lqf*Power(Pqf,2) - 4*lb*lopc*lpo*lqf*Power(Pqf,2) - \
+4*lb*lox*lpo*lqf*Power(Pqf,2))/
+         (chW*Power(E,chW*lplus*x1)*(-4*l2g + lopc + 4*lox)*(-lopc - 4*lox + \
+4*lplus - 4*lpo)*(l2g + lplus + lpo)*(-lb + lplus - lqf)*(l2g - lb + lpo - \
+lqf))))/Power(E,chW*(l2g + lpo)*x1) + 
+   (lplus*(l2g + lpo)*((-48*(-(l2g*Power(lb,2)*lox*Power(Pqf,2)) + \
+Power(lb,2)*lopc*lox*Power(Pqf,2) + Power(lb,2)*Power(lox,2)*Power(Pqf,2)))/
+         (chW*Power(E,(chW*(lopc + 4*lox + 4*lpo)*x2)/4.)*(-4*l2g + lopc + \
+4*lox)*(-lopc - 4*lox + 4*lplus - 4*lpo)*(4*l2g + lopc + 4*lox + \
+8*lpo)*(-4*lb + lopc + 4*lox + 4*lpo - 4*lqf)*(l2g - lb + lpo - lqf)) - 
+        (3*(-(l2g*Power(lb,2)*lox*Power(Pqf,2)) + \
+Power(lb,2)*lopc*lox*Power(Pqf,2) + Power(lb,2)*Power(lox,2)*Power(Pqf,2)))/
+         (chW*Power(E,chW*(lb + lqf)*x2)*(-4*l2g + lopc + 4*lox)*(-4*lb + \
+lopc + 4*lox + 4*lpo - 4*lqf)*(l2g - lb + lpo - lqf)*(lb - lplus + lqf)*(l2g \
++ lb + lpo + lqf)) + 
+        (-(l2g*Power(lb,2)*lopc*Pqf) + Power(lb,2)*Power(lopc,2)*Pqf - \
+4*l2g*Power(lb,2)*lox*Pqf + 5*Power(lb,2)*lopc*lox*Pqf + \
+4*Power(lb,2)*Power(lox,2)*Pqf + 4*l2g*Power(lb,2)*lplus*Pqf + 
+           l2g*lb*lopc*lplus*Pqf - 4*Power(lb,2)*lopc*lplus*Pqf - \
+lb*Power(lopc,2)*lplus*Pqf + 4*l2g*lb*lox*lplus*Pqf - \
+4*Power(lb,2)*lox*lplus*Pqf - 5*lb*lopc*lox*lplus*Pqf - \
+4*lb*Power(lox,2)*lplus*Pqf - 
+           4*l2g*lb*Power(lplus,2)*Pqf + 4*lb*lopc*Power(lplus,2)*Pqf + \
+4*lb*lox*Power(lplus,2)*Pqf - 4*l2g*Power(lb,2)*lpo*Pqf + \
+4*Power(lb,2)*lopc*lpo*Pqf + 4*Power(lb,2)*lox*lpo*Pqf + \
+4*l2g*lb*lplus*lpo*Pqf - 
+           4*lb*lopc*lplus*lpo*Pqf - 4*lb*lox*lplus*lpo*Pqf - \
+l2g*lb*lopc*lqf*Pqf + lb*Power(lopc,2)*lqf*Pqf - 4*l2g*lb*lox*lqf*Pqf + \
+5*lb*lopc*lox*lqf*Pqf + 4*lb*Power(lox,2)*lqf*Pqf + 4*l2g*lb*lplus*lqf*Pqf - 
+           4*lb*lopc*lplus*lqf*Pqf - 4*lb*lox*lplus*lqf*Pqf - \
+4*l2g*lb*lpo*lqf*Pqf + 4*lb*lopc*lpo*lqf*Pqf + 4*lb*lox*lpo*lqf*Pqf + \
+l2g*Power(lb,2)*lopc*Power(Pqf,2) - Power(lb,2)*Power(lopc,2)*Power(Pqf,2) + 
+           l2g*Power(lb,2)*lox*Power(Pqf,2) - \
+2*Power(lb,2)*lopc*lox*Power(Pqf,2) - Power(lb,2)*Power(lox,2)*Power(Pqf,2) - \
+4*l2g*Power(lb,2)*lplus*Power(Pqf,2) - l2g*lb*lopc*lplus*Power(Pqf,2) + 
+           4*Power(lb,2)*lopc*lplus*Power(Pqf,2) + \
+lb*Power(lopc,2)*lplus*Power(Pqf,2) - 4*l2g*lb*lox*lplus*Power(Pqf,2) + \
+4*Power(lb,2)*lox*lplus*Power(Pqf,2) + 5*lb*lopc*lox*lplus*Power(Pqf,2) + 
+           4*lb*Power(lox,2)*lplus*Power(Pqf,2) + \
+4*l2g*lb*Power(lplus,2)*Power(Pqf,2) - 4*lb*lopc*Power(lplus,2)*Power(Pqf,2) \
+- 4*lb*lox*Power(lplus,2)*Power(Pqf,2) + 4*l2g*Power(lb,2)*lpo*Power(Pqf,2) - \
+
+           4*Power(lb,2)*lopc*lpo*Power(Pqf,2) - \
+4*Power(lb,2)*lox*lpo*Power(Pqf,2) - 4*l2g*lb*lplus*lpo*Power(Pqf,2) + \
+4*lb*lopc*lplus*lpo*Power(Pqf,2) + 4*lb*lox*lplus*lpo*Power(Pqf,2) + 
+           l2g*lb*lopc*lqf*Power(Pqf,2) - lb*Power(lopc,2)*lqf*Power(Pqf,2) + \
+4*l2g*lb*lox*lqf*Power(Pqf,2) - 5*lb*lopc*lox*lqf*Power(Pqf,2) - \
+4*lb*Power(lox,2)*lqf*Power(Pqf,2) - 4*l2g*lb*lplus*lqf*Power(Pqf,2) + 
+           4*lb*lopc*lplus*lqf*Power(Pqf,2) + 4*lb*lox*lplus*lqf*Power(Pqf,2) \
++ 4*l2g*lb*lpo*lqf*Power(Pqf,2) - 4*lb*lopc*lpo*lqf*Power(Pqf,2) - \
+4*lb*lox*lpo*lqf*Power(Pqf,2))/
+         (chW*Power(E,chW*lplus*x2)*(-4*l2g + lopc + 4*lox)*(-lopc - 4*lox + \
+4*lplus - 4*lpo)*(l2g + lplus + lpo)*(-lb + lplus - lqf)*(l2g - lb + lpo - \
+lqf))))/Power(E,chW*(l2g + lpo)*x2) - 
+   (lplus*(l2g + lpo)*((12*(-16*l2g*Power(lb,4)*lox*Power(Pqf,2) + \
+16*l2g*Power(lb,3)*lopc*lox*Power(Pqf,2) + \
+4*Power(lb,4)*lopc*lox*Power(Pqf,2) + \
+3*l2g*Power(lb,2)*Power(lopc,2)*lox*Power(Pqf,2) - 
+             7*Power(lb,3)*Power(lopc,2)*lox*Power(Pqf,2) + \
+16*l2g*Power(lb,3)*Power(lox,2)*Power(Pqf,2) + \
+16*Power(lb,4)*Power(lox,2)*Power(Pqf,2) + \
+12*l2g*Power(lb,2)*lopc*Power(lox,2)*Power(Pqf,2) - 
+             32*Power(lb,3)*lopc*Power(lox,2)*Power(Pqf,2) - \
+16*Power(lb,3)*Power(lox,3)*Power(Pqf,2) + \
+16*l2g*Power(lb,3)*lox*lplus*Power(Pqf,2) - \
+28*l2g*Power(lb,2)*lopc*lox*lplus*Power(Pqf,2) + 
+             8*Power(lb,3)*lopc*lox*lplus*Power(Pqf,2) + \
+4*Power(lb,2)*Power(lopc,2)*lox*lplus*Power(Pqf,2) - \
+16*l2g*Power(lb,2)*Power(lox,2)*lplus*Power(Pqf,2) - \
+16*Power(lb,3)*Power(lox,2)*lplus*Power(Pqf,2) + 
+             20*Power(lb,2)*lopc*Power(lox,2)*lplus*Power(Pqf,2) + \
+16*Power(lb,2)*Power(lox,3)*lplus*Power(Pqf,2) + \
+16*l2g*Power(lb,3)*lox*lpo*Power(Pqf,2) + \
+12*l2g*Power(lb,2)*lopc*lox*lpo*Power(Pqf,2) - 
+             16*Power(lb,3)*lopc*lox*lpo*Power(Pqf,2) + \
+3*Power(lb,2)*Power(lopc,2)*lox*lpo*Power(Pqf,2) - \
+16*Power(lb,3)*Power(lox,2)*lpo*Power(Pqf,2) + \
+12*Power(lb,2)*lopc*Power(lox,2)*lpo*Power(Pqf,2) - 
+             16*l2g*Power(lb,2)*lox*lplus*lpo*Power(Pqf,2) - \
+8*Power(lb,2)*lopc*lox*lplus*lpo*Power(Pqf,2) + \
+16*Power(lb,2)*Power(lox,2)*lplus*lpo*Power(Pqf,2) + \
+12*Power(lb,2)*lopc*lox*Power(lpo,2)*Power(Pqf,2) - 
+             32*l2g*Power(lb,3)*lox*lqf*Power(Pqf,2) + \
+16*l2g*Power(lb,2)*lopc*lox*lqf*Power(Pqf,2) + \
+8*Power(lb,3)*lopc*lox*lqf*Power(Pqf,2) - \
+7*Power(lb,2)*Power(lopc,2)*lox*lqf*Power(Pqf,2) + 
+             16*l2g*Power(lb,2)*Power(lox,2)*lqf*Power(Pqf,2) + \
+32*Power(lb,3)*Power(lox,2)*lqf*Power(Pqf,2) - \
+32*Power(lb,2)*lopc*Power(lox,2)*lqf*Power(Pqf,2) - \
+16*Power(lb,2)*Power(lox,3)*lqf*Power(Pqf,2) + 
+             16*l2g*Power(lb,2)*lox*lplus*lqf*Power(Pqf,2) + \
+8*Power(lb,2)*lopc*lox*lplus*lqf*Power(Pqf,2) - \
+16*Power(lb,2)*Power(lox,2)*lplus*lqf*Power(Pqf,2) + \
+16*l2g*Power(lb,2)*lox*lpo*lqf*Power(Pqf,2) - 
+             16*Power(lb,2)*lopc*lox*lpo*lqf*Power(Pqf,2) - \
+16*Power(lb,2)*Power(lox,2)*lpo*lqf*Power(Pqf,2) - \
+16*l2g*Power(lb,2)*lox*Power(lqf,2)*Power(Pqf,2) + \
+4*Power(lb,2)*lopc*lox*Power(lqf,2)*Power(Pqf,2) + 
+             16*Power(lb,2)*Power(lox,2)*Power(lqf,2)*Power(Pqf,2)))/
+         (chW*Power(E,(chW*(lopc + 4*lox + 4*lpo)*x1)/4.)*(-4*l2g + lopc + \
+4*lox)*(-lopc - 4*lox + 4*lplus - 4*lpo)*Power(-4*lb + lopc + 4*lox + 4*lpo - \
+4*lqf,2)*(-lb + lplus - lqf)*(l2g - lb + lpo - lqf)*
+           (4*lb + lopc + 4*lox + 4*lpo + 4*lqf)) + (Power(lb,3)*lopc*Pqf - \
+Power(lb,2)*Power(lopc,2)*Pqf + 4*Power(lb,3)*lox*Pqf - \
+5*Power(lb,2)*lopc*lox*Pqf - 4*Power(lb,2)*Power(lox,2)*Pqf - 
+           4*Power(lb,3)*lplus*Pqf + 3*Power(lb,2)*lopc*lplus*Pqf + \
+lb*Power(lopc,2)*lplus*Pqf + 5*lb*lopc*lox*lplus*Pqf + \
+4*lb*Power(lox,2)*lplus*Pqf + 4*Power(lb,2)*Power(lplus,2)*Pqf - 
+           4*lb*lopc*Power(lplus,2)*Pqf - 4*lb*lox*Power(lplus,2)*Pqf + \
+4*Power(lb,3)*lpo*Pqf - 5*Power(lb,2)*lopc*lpo*Pqf - \
+8*Power(lb,2)*lox*lpo*Pqf + 5*lb*lopc*lplus*lpo*Pqf + 8*lb*lox*lplus*lpo*Pqf - 
+           4*lb*Power(lplus,2)*lpo*Pqf - 4*Power(lb,2)*Power(lpo,2)*Pqf + \
+4*lb*lplus*Power(lpo,2)*Pqf + 2*Power(lb,2)*lopc*lqf*Pqf - \
+lb*Power(lopc,2)*lqf*Pqf + 8*Power(lb,2)*lox*lqf*Pqf - 5*lb*lopc*lox*lqf*Pqf - 
+           4*lb*Power(lox,2)*lqf*Pqf - 8*Power(lb,2)*lplus*lqf*Pqf + \
+3*lb*lopc*lplus*lqf*Pqf + 4*lb*Power(lplus,2)*lqf*Pqf + \
+8*Power(lb,2)*lpo*lqf*Pqf - 5*lb*lopc*lpo*lqf*Pqf - 8*lb*lox*lpo*lqf*Pqf - 
+           4*lb*Power(lpo,2)*lqf*Pqf + lb*lopc*Power(lqf,2)*Pqf + \
+4*lb*lox*Power(lqf,2)*Pqf - 4*lb*lplus*Power(lqf,2)*Pqf + \
+4*lb*lpo*Power(lqf,2)*Pqf - Power(lb,3)*lopc*Power(Pqf,2) + 
+           Power(lb,2)*Power(lopc,2)*Power(Pqf,2) - \
+Power(lb,3)*lox*Power(Pqf,2) + 2*Power(lb,2)*lopc*lox*Power(Pqf,2) + \
+Power(lb,2)*Power(lox,2)*Power(Pqf,2) + 4*Power(lb,3)*lplus*Power(Pqf,2) - 
+           3*Power(lb,2)*lopc*lplus*Power(Pqf,2) - \
+lb*Power(lopc,2)*lplus*Power(Pqf,2) - 5*lb*lopc*lox*lplus*Power(Pqf,2) - \
+4*lb*Power(lox,2)*lplus*Power(Pqf,2) - \
+4*Power(lb,2)*Power(lplus,2)*Power(Pqf,2) + 
+           4*lb*lopc*Power(lplus,2)*Power(Pqf,2) + \
+4*lb*lox*Power(lplus,2)*Power(Pqf,2) - 4*Power(lb,3)*lpo*Power(Pqf,2) + \
+5*Power(lb,2)*lopc*lpo*Power(Pqf,2) + 5*Power(lb,2)*lox*lpo*Power(Pqf,2) - 
+           5*lb*lopc*lplus*lpo*Power(Pqf,2) - 8*lb*lox*lplus*lpo*Power(Pqf,2) \
++ 4*lb*Power(lplus,2)*lpo*Power(Pqf,2) + \
+4*Power(lb,2)*Power(lpo,2)*Power(Pqf,2) - \
+4*lb*lplus*Power(lpo,2)*Power(Pqf,2) - 
+           2*Power(lb,2)*lopc*lqf*Power(Pqf,2) + \
+lb*Power(lopc,2)*lqf*Power(Pqf,2) - 5*Power(lb,2)*lox*lqf*Power(Pqf,2) + \
+5*lb*lopc*lox*lqf*Power(Pqf,2) + 4*lb*Power(lox,2)*lqf*Power(Pqf,2) + 
+           8*Power(lb,2)*lplus*lqf*Power(Pqf,2) - \
+3*lb*lopc*lplus*lqf*Power(Pqf,2) - 4*lb*Power(lplus,2)*lqf*Power(Pqf,2) - \
+8*Power(lb,2)*lpo*lqf*Power(Pqf,2) + 5*lb*lopc*lpo*lqf*Power(Pqf,2) + 
+           8*lb*lox*lpo*lqf*Power(Pqf,2) + 4*lb*Power(lpo,2)*lqf*Power(Pqf,2) \
+- lb*lopc*Power(lqf,2)*Power(Pqf,2) - 4*lb*lox*Power(lqf,2)*Power(Pqf,2) + \
+4*lb*lplus*Power(lqf,2)*Power(Pqf,2) - 
+           4*lb*lpo*Power(lqf,2)*Power(Pqf,2))/(chW*Power(E,chW*lplus*x1)*(-\
+lopc - 4*lox + 4*lplus - 4*lpo)*(-4*lb + lopc + 4*lox + 4*lpo - 4*lqf)*(-lb + \
+lplus - lqf)*(l2g - lb + lpo - lqf)*(lb + lplus + lqf))))/
+    Power(E,chW*(lb + lqf)*x1) + (lplus*(l2g + \
+lpo)*((12*(-16*l2g*Power(lb,4)*lox*Power(Pqf,2) + \
+16*l2g*Power(lb,3)*lopc*lox*Power(Pqf,2) + \
+4*Power(lb,4)*lopc*lox*Power(Pqf,2) + 
+             3*l2g*Power(lb,2)*Power(lopc,2)*lox*Power(Pqf,2) - \
+7*Power(lb,3)*Power(lopc,2)*lox*Power(Pqf,2) + \
+16*l2g*Power(lb,3)*Power(lox,2)*Power(Pqf,2) + \
+16*Power(lb,4)*Power(lox,2)*Power(Pqf,2) + 
+             12*l2g*Power(lb,2)*lopc*Power(lox,2)*Power(Pqf,2) - \
+32*Power(lb,3)*lopc*Power(lox,2)*Power(Pqf,2) - \
+16*Power(lb,3)*Power(lox,3)*Power(Pqf,2) + \
+16*l2g*Power(lb,3)*lox*lplus*Power(Pqf,2) - 
+             28*l2g*Power(lb,2)*lopc*lox*lplus*Power(Pqf,2) + \
+8*Power(lb,3)*lopc*lox*lplus*Power(Pqf,2) + \
+4*Power(lb,2)*Power(lopc,2)*lox*lplus*Power(Pqf,2) - \
+16*l2g*Power(lb,2)*Power(lox,2)*lplus*Power(Pqf,2) - 
+             16*Power(lb,3)*Power(lox,2)*lplus*Power(Pqf,2) + \
+20*Power(lb,2)*lopc*Power(lox,2)*lplus*Power(Pqf,2) + \
+16*Power(lb,2)*Power(lox,3)*lplus*Power(Pqf,2) + \
+16*l2g*Power(lb,3)*lox*lpo*Power(Pqf,2) + 
+             12*l2g*Power(lb,2)*lopc*lox*lpo*Power(Pqf,2) - \
+16*Power(lb,3)*lopc*lox*lpo*Power(Pqf,2) + \
+3*Power(lb,2)*Power(lopc,2)*lox*lpo*Power(Pqf,2) - \
+16*Power(lb,3)*Power(lox,2)*lpo*Power(Pqf,2) + 
+             12*Power(lb,2)*lopc*Power(lox,2)*lpo*Power(Pqf,2) - \
+16*l2g*Power(lb,2)*lox*lplus*lpo*Power(Pqf,2) - \
+8*Power(lb,2)*lopc*lox*lplus*lpo*Power(Pqf,2) + \
+16*Power(lb,2)*Power(lox,2)*lplus*lpo*Power(Pqf,2) + 
+             12*Power(lb,2)*lopc*lox*Power(lpo,2)*Power(Pqf,2) - \
+32*l2g*Power(lb,3)*lox*lqf*Power(Pqf,2) + \
+16*l2g*Power(lb,2)*lopc*lox*lqf*Power(Pqf,2) + \
+8*Power(lb,3)*lopc*lox*lqf*Power(Pqf,2) - 
+             7*Power(lb,2)*Power(lopc,2)*lox*lqf*Power(Pqf,2) + \
+16*l2g*Power(lb,2)*Power(lox,2)*lqf*Power(Pqf,2) + \
+32*Power(lb,3)*Power(lox,2)*lqf*Power(Pqf,2) - \
+32*Power(lb,2)*lopc*Power(lox,2)*lqf*Power(Pqf,2) - 
+             16*Power(lb,2)*Power(lox,3)*lqf*Power(Pqf,2) + \
+16*l2g*Power(lb,2)*lox*lplus*lqf*Power(Pqf,2) + \
+8*Power(lb,2)*lopc*lox*lplus*lqf*Power(Pqf,2) - \
+16*Power(lb,2)*Power(lox,2)*lplus*lqf*Power(Pqf,2) + 
+             16*l2g*Power(lb,2)*lox*lpo*lqf*Power(Pqf,2) - \
+16*Power(lb,2)*lopc*lox*lpo*lqf*Power(Pqf,2) - \
+16*Power(lb,2)*Power(lox,2)*lpo*lqf*Power(Pqf,2) - \
+16*l2g*Power(lb,2)*lox*Power(lqf,2)*Power(Pqf,2) + 
+             4*Power(lb,2)*lopc*lox*Power(lqf,2)*Power(Pqf,2) + \
+16*Power(lb,2)*Power(lox,2)*Power(lqf,2)*Power(Pqf,2)))/
+         (chW*Power(E,(chW*(lopc + 4*lox + 4*lpo)*x2)/4.)*(-4*l2g + lopc + \
+4*lox)*(-lopc - 4*lox + 4*lplus - 4*lpo)*Power(-4*lb + lopc + 4*lox + 4*lpo - \
+4*lqf,2)*(-lb + lplus - lqf)*(l2g - lb + lpo - lqf)*
+           (4*lb + lopc + 4*lox + 4*lpo + 4*lqf)) + (Power(lb,3)*lopc*Pqf - \
+Power(lb,2)*Power(lopc,2)*Pqf + 4*Power(lb,3)*lox*Pqf - \
+5*Power(lb,2)*lopc*lox*Pqf - 4*Power(lb,2)*Power(lox,2)*Pqf - 
+           4*Power(lb,3)*lplus*Pqf + 3*Power(lb,2)*lopc*lplus*Pqf + \
+lb*Power(lopc,2)*lplus*Pqf + 5*lb*lopc*lox*lplus*Pqf + \
+4*lb*Power(lox,2)*lplus*Pqf + 4*Power(lb,2)*Power(lplus,2)*Pqf - 
+           4*lb*lopc*Power(lplus,2)*Pqf - 4*lb*lox*Power(lplus,2)*Pqf + \
+4*Power(lb,3)*lpo*Pqf - 5*Power(lb,2)*lopc*lpo*Pqf - \
+8*Power(lb,2)*lox*lpo*Pqf + 5*lb*lopc*lplus*lpo*Pqf + 8*lb*lox*lplus*lpo*Pqf - 
+           4*lb*Power(lplus,2)*lpo*Pqf - 4*Power(lb,2)*Power(lpo,2)*Pqf + \
+4*lb*lplus*Power(lpo,2)*Pqf + 2*Power(lb,2)*lopc*lqf*Pqf - \
+lb*Power(lopc,2)*lqf*Pqf + 8*Power(lb,2)*lox*lqf*Pqf - 5*lb*lopc*lox*lqf*Pqf - 
+           4*lb*Power(lox,2)*lqf*Pqf - 8*Power(lb,2)*lplus*lqf*Pqf + \
+3*lb*lopc*lplus*lqf*Pqf + 4*lb*Power(lplus,2)*lqf*Pqf + \
+8*Power(lb,2)*lpo*lqf*Pqf - 5*lb*lopc*lpo*lqf*Pqf - 8*lb*lox*lpo*lqf*Pqf - 
+           4*lb*Power(lpo,2)*lqf*Pqf + lb*lopc*Power(lqf,2)*Pqf + \
+4*lb*lox*Power(lqf,2)*Pqf - 4*lb*lplus*Power(lqf,2)*Pqf + \
+4*lb*lpo*Power(lqf,2)*Pqf - Power(lb,3)*lopc*Power(Pqf,2) + 
+           Power(lb,2)*Power(lopc,2)*Power(Pqf,2) - \
+Power(lb,3)*lox*Power(Pqf,2) + 2*Power(lb,2)*lopc*lox*Power(Pqf,2) + \
+Power(lb,2)*Power(lox,2)*Power(Pqf,2) + 4*Power(lb,3)*lplus*Power(Pqf,2) - 
+           3*Power(lb,2)*lopc*lplus*Power(Pqf,2) - \
+lb*Power(lopc,2)*lplus*Power(Pqf,2) - 5*lb*lopc*lox*lplus*Power(Pqf,2) - \
+4*lb*Power(lox,2)*lplus*Power(Pqf,2) - \
+4*Power(lb,2)*Power(lplus,2)*Power(Pqf,2) + 
+           4*lb*lopc*Power(lplus,2)*Power(Pqf,2) + \
+4*lb*lox*Power(lplus,2)*Power(Pqf,2) - 4*Power(lb,3)*lpo*Power(Pqf,2) + \
+5*Power(lb,2)*lopc*lpo*Power(Pqf,2) + 5*Power(lb,2)*lox*lpo*Power(Pqf,2) - 
+           5*lb*lopc*lplus*lpo*Power(Pqf,2) - 8*lb*lox*lplus*lpo*Power(Pqf,2) \
++ 4*lb*Power(lplus,2)*lpo*Power(Pqf,2) + \
+4*Power(lb,2)*Power(lpo,2)*Power(Pqf,2) - \
+4*lb*lplus*Power(lpo,2)*Power(Pqf,2) - 
+           2*Power(lb,2)*lopc*lqf*Power(Pqf,2) + \
+lb*Power(lopc,2)*lqf*Power(Pqf,2) - 5*Power(lb,2)*lox*lqf*Power(Pqf,2) + \
+5*lb*lopc*lox*lqf*Power(Pqf,2) + 4*lb*Power(lox,2)*lqf*Power(Pqf,2) + 
+           8*Power(lb,2)*lplus*lqf*Power(Pqf,2) - \
+3*lb*lopc*lplus*lqf*Power(Pqf,2) - 4*lb*Power(lplus,2)*lqf*Power(Pqf,2) - \
+8*Power(lb,2)*lpo*lqf*Power(Pqf,2) + 5*lb*lopc*lpo*lqf*Power(Pqf,2) + 
+           8*lb*lox*lpo*lqf*Power(Pqf,2) + 4*lb*Power(lpo,2)*lqf*Power(Pqf,2) \
+- lb*lopc*Power(lqf,2)*Power(Pqf,2) - 4*lb*lox*Power(lqf,2)*Power(Pqf,2) + \
+4*lb*lplus*Power(lqf,2)*Power(Pqf,2) - 
+           4*lb*lpo*Power(lqf,2)*Power(Pqf,2))/(chW*Power(E,chW*lplus*x2)*(-\
+lopc - 4*lox + 4*lplus - 4*lpo)*(-4*lb + lopc + 4*lox + 4*lpo - 4*lqf)*(-lb + \
+lplus - lqf)*(l2g - lb + lpo - lqf)*(lb + lplus + lqf))))/
+    Power(E,chW*(lb + lqf)*x2)\
+\>", "Output",
+ CellChangeTimes->{3.767552656277506*^9, 3.767552956487269*^9},
+ CellLabel->
+  "Out[33]//CForm=",ExpressionUUID->"fed5cab5-a19d-4a11-89e4-7768672e254b"]
+}, Open  ]]
+},
+WindowSize->{1920, 973},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"11.3 for Mac OS X x86 (32-bit, 64-bit Kernel) (March 5, \
+2018)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 2541, 60, 346, "Input",ExpressionUUID->"e0e1a34f-e7fa-42c7-9da0-8b5101a10315"],
+Cell[CellGroupData[{
+Cell[3124, 84, 5436, 152, 409, "Input",ExpressionUUID->"f956deea-5065-4918-b6ea-fbaa06ca54e7"],
+Cell[CellGroupData[{
+Cell[8585, 240, 704, 20, 26, "Print",ExpressionUUID->"1e43d1f9-079d-4f9f-8efc-e6fa70f03661"],
+Cell[9292, 262, 704, 20, 26, "Print",ExpressionUUID->"cfc675dc-4675-47a3-8eeb-910431e35dc3"],
+Cell[9999, 284, 3182, 83, 76, "Print",ExpressionUUID->"b1b4863e-ba45-479e-b848-8c990afb3463"],
+Cell[13184, 369, 4003, 107, 76, "Print",ExpressionUUID->"4a7f1f05-d4bb-41c0-9d68-2170e66f48e4"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[17236, 482, 817, 17, 73, "Input",ExpressionUUID->"a92aeb96-5146-46a7-b50c-21034fde9e1b"],
+Cell[18056, 501, 5500, 162, 196, "Output",ExpressionUUID->"f5363144-9fe8-4a11-8628-e672bbc963c0"],
+Cell[23559, 665, 5436, 164, 158, "Output",ExpressionUUID->"9ffad435-61d0-4928-ab8f-99312753c7a5"],
+Cell[28998, 831, 1170, 20, 117, "Output",ExpressionUUID->"b1d02bcc-24cb-46ba-9fea-787509ff97cc"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[30205, 856, 1115, 18, 30, "Input",ExpressionUUID->"b79579ed-a75e-43fb-b857-cdd222bbc933"],
+Cell[31323, 876, 42195, 1012, 851, "Output",ExpressionUUID->"68eb4292-e6bb-4bf7-86d4-a20471567785"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[73555, 1893, 462, 10, 30, "Input",ExpressionUUID->"0d8efaa6-7fbe-4373-8abe-9119c057537b"],
+Cell[74020, 1905, 84189, 2019, 1689, "Output",ExpressionUUID->"5a58e6e6-7a22-4e59-8b84-ff8299e71187"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[158246, 3929, 207, 3, 30, "Input",ExpressionUUID->"328d6f6b-d25a-4b81-8dc4-0a3aa0550e54"],
+Cell[158456, 3934, 21410, 349, 2025, "Output",ExpressionUUID->"fed5cab5-a19d-4a11-89e4-7768672e254b"]
+}, Open  ]]
+}
+]
+*)
+
