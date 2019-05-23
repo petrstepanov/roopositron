@@ -22,23 +22,23 @@
 #include "TAxis.h"
 #include "TMath.h"
 
-class ParaPdf: public RooAbsPdf {
+class LiquidSimplePdf: public RooAbsPdf {
 public:
-	ParaPdf() {
+	LiquidSimplePdf() {
 	}
 	;
-	ParaPdf(const char *name, const char *title, RooAbsReal& _t,
+	LiquidSimplePdf(const char *name, const char *title, RooAbsReal& _t,
 			RooAbsReal& _Pps,          // Probability of forming qf-Ps
 			RooAbsReal& _lplus,        // Probability of observation a thermalized positron
 			RooAbsReal& _lpo,          // Pick-off annihilation speed
 			RooAbsReal& _l2g,          // Two-gamma annihilation rate
 			RooAbsReal& _lopc,         // Ortho-para conversion speed
 			RooAbsReal& _chW);
-	ParaPdf(const ParaPdf& other, const char* name = 0);
+	LiquidSimplePdf(const LiquidSimplePdf& other, const char* name = 0);
 	virtual TObject* clone(const char* newname) const {
-		return new ParaPdf(*this, newname);
+		return new LiquidSimplePdf(*this, newname);
 	}
-	inline virtual ~ParaPdf() {
+	inline virtual ~LiquidSimplePdf() {
 	}
 
 	Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars,
@@ -64,7 +64,7 @@ protected:
 	Double_t indefiniteIntegral(Double_t y) const;
 
 private:
-ClassDef(ParaPdf, 1)
+ClassDef(LiquidSimplePdf, 1)
 };
 
 #endif /* MY_PARAPDF */

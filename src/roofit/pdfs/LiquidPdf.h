@@ -32,6 +32,7 @@ public:
 			RooAbsReal& _Pqf,            // Probability of forming qf-Ps
 			RooAbsReal& _lb,             // Transformation rate of qf-Ps in to Ps
 			RooAbsReal& _lqf,            // Annihilation rate of qf-Ps
+			RooAbsReal& _lplus,          // Annihilation rate of solvated positrons
 			RooAbsReal& _lpo,            // Pick-off annihilation rate
 			RooAbsReal& _lopc,           // Ortho-para conversion rate
 			RooAbsReal& _lox,            // Oxidation rate
@@ -53,6 +54,7 @@ protected:
 	RooRealProxy Pqf;
 	RooRealProxy lb;
 	RooRealProxy lqf;
+	RooRealProxy lplus;
 	RooRealProxy lpo;
 	RooRealProxy lopc;
 	RooRealProxy lox;
@@ -66,7 +68,7 @@ protected:
 	Double_t ArcTan(Double_t a) const;
 	Double_t Coth(Double_t a) const;
 	Double_t Log(Double_t a) const;
-	Double_t indefiniteIntegral(Double_t y) const;
+	Double_t indefiniteIntegral(Double_t x) const;
 
 private:
 ClassDef(LiquidPdf, 1)

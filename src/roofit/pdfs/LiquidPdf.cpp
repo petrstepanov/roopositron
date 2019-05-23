@@ -20,6 +20,7 @@ LiquidPdf::LiquidPdf(const char *name, const char *title,
 		RooAbsReal& _Pqf,
 		RooAbsReal& _lb,
 		RooAbsReal& _lqf,
+		RooAbsReal& _lplus,
 		RooAbsReal& _lpo,
 		RooAbsReal& _lopc,
 		RooAbsReal& _lox,
@@ -31,6 +32,7 @@ LiquidPdf::LiquidPdf(const char *name, const char *title,
     Pqf("Pqf", "Pqf", this, _Pqf),
     lb("lb", "lb", this, _lb),
     lqf("lqf", "lqf", this, _lqf),
+    lplus("lplus", "lplus", this, _lplus),
     lpo("lpo", "lpo", this, _lpo),
     lopc("lopc", "lopc", this, _lopc),
     lox("lox", "lox", this, _lox),
@@ -44,6 +46,7 @@ t("t", this, other.t),
 Pqf("Pqf", this, other.Pqf),
 lb("lb", this, other.lb),
 lqf("lqf", this, other.lqf),
+lplus("lplus", this, other.lplus),
 lpo("lpo", this, other.lpo),
 lopc("lopc", this, other.lopc),
 lox("lox", this, other.lox),
@@ -56,21 +59,15 @@ Double_t LiquidPdf::evaluate() const {
     Double_t E = TMath::E();
     Double_t Pi = TMath::Pi();
     
-    Double_t DPs = 1E7;
-    Double_t lJ=Pi*Pi*DPs/L/L;
-    Double_t l = L;
-    
     return
-Power(E,chW*(-kv - lb)*t)*lb*(1 - Pps) +
-   ((-Power(E,chW*(-kv - lb)*t) + Power(E,-(chW*lv*t)))*kv*lv*(1 - Pps))/
-	(kv + lb - lv) + (l2g*Pps)/(4.*Power(E,chW*l2g*t)) +
-   (3*Power(E,(-((chW*mu*t*Vth)/l) -
-		  Mr*mu*Log((1 - (V0 - Vth)/(Power(E,(2*chW*t*Vth)/(l*Mr))*(V0 + Vth)))/
-			 (1 - (V0 - Vth)/(V0 + Vth))))/4.)*mu*Pps*Vth*
-	  (1 + (V0 - Vth)/(Power(E,(2*chW*t*Vth)/(l*Mr))*(V0 + Vth))))/
-	(16.*l*(1 - (V0 - Vth)/(Power(E,(2*chW*t*Vth)/(l*Mr))*(V0 + Vth))))
-				;
-    
+    		Power(E,chW*(-lopc/4. - lox - lpo)*t)*(lopc/4. + lox + lpo)*((3*lb*lox*lplus*Pqf)/(4.*(-lopc/4. - lox + lplus - lpo)*(lopc/4. + lox + lpo)*(lb - lopc/4. - lox - lpo + lqf)) +
+    		      (3*lb*lpo*Pqf)/(4.*(lopc/4. + lox + lpo)*(lb - lopc/4. - lox - lpo + lqf)) + (3*lb*lopc*(l2g + lpo)*Pqf)/(16.*(l2g - lopc/4. - lox)*(lopc/4. + lox + lpo)*(lb - lopc/4. - lox - lpo + lqf))) +
+    		   (lplus*(1 - Pqf - (3*lb*lox*Pqf)/(4.*(-lopc/4. - lox + lplus - lpo)*(lb - lopc/4. - lox - lpo + lqf)) - (3*lb*lox*Pqf)/(4.*(lb - lplus + lqf)*(lb - lopc/4. - lox - lpo + lqf))))/Power(E,chW*lplus*t) +
+    		   Power(E,chW*(-l2g - lpo)*t)*(l2g + lpo)*((lb*Pqf)/(4.*(-l2g + lb - lpo + lqf)) - (3*lb*lopc*Pqf)/(16.*(l2g - lopc/4. - lox)*(lb - lopc/4. - lox - lpo + lqf)) -
+    		      (3*lb*lopc*Pqf)/(16.*(-l2g + lb - lpo + lqf)*(lb - lopc/4. - lox - lpo + lqf))) + Power(E,chW*(-lb - lqf)*t)*(lb + lqf)*
+    		    ((lqf*Pqf)/(lb + lqf) - (lb*(l2g + lpo)*Pqf)/(4.*(lb + lqf)*(-l2g + lb - lpo + lqf)) - (3*lb*lpo*Pqf)/(4.*(lb + lqf)*(lb - lopc/4. - lox - lpo + lqf)) +
+    		      (3*lb*lox*lplus*Pqf)/(4.*(lb + lqf)*(lb - lplus + lqf)*(lb - lopc/4. - lox - lpo + lqf)) + (3*lb*lopc*(l2g + lpo)*Pqf)/(16.*(lb + lqf)*(-l2g + lb - lpo + lqf)*(lb - lopc/4. - lox - lpo + lqf)))
+	;
 }
 
 Double_t LiquidPdf::Power(Double_t a, Double_t b) const{
@@ -99,16 +96,15 @@ Int_t LiquidPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, 
    return 0;
 }
 
-Double_t LiquidPdf::indefiniteIntegral(Double_t y) const{
-    Double_t l = L;
+Double_t LiquidPdf::indefiniteIntegral(Double_t x) const{
 	Double_t E = TMath::E();
 	return
-((4*kv*(-1 + Pps))/(Power(E,chW*lv*y)*(kv + lb - lv)) +
-	 (4*(lb - lv)*(-1 + Pps))/(Power(E,chW*(kv + lb)*y)*(kv + lb - lv)) -
-	 Pps/Power(E,chW*l2g*y) - (3*Power(2,(Mr*mu)/4.)*Pps)/
-	  (Power(E,(chW*mu*Vth*y)/(4.*l))*
-		Power(((V0 + Vth)*(1 + (-V0 + Vth)/
-			   (Power(E,(2*chW*Vth*y)/(l*Mr))*(V0 + Vth))))/Vth,(Mr*mu)/4.)))/(4.*chW)
+			-(((lb*(lox*(-4 + Pqf) + lopc*(-1 + Pqf) - 4*(lplus - lpo)*(-1 + Pqf)) - (lopc + 4*(lox - lplus + lpo))*(lplus - lqf)*(-1 + Pqf))/(Power(E,chW*lplus*x)*(lopc + 4*(lox - lplus + lpo))*(-lb + lplus - lqf)) +
+			       (12*lb*(4*lox*(lplus - lpo) + l2g*(lopc - 4*lplus + 4*lpo))*Pqf)/(Power(E,(chW*(lopc + 4*(lox + lpo))*x)/4.)*(-4*l2g + lopc + 4*lox)*(lopc + 4*(lox - lplus + lpo))*(-4*lb + lopc + 4*(lox + lpo - lqf))) +
+			       (lb*(l2g - lopc - lox)*Pqf)/(Power(E,chW*(l2g + lpo)*x)*(4*l2g - lopc - 4*lox)*(-l2g + lb - lpo + lqf)) +
+			       ((lb*(lox*(3*lplus + lpo - 4*lqf) + (lopc + 4*(lplus + lpo - 2*lqf))*(lpo - lqf)) - 4*Power(lb,2)*(lpo - lqf) + (lopc + 4*(lox + lpo - lqf))*(lpo - lqf)*(-lplus + lqf) +
+			            l2g*(-Power(lb,2) + lb*(lopc + lox + lplus + 4*lpo - 5*lqf) + (lopc + 4*(lox + lpo - lqf))*(-lplus + lqf)))*Pqf)/(Power(E,chW*(lb + lqf)*x)*(4*lb - lopc - 4*(lox + lpo - lqf))*(lb - lplus + lqf)*(-l2g + lb - lpo + lqf)))
+			      /chW)
 			;
 }
 

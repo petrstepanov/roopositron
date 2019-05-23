@@ -17,10 +17,10 @@
 #include "AbstractProvider.h"
 #include "RooRealVar.h"
 
-class ParaProvider : public AbstractProvider{
+class LiquidSimpleProvider : public AbstractProvider{
 public:
-    ParaProvider(RooRealVar* observable, RooRealVar* channelWidth);
-    virtual ~ParaProvider();
+    LiquidSimpleProvider(RooRealVar* observable, RooRealVar* channelWidth);
+    virtual ~LiquidSimpleProvider();
 
 private:
     RooAbsPdf* initPdf(int i);

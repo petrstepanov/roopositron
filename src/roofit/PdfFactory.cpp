@@ -20,9 +20,10 @@
 #include "providers/TwoExpProvider.h"
 #include "providers/ThreeExpProvider.h"
 #include "providers/GrainProvider.h"
+#include "providers/LiquidProvider.h"
+#include "providers/LiquidSimpleProvider.h"
 #include "providers/PowderProvider.h"
 #include "providers/Powder2Provider.h"
-#include "providers/ParaProvider.h"
 #include "providers/TrappingProvider.h"
 
 PdfFactory::PdfFactory(){};
@@ -50,8 +51,10 @@ PdfHashNames PdfFactory::hashPdfName(const char* pdfName) {
 		return kPowderPdf;
 	if (name == "powder2")
 		return kPowder2Pdf;
-	if (name == "para")
-		return kParamagneticPdf;
+	if (name == "liquid")
+		return kLiquidPdf;
+	if (name == "liquidsim")
+		return kLiquidSimplePdf;
 	return kExponentPdf;
 }
 
@@ -110,9 +113,14 @@ RooAbsPdf* PdfFactory::getPdf(const char* name, RooRealVar* observable, RooRealV
 			return pp->getPdf(pdfIndexes[kPowder2Pdf]);
 			break;
 		}
-		case kParamagneticPdf: {
-			ParaProvider* pp = new ParaProvider(observable, channelWidth);
-			return pp->getPdf(pdfIndexes[kParamagneticPdf]);
+		case kLiquidPdf: {
+			LiquidProvider* lp = new LiquidProvider(observable, channelWidth);
+			return lp->getPdf(pdfIndexes[kLiquidPdf]);
+			break;
+		}
+		case kLiquidSimplePdf: {
+			LiquidSimpleProvider* pp = new LiquidSimpleProvider(observable, channelWidth);
+			return pp->getPdf(pdfIndexes[kLiquidSimplePdf]);
 			break;
 		}
 		default: {

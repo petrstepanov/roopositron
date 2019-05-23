@@ -27,7 +27,8 @@ enum PdfHashNames {
     kGrainPdf,
     kPowderPdf,
     kPowder2Pdf,
-	kParamagneticPdf
+	kLiquidPdf,
+	kLiquidSimplePdf
 };
 
 class PdfFactory {
@@ -39,7 +40,7 @@ public:
 
 private:
     static PdfHashNames hashPdfName(const char* pdfName);
-    int pdfIndexes[16] = {0};
+    int pdfIndexes[32] = {0};
 };
 
 #endif /* PDFHASH_H */
