@@ -13,10 +13,9 @@
 
 #include "TwoGaussProvider.h"
 #include "RooFormulaVar.h"
-#include "RooGaussian.h"
-#include "RooAddPdf.h"
 #include "../pdfs/TwoGaussian.h"
 #include "../../model/Constants.h"
+#include "../../util/RootHelper.h"
 
 TwoGaussProvider::TwoGaussProvider(RooRealVar* _observable, RooRealVar* _channelWidth) : AbstractProvider(_observable, _channelWidth) {}
     
@@ -59,4 +58,17 @@ RooAbsPdf* TwoGaussProvider::initPdf(int i) {
 
     // Works much faster with TwoGaussian rather than with sum of two RooGaussian
     return new TwoGaussian("twoGauss", "Two gauss model", *observable, *gMean, *g1Dispersion, *g2Dispersion, *g2FractionNorm);
+}
+
+RooArgSet* TwoGaussProvider::getIndirectParameters(RooAbsPdf* pdf){
+    RooArgSet* indirectParameters = new RooArgSet();
+
+    // pdf parameters might have suffixed names so we account on that
+    // for "Int_exp2" we pull "Int_exp2_##" as well
+    RooRealVar* g2Fraction = RootHelper::getParameterByNameCommonOrLocal(pdf, "Int_gauss2");
+    if (g2Fraction){
+    	RooFormulaVar* g1Fraction = new RooFormulaVar("Int_gauss1", "100-@0", RooArgList(*g2Fraction));
+    	indirectParameters->add(*g1Fraction);
+    }
+    return indirectParameters;
 }

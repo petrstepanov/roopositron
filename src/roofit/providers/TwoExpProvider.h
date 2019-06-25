@@ -24,8 +24,11 @@ public:
     TwoExpProvider(RooRealVar* observable, RooRealVar* channelWidth);
     virtual ~TwoExpProvider();
 
-    RooAbsPdf* initPdf(int i);
     static RooArgSet* getIndirectParameters(RooAbsPdf* pdf);
+
+private:
+    RooAbsPdf* initPdf(int i);
+
 };
 
 #endif /* EXPPROVIDER_H */

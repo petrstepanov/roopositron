@@ -12,6 +12,7 @@
  */
 
 #include "GraphicsHelper.h"
+#include "RootHelper.h"
 #include "StringUtils.h"
 #include "Debug.h"
 #include <TBox.h>
@@ -46,30 +47,35 @@ void GraphicsHelper::drawRegion(RooPlot* frame, Int_t xMin, Int_t xMax) {
 	Debug("GraphicsHelper::drawRegion", "xMin: " << xMin << ", xMax: " << xMax << "yMin: " << yMin << ", yMax: " << yMax);
 }
 
-void GraphicsHelper::printVariable(Int_t sigDigits, const char* options, Int_t& currentLine, RooRealVar* var, TPaveText* box, RooArgList* paramsList) {
-	TString* formatted = var->format(sigDigits, options);
-	const char* formattedString = formatted->Data();
-	TText* t = box->AddText(formattedString);
+void GraphicsHelper::printVariable(Int_t sigDigits, const char* options, Int_t& currentLine, RooAbsArg* rooAbsArg, TPaveText* box, RooArgList* paramsList) {
+	if (RooRealVar* var = dynamic_cast<RooRealVar*>(rooAbsArg)){
+		TString* formatted = var->format(sigDigits, options);
+		const char* formattedString = formatted->Data();
 
-	Bool_t notConstant = !var->isConstant();
-	Bool_t atMaximum = var->getVal() + var->getError() > var->getMax();
-	Bool_t atMinimum = var->getVal() - var->getError() < var->getMin();
-	if (notConstant && (atMaximum || atMinimum)) t->SetTextColor(kOrange+8);
-	paramsList->remove(*var);
-	currentLine++;
-
-	Debug("GraphicsHelper::printVariable", var->GetName() << "; notConstant " << notConstant << "; atMaximum " << atMaximum << "; atMinimum " << atMinimum);
-}
-
-void GraphicsHelper::printVariable(Int_t sigDigits, const char* options, Int_t& currentLine, RooFormulaVar* var, TPaveText* box, RooArgList* paramsList) {
-	TString formatted = TString::Format("%s = %f", var->GetName(), var->evaluate());
-	const char* formattedString = formatted.Data();
-	TText* t = box->AddText(formattedString);
-
-	paramsList->remove(*var);
-	currentLine++;
-
-	Debug("GraphicsHelper::printVariable", var->GetName());
+		Bool_t notConstant = !var->isConstant();
+		Bool_t atMaximum = var->getVal() + var->getError() > var->getMax();
+		Bool_t atMinimum = var->getVal() - var->getError() < var->getMin();
+		if (notConstant && (atMaximum || atMinimum)){
+			TText* t = box->AddText(TString::Format("%s (at limit)", formattedString).Data());
+			t->SetTextColor(kOrange+8);
+		} else {
+			box->AddText(formattedString);
+		}
+		paramsList->remove(*var);
+		currentLine++;
+		Debug("GraphicsHelper::printVariable", var->GetName() << "; notConstant " << notConstant << "; atMaximum " << atMaximum << "; atMinimum " << atMinimum);
+	}
+	else if (RooFormulaVar* var = dynamic_cast<RooFormulaVar*>(rooAbsArg)){
+		TString fmt("%s = %.#f (indirect)");
+		fmt.ReplaceAll("#", TString::Format("%d", sigDigits).Data());
+		TString formatted = TString::Format(fmt.Data(), var->GetName(), var->evaluate());
+		const char* formattedString = formatted.Data();
+		TText* t = box->AddText(formattedString);
+		t->SetTextColor(kGray+1);
+		paramsList->remove(*var);
+		currentLine++;
+		Debug("GraphicsHelper::printVariable", var->GetName());
+	}
 }
 
 TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, Double_t xmax, Double_t ymax) {
@@ -121,21 +127,21 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 
 	Int_t sigDigits = 0;
 	// Print "bins", "integral" and "background" variables first
-	if (RooRealVar* var = findRooRealVarInList(paramsList, "bins")) {
+	if (RooAbsArg* var = RootHelper::findArgNameSubstring(paramsList, "bins")) {
 		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
 	}
 
-	if (RooRealVar* var = findRooRealVarInList(paramsList, "integral")) {
+	if (RooAbsArg* var = RootHelper::findArgNameSubstring(paramsList, "integral")) {
 		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
 	}
 
 	sigDigits = 3;
-	if (RooRealVar* var = findRooRealVarInList(paramsList, "background")) {
+	if (RooAbsArg* var = RootHelper::findArgNameSubstring(paramsList, "background")) {
 		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
 	}
 
 	sigDigits = 5;
-	if (RooRealVar* var = findRooRealVarInList(paramsList, "channelWidth")) {
+	if (RooAbsArg* var = RootHelper::findArgNameSubstring(paramsList, "channelWidth")) {
 		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
 	}
 
@@ -146,7 +152,7 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 
 	sigDigits = 3;
 	// Print source contribution related variables
-	while (RooRealVar* var = findRooRealVarInList(paramsList, "ource")) {
+	while (RooAbsArg* var = RootHelper::findArgNameSubstring(paramsList, "ource")) {
 		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
 	}
 
@@ -156,7 +162,7 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 	linesNumber++;
 
 	// Print resolution function related variables
-	while (RooRealVar* var = findRooRealVarInList(paramsList, "gauss")) {
+	while (RooAbsArg* var = RootHelper::findArgNameSubstring(paramsList, "gauss")) {
 		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
 	}
 
@@ -168,12 +174,9 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 	// Print other variables (model)
 	pIter = paramsList->createIterator();
 	while (TObject* obj = pIter->Next()) {
-		if (RooFormulaVar* formulaVar = dynamic_cast<RooFormulaVar*>(obj)){
-
-		}
-		else if (RooRealVar* realVar = dynamic_cast<RooRealVar*>(obj)){
-			if (realVar->isConstant() && !showConstants) continue;
-			printVariable(sigDigits, options, linesNumber, realVar, box, paramsList);
+		if (RooAbsArg* var = dynamic_cast<RooAbsArg*>(obj)){
+			//if (realVar->isConstant() && !showConstants) continue;
+			printVariable(sigDigits, options, linesNumber, var, box, paramsList);
 		}
 	}
 
@@ -190,19 +193,4 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 
 	delete pIter;
 	return box;
-}
-
-// Finds RooRealVar in list by a name substring
-RooRealVar* GraphicsHelper::findRooRealVarInList(RooArgList* list, const char* nameSubstring) {
-	TIterator* it = list->createIterator();
-	TObject* temp;
-	while ((temp = it->Next())) {
-		if (RooRealVar* rooRealVar = dynamic_cast<RooRealVar*>(temp)) {
-			const char* name = rooRealVar->GetName();
-			if (StringUtils::isSubstring(name, nameSubstring)) {
-				return rooRealVar;
-			}
-		}
-	}
-	return NULL;
 }

@@ -23,8 +23,10 @@ public:
     ThreeExpProvider(RooRealVar* observable, RooRealVar* channelWidth);
     virtual ~ThreeExpProvider();
 
-    RooAbsPdf* initPdf(int i);
     static RooArgSet* getIndirectParameters(RooAbsPdf* pdf);
+
+private:
+    RooAbsPdf* initPdf(int i);
 };
 
 #endif /* THREEEXPPROVIDER_H */

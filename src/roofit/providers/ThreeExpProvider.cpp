@@ -46,7 +46,6 @@ RooAbsPdf* ThreeExpProvider::initPdf(int i) {
     return new ThreeExpPdf("threeExp", "three exponential pdf", *observable, *tau1Ch, *tau2Ch, *tau3Ch, *intExp2Norm, *intExp3Norm);
 }
 
-
 RooArgSet* ThreeExpProvider::getIndirectParameters(RooAbsPdf* pdf){
     RooArgSet* indirectParameters = new RooArgSet();
 

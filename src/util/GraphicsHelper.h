@@ -39,9 +39,7 @@ public:
 	static Double_t getResidualsPadFontFactor();
 
 private:
-	static RooRealVar* findRooRealVarInList(RooArgList* list, const char* name);
-	static void printVariable(Int_t sigDigits, const char* options, Int_t& currentLine, RooRealVar* var, TPaveText* box, RooArgList* paramsList);
-	static void printVariable(Int_t sigDigits, const char* options, Int_t& currentLine, RooFormulaVar* var, TPaveText* box, RooArgList* paramsList);
+	static void printVariable(Int_t sigDigits, const char* options, Int_t& currentLine, RooAbsArg* rooAbsReal, TPaveText* box, RooArgList* paramsList);
 };
 
 #endif /* GRAPHICSHELPER_H */

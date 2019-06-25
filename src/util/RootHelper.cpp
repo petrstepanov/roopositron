@@ -124,7 +124,19 @@ RooRealVar* RootHelper::getParameterNameContains(RooArgSet* rooRealVarSet, const
 	return nullptr;
 }
 
-
+// Finds RooRealVar in list by a name substring
+RooAbsArg* RootHelper::findArgNameSubstring(RooAbsCollection* list, const char* nameSubstring) {
+	TIterator* it = list->createIterator();
+	while (TObject* temp = it->Next()) {
+		if (RooAbsArg* rooAbsArg = dynamic_cast<RooAbsArg*>(temp)) {
+			const char* name = rooAbsArg->GetName();
+			if (StringUtils::isSubstring(name, nameSubstring)) {
+				return rooAbsArg;
+			}
+		}
+	}
+	return NULL;
+}
 
 
 //

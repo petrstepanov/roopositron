@@ -154,7 +154,7 @@ bool StringUtils::isEmpty(const char* string) {
 	return true;
 }
 
-std::string getStringWithoutSuffix(std::string stringMaybeWithSuffix) {
+std::string StringUtils::getStringWithoutSuffix(std::string stringMaybeWithSuffix) {
 	const std::regex re("(.*)(_[0-9]+)$");
 	std::smatch match;
 

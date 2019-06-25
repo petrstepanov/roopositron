@@ -15,6 +15,7 @@
 #include "RooFormulaVar.h"
 #include "../pdfs/ThreeGaussian.h"
 #include "../../model/Constants.h"
+#include "../../util/RootHelper.h"
 
 ThreeGaussProvider::ThreeGaussProvider(RooRealVar* _observable, RooRealVar* _channelWidth) : AbstractProvider(_observable, _channelWidth) {}
 
@@ -48,4 +49,19 @@ RooAbsPdf* ThreeGaussProvider::initPdf(int i) {
     RooRealVar* gMean = new RooRealVar("mean_gauss", "Resolution function mean", 1, "ch");
 
 	return new ThreeGaussian("threeGauss", "Three gauss pdf", *observable, *gMean, *g1Dispersion, *g3Dispersion, *g2Dispersion, *g3FractionNorm, *g2FractionNorm);
+}
+
+RooArgSet* ThreeGaussProvider::getIndirectParameters(RooAbsPdf* pdf){
+    RooArgSet* indirectParameters = new RooArgSet();
+
+    // pdf parameters might have suffixed names so we account on that
+    // for "Int_exp2" we pull "Int_exp2_##" as well
+    RooRealVar* g2Fraction = RootHelper::getParameterByNameCommonOrLocal(pdf, "Int_gauss2");
+    RooRealVar* g3Fraction = RootHelper::getParameterByNameCommonOrLocal(pdf, "Int_gauss3");
+
+    if (g2Fraction){
+    	RooFormulaVar* g1Fraction = new RooFormulaVar("Int_gauss1", "100-@0-@1", RooArgList(*g2Fraction, *g3Fraction));
+    	indirectParameters->add(*g1Fraction);
+    }
+    return indirectParameters;
 }

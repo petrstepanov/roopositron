@@ -22,6 +22,8 @@ public:
     LiquidProvider(RooRealVar* observable, RooRealVar* channelWidth);
     virtual ~LiquidProvider();
 
+    static RooArgSet* getIndirectParameters(RooAbsPdf* pdf);
+
 private:
     RooAbsPdf* initPdf(int i);
 };

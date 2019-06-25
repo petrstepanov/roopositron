@@ -138,9 +138,13 @@ RooArgSet* PdfFactory::getIndirectParameters(const char* modelName, RooAbsPdf* p
 			break;
 		}
 		case kTwoGaussPdf: {
+			RooArgSet* indirectParameters = TwoGaussProvider::getIndirectParameters(pdf);
+			return indirectParameters;
 			break;
 		}
 		case kThreeGaussPdf: {
+			RooArgSet* indirectParameters = ThreeGaussProvider::getIndirectParameters(pdf);
+			return indirectParameters;
 			break;
 		}
 		case kExponentPdf: {
@@ -169,6 +173,8 @@ RooArgSet* PdfFactory::getIndirectParameters(const char* modelName, RooAbsPdf* p
 			break;
 		}
 		case kLiquidPdf: {
+			RooArgSet* indirectParameters = LiquidProvider::getIndirectParameters(pdf);
+			return indirectParameters;
 			break;
 		}
 		case kLiquidSimplePdf: {

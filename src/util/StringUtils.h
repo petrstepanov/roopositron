@@ -34,7 +34,6 @@ public:
     static std::string suffix(const char* name, int index, const char* nameSuffix = "");
     static std::string ordinal(const char*, int index);
     static bool isEmpty(const char*);
-    static std::string ordinal(const char*, int index);
     static std::string getStringWithoutSuffix(std::string stringMaybeWithSuffix);
 };
 

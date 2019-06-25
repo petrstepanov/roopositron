@@ -21,7 +21,9 @@ class ThreeGaussProvider : public AbstractProvider {
 public:
     ThreeGaussProvider(RooRealVar* observable, RooRealVar* channelWidth);
     virtual ~ThreeGaussProvider();
-    
+
+    static RooArgSet* getIndirectParameters(RooAbsPdf* pdf);
+
 private:
     RooAbsPdf* initPdf(int i);
 };

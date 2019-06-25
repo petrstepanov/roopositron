@@ -22,6 +22,8 @@ public:
     TwoGaussProvider(RooRealVar* observable, RooRealVar* channelWidth);
     virtual ~TwoGaussProvider();
     
+    static RooArgSet* getIndirectParameters(RooAbsPdf* pdf);
+
 private:
     RooAbsPdf* initPdf(int i);
 };
