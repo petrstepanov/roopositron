@@ -16,14 +16,14 @@
 #include "../pdfs/TrapPdf.h"
 #include "../../model/Constants.h"
 
-TrappingProvider::TrappingProvider(RooRealVar* observable) : AbstractProvider(observable) {}
+TrappingProvider::TrappingProvider(RooRealVar* _observable, RooRealVar* _channelWidth) : AbstractProvider(_observable, _channelWidth) {}
     
 TrappingProvider::~TrappingProvider() {
 }
 
 RooAbsPdf* TrappingProvider::initPdf(int i) {
     RooConstVar* fwhm2disp = Constants::fwhm2disp;
-    RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
+//    RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
 	
     RooRealVar* tauBulk = new RooRealVar("tauBulk", "e+ lifetime in source", 0.15, 0.1, 0.3, "ns");
     RooFormulaVar* tauBulkCh = new RooFormulaVar("tauBulkCh", "@0/@1", RooArgList(*tauBulk, *channelWidth));

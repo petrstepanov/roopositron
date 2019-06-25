@@ -16,14 +16,13 @@
 #include "RooGaussian.h"
 #include "../../model/Constants.h"
 
-OneGaussProvider::OneGaussProvider(RooRealVar* observable) : AbstractProvider(observable) {}
+OneGaussProvider::OneGaussProvider(RooRealVar* _observable, RooRealVar* _channelWidth) : AbstractProvider(_observable, _channelWidth) {}
     
 OneGaussProvider::~OneGaussProvider() {
 }
 
 RooAbsPdf* OneGaussProvider::initPdf(int i) {
     RooConstVar* fwhm2disp = Constants::fwhm2disp;
-    RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
 
     // 1st Gauss FWHM
     RooRealVar* g1FWHM = new RooRealVar("FWHM_gauss1", "1st gauss FWHM", 0.3, 0.1, 0.5, "ns");

@@ -14,9 +14,9 @@
 #include "RootHelper.h"
 #include "TString.h"
 #include "StringUtils.h"
+#include "Debug.h"
 #include <TUnixSystem.h>
 #include <RooWorkspace.h>
-#include "Debug.h"
 #include <iostream>
 
 //void RootHelper::deleteObject(const char* name){
@@ -75,6 +75,9 @@ RooAbsPdf* RootHelper::suffixPdfAndNodes(RooAbsPdf* pdf, RooRealVar* observable,
 	#endif
 	TString suffixedName = TString::Format("%s_%s", pdf->GetName(), suffix);
 	RooAbsPdf* suffixedPdf =  w->pdf(suffixedName.Data());
+
+	// Rename indirect parameters too!
+
 	return suffixedPdf;
 }
 
@@ -86,3 +89,54 @@ void RootHelper::setRooRealVarValueLimits(RooRealVar* var, Double_t value, Doubl
 	var->setMax(max);
 	var->setVal(value);
 }
+
+RooRealVar* RootHelper::getParameterByNameCommonOrLocal(RooAbsPdf* pdf, const char* name){
+	// for given parameter name, say #tau1 will return either exact match or suffixed:
+	// #tau1 or #tau1_13 or #tau1_2
+
+	std::string nameString(name);
+
+	// TODO: check list is not empty otherwise pass observable
+	RooArgSet* parameters = pdf->getParameters(RooArgSet()); // pdf->getParameters(*observable);
+	TIterator* it = parameters->createIterator();
+	while (TObject* temp = it->Next()) {
+		if (RooRealVar* parameter = dynamic_cast<RooRealVar*>(temp)) {
+			std::string parameterName = parameter->GetName();
+			std::string parameterNameWithoutSuffix = StringUtils::getStringWithoutSuffix(parameterName);
+			if (nameString == parameterNameWithoutSuffix){
+				return parameter;
+			}
+		}
+	}
+	return NULL;
+}
+
+// Deprecated, use getParameterByNameCommonOrLocal()
+RooRealVar* RootHelper::getParameterNameContains(RooArgSet* rooRealVarSet, const char* nameSubstring){
+	TIterator* it = rooRealVarSet->createIterator();
+	while (TObject* temp = it->Next()) {
+		if (RooRealVar* rrv = dynamic_cast<RooRealVar*>(temp)) {
+			if (StringUtils::isSubstring(rrv->GetName(), nameSubstring)){
+				return rrv;
+			}
+		}
+	}
+	return nullptr;
+}
+
+// Finds RooRealVar in list by a name substring
+RooAbsArg* RootHelper::findArgNameSubstring(RooAbsCollection* list, const char* nameSubstring) {
+	TIterator* it = list->createIterator();
+	while (TObject* temp = it->Next()) {
+		if (RooAbsArg* rooAbsArg = dynamic_cast<RooAbsArg*>(temp)) {
+			const char* name = rooAbsArg->GetName();
+			if (StringUtils::isSubstring(name, nameSubstring)) {
+				return rooAbsArg;
+			}
+		}
+	}
+	return NULL;
+}
+
+
+//

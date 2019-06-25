@@ -25,11 +25,12 @@ public:
     virtual ~Constants();
     
 //    int getNumberOfChannels();
-    double getChannelWidth();
-    RooConstVar* getRooChannelWidth();
+    double getDefaultChannelWidth();
+//    RooConstVar* getRooChannelWidth();
     int getSkipLines();
     int getMinChannel();
     int getMaxChannel();
+    int getBackgroundBins();
     int getExcludeMinChannel();
     int getExcludeMaxChannel();    
     const char* getResolutionFunctionModel();
@@ -38,6 +39,7 @@ public:
     std::vector<std::string> getDecayModels();
     std::vector<std::string> getCommonParameters();
     double getBufferFraction();
+    int getConvolutionBins();
     int getImageWidth();
     int getImageHeight();
     void print();
@@ -54,7 +56,7 @@ private:
     bool extendFromFile(RooArgList* constants, std::string filename);
     void writeToFile(RooArgList* constants, std::string filename);
     
-    RooConstVar* channelWidth;
+//    RooConstVar* channelWidth;
     const std::string DEFAULT_FILENAME = "constants.txt";
     const int TAB_SIZE = 20; 
 };

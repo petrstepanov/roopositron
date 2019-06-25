@@ -19,13 +19,13 @@
 #include "../../util/StringUtils.h"
 #include <iostream>
 
-TwoExpSourceProvider::TwoExpSourceProvider(RooRealVar* _observable) : AbstractProvider(_observable) {}
+TwoExpSourceProvider::TwoExpSourceProvider(RooRealVar* _observable, RooRealVar* _channelWidth) : AbstractProvider(_observable, _channelWidth) {}
 
 TwoExpSourceProvider::~TwoExpSourceProvider() {
 }
 
 RooAbsPdf* TwoExpSourceProvider::initPdf(int i) {
-    RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
+//    RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
     
     // Instantiate RooRealVar parameters
     RooRealVar* tau1Source = new RooRealVar("#tau1_source", "1st positron lifetime in source", 0.2, 0.1, 2, "ns");

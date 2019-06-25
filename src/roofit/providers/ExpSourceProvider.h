@@ -19,7 +19,7 @@
 
 class ExpSourceProvider : public AbstractProvider {
 public:
-    ExpSourceProvider(RooRealVar* observable);
+    ExpSourceProvider(RooRealVar* observable, RooRealVar* channelWidth);
     virtual ~ExpSourceProvider();
     
 private:

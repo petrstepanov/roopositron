@@ -15,10 +15,10 @@
 #define ADDITIVECONVOLUTIONPDF_H
 
 #include "../model/ParametersPool.h"
-#include "../roofit/PdfServer.h"
 #include "RooAbsPdf.h"
 #include "RooFormulaVar.h"
 #include <vector>
+#include "PdfFactory.h"
 
 class AdditiveConvolutionPdf {
 public:
@@ -28,45 +28,27 @@ public:
     virtual ~AdditiveConvolutionPdf();
 
     void constructModel();
-    void addBackground();
-    // void convoluteComponents();
 
     RooAbsPdf* getPdf();
+    RooAbsPdf* getPdfNonConvoluted();
     RooAbsPdf* getResolutionFunction();
-    RooArgList* getAllComponents();
-    RooArgList* getConvolutedComponents();
-    RooAbsPdf* getSourceCompoment();
-    RooAbsPdf* getConvolutedSourceComponent();
     
 private:
     void initComponents(std::vector<std::string> componentIds, int sourceComponents);
     void initResolutionModel(const char* resolutionId);
 
-    PdfServer* pdfServer;
+    PdfFactory* pdfFactory;
     RooRealVar* observable;
+
+    RooRealVar* channelWidth;
 
     RooArgList* componentsList = new RooArgList();
     RooArgList* sourceComponentsList = new RooArgList();
-    RooAbsPdf* resolutionFunction; 
+    RooAbsPdf* resolutionFunction;
     
-    RooArgList* coefficientsList = new RooArgList(); // in percent
-    RooArgList* normalizedCoefficients = new RooArgList(); // in [0, 1]
-    RooArgList* recursiveCoefficients = new RooArgList();
-    
-    RooArgList* convolutedComponentsList = new RooArgList();
-    RooArgList* convolutedSourceComponentsList = new RooArgList();
-
     RooAbsPdf* modelNonConvoluted;
     RooAbsPdf* model;
-    RooAbsPdf* modelWithBg;
 
-
-    RooAbsPdf* sourcePdf;
-    RooAbsPdf* convolutedSourcePdf;
-    
-    // Source contribution coefficients
-    RooRealVar* Int_source;
-    RooFormulaVar* Int_sourceNorm;
 };
 
 #endif /* ADDITIVECONVOLUTIONPDF_H */

@@ -36,7 +36,7 @@ public:
 			RooAbsReal& _l2g,          // Two-gamma annihilation rate
 			RooAbsReal& _V0,           // Two-gamma annihilation rate
 			RooAbsReal& _Vth,          // Three-gamma annihilation rate
-			Double_t chW);
+			RooAbsReal& _chW);		   // Channel width
 	Powder2Pdf(const Powder2Pdf& other, const char* name = 0);
 	virtual TObject* clone(const char* newname) const {
 		return new Powder2Pdf(*this, newname);
@@ -62,8 +62,8 @@ protected:
 	RooRealProxy l2g;
 	RooRealProxy V0;
 	RooRealProxy Vth;
+	RooRealProxy chW;
 
-	Double_t chW = 0;
 	Double_t evaluate() const;
 	Double_t sum(Double_t a) const;
 	Double_t Power(Double_t a, Double_t b) const;

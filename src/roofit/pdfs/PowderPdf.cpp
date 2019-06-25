@@ -29,7 +29,7 @@ PowderPdf::PowderPdf(const char *name, const char *title,
 //    RooAbsReal& _l3g,
     RooAbsReal& _V0,
     RooAbsReal& _Vth,
-    Double_t _chW
+	RooAbsReal& _chW
     ) :
     RooAbsPdf(name, title),
     t("t", "t", this, _t),
@@ -45,7 +45,7 @@ PowderPdf::PowderPdf(const char *name, const char *title,
 //    l3g("l3g", "l3g", this, _l3g),
     V0("V0", "V0", this, _V0),
     Vth("Vth", "Vth", this, _Vth),
-    chW(_chW) {
+	chW("chW", "chW", this, _chW) {
 }
 
 PowderPdf::PowderPdf(const PowderPdf& other, const char* name) :
@@ -63,7 +63,7 @@ l2g("l2g", this, other.l2g),
 //l3g("l3g", this, other.l3g),
 V0("V0", this, other.V0),
 Vth("Vth", this, other.Vth),
-chW(other.chW){
+chW("chW", this, other.chW){
 }
 
 Double_t PowderPdf::evaluate() const {   

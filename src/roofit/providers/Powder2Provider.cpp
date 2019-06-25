@@ -11,16 +11,12 @@
 #include "../pdfs/Powder2Pdf.h"
 #include "../../model/Constants.h"
 
-Powder2Provider::Powder2Provider(RooRealVar* observable) :
-		AbstractProvider(observable) {
-}
+Powder2Provider::Powder2Provider(RooRealVar* _observable, RooRealVar* _channelWidth) : AbstractProvider(_observable, _channelWidth) {}
 
 Powder2Provider::~Powder2Provider() {
 }
 
 RooAbsPdf* Powder2Provider::initPdf(int i) {
-	RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
-
 	RooRealVar* l2g = new RooRealVar("#lambda_2#gamma", "Two-gamma annihilation rate", 8, "1/ns");
 	l2g->setConstant(kTRUE);
 
@@ -49,5 +45,5 @@ RooAbsPdf* Powder2Provider::initPdf(int i) {
 	RooRealVar* Mratio = new RooRealVar("M/m", "Powder mass to positron mass ratio", 1E5, 1E2, 1E7, "");
 	RooRealVar* mu = new RooRealVar("#mu", "Probability of o-p conversion near surface", 1E-5, 0, 1E-3, "");
 
-	return new Powder2Pdf("powder2", "Powder model two-defect", *observable, *Langstrom, *kappaVac1, *kappaVac2, *pPs, *lambdaBulk, *lambdaD1, *lambdaD2, *lambdaBulk, *Mratio, *mu, *l2g, *V0, *Vth, channelWidth->getValV());
+	return new Powder2Pdf("powder2", "Powder model two-defect", *observable, *Langstrom, *kappaVac1, *kappaVac2, *pPs, *lambdaBulk, *lambdaD1, *lambdaD2, *lambdaBulk, *Mratio, *mu, *l2g, *V0, *Vth, *channelWidth);
 }

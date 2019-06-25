@@ -11,22 +11,19 @@
  * Created on December 6, 2018, 1:03 PM
  */
 
-#include "ParaProvider.h"
+#include "LiquidSimpleProvider.h"
+
 #include "RooFormulaVar.h"
 #include "RooConstVar.h"
-#include "../pdfs/ParaPdf.h"
+#include "../pdfs/LiquidSimplePdf.h"
 #include "../../model/Constants.h"
 
-ParaProvider::ParaProvider(RooRealVar* observable) :
-		AbstractProvider(observable) {
+LiquidSimpleProvider::LiquidSimpleProvider(RooRealVar* _observable, RooRealVar* _channelWidth) : AbstractProvider(_observable, _channelWidth) {}
+
+LiquidSimpleProvider::~LiquidSimpleProvider() {
 }
 
-ParaProvider::~ParaProvider() {
-}
-
-RooAbsPdf* ParaProvider::initPdf(int i) {
-	RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
-
+RooAbsPdf* LiquidSimpleProvider::initPdf(int i) {
 //	Pps("Pps", this, other.Pps),
 //	lplus("lplus", this, other.lplus),
 //	lpo("lpo", this, other.lpo),
@@ -44,5 +41,5 @@ RooAbsPdf* ParaProvider::initPdf(int i) {
 
 	RooRealVar* lopc = new RooRealVar("#lambda_opc", "Ortho-para conversion speed", 1, 1E-3, 1E3, "1/ns");
 
-	return new ParaPdf("para", "Paramagnetic pdf", *observable, *pPs, *lplus, *lpo, *l2g, *lopc, channelWidth->getValV());
+	return new LiquidSimplePdf("para", "Paramagnetic pdf", *observable, *pPs, *lplus, *lpo, *l2g, *lopc, *channelWidth);
 }

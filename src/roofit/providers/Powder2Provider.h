@@ -13,7 +13,7 @@
 
 class Powder2Provider : public AbstractProvider{
 public:
-    Powder2Provider(RooRealVar *observable);
+    Powder2Provider(RooRealVar* observable, RooRealVar* channelWidth);
     virtual ~Powder2Provider();
 
 private:

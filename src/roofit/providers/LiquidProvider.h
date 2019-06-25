@@ -11,20 +11,22 @@
  * Created on December 6, 2018, 1:03 PM
  */
 
-#ifndef PARAPROVIDER_H
-#define PARAPROVIDER_H
+#ifndef LIQUIDPROVIDER_H
+#define LIQUIDPROVIDER_H
 
 #include "AbstractProvider.h"
 #include "RooRealVar.h"
 
-class ParaProvider : public AbstractProvider{
+class LiquidProvider : public AbstractProvider{
 public:
-    ParaProvider(RooRealVar *observable);
-    virtual ~ParaProvider();
+    LiquidProvider(RooRealVar* observable, RooRealVar* channelWidth);
+    virtual ~LiquidProvider();
+
+    static RooArgSet* getIndirectParameters(RooAbsPdf* pdf);
 
 private:
     RooAbsPdf* initPdf(int i);
 };
 
-#endif /* PARAROVIDER_H */
+#endif /* LIQUIDPROVIDER_H */
 

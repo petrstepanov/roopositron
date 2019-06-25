@@ -16,14 +16,13 @@
 #include "../pdfs/GrainPdf.h"
 #include "../../model/Constants.h"
 
-GrainProvider::GrainProvider(RooRealVar* observable) : AbstractProvider(observable) {}
+GrainProvider::GrainProvider(RooRealVar* _observable, RooRealVar* _channelWidth) : AbstractProvider(_observable, _channelWidth) {}
     
 GrainProvider::~GrainProvider() {
 }
 
 RooAbsPdf* GrainProvider::initPdf(int i) {
     RooConstVar* fwhm2disp = Constants::fwhm2disp;
-    RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
 	
     RooRealVar* tauBulk = new RooRealVar("tauBulk", "e+_lifetime_in_source", 0.120, 0.120, 0.120, "ns");
     RooFormulaVar* lambdaBulk = new RooFormulaVar("lambdaBulk", "1/@0", *tauBulk);

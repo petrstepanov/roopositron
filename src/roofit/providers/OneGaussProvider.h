@@ -19,7 +19,7 @@
 
 class OneGaussProvider : public AbstractProvider {
 public:
-    OneGaussProvider(RooRealVar* observable);
+    OneGaussProvider(RooRealVar* observable, RooRealVar* channelWidth);
     virtual ~OneGaussProvider();
     
 private:

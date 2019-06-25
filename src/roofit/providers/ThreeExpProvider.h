@@ -20,9 +20,12 @@
 
 class ThreeExpProvider : public AbstractProvider {
 public:
-    ThreeExpProvider(RooRealVar* observable);
+    ThreeExpProvider(RooRealVar* observable, RooRealVar* channelWidth);
     virtual ~ThreeExpProvider();
 
+    static RooArgSet* getIndirectParameters(RooAbsPdf* pdf);
+
+private:
     RooAbsPdf* initPdf(int i);
 };
 

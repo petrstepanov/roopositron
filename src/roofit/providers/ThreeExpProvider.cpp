@@ -16,16 +16,15 @@
 #include "RooFormulaVar.h"
 #include "../pdfs/ThreeExpPdf.h"
 #include "../../model/Constants.h"
-#include "../../util/StringUtils.h"
+#include "../../util/RootHelper.h"
 #include <iostream>
 
-ThreeExpProvider::ThreeExpProvider(RooRealVar* _observable) : AbstractProvider(_observable) {}
+ThreeExpProvider::ThreeExpProvider(RooRealVar* _observable, RooRealVar* _channelWidth) : AbstractProvider(_observable, _channelWidth) {}
 
 ThreeExpProvider::~ThreeExpProvider() {
 }
 
 RooAbsPdf* ThreeExpProvider::initPdf(int i) {
-    RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
     
     // Instantiate RooRealVar parameters
     RooRealVar* tau1 = new RooRealVar("#tau1", "1st positron lifetime", 0.2, 0.1, 2, "ns");
@@ -45,4 +44,18 @@ RooAbsPdf* ThreeExpProvider::initPdf(int i) {
 
     // Instantiate model
     return new ThreeExpPdf("threeExp", "three exponential pdf", *observable, *tau1Ch, *tau2Ch, *tau3Ch, *intExp2Norm, *intExp3Norm);
+}
+
+RooArgSet* ThreeExpProvider::getIndirectParameters(RooAbsPdf* pdf){
+    RooArgSet* indirectParameters = new RooArgSet();
+
+    // pdf parameters might have suffixed names so we account on that
+    // for "Int_exp2" we pull "Int_exp2_##" as well
+    RooRealVar* Int_exp2 = RootHelper::getParameterByNameCommonOrLocal(pdf, "Int_exp2");
+    RooRealVar* Int_exp3 = RootHelper::getParameterByNameCommonOrLocal(pdf, "Int_exp3");
+    if (Int_exp2 && Int_exp3){
+    	RooFormulaVar* Int_exp1 = new RooFormulaVar("Int_exp1", "100-@0-@1", RooArgList(*Int_exp2, *Int_exp3));
+    	indirectParameters->add(*Int_exp1);
+    }
+    return indirectParameters;
 }

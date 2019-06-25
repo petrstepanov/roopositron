@@ -15,15 +15,16 @@
 #include "RooFormulaVar.h"
 #include "../pdfs/TwoGaussian.h"
 #include "../../model/Constants.h"
+#include "../../util/RootHelper.h"
 
-TwoGaussProvider::TwoGaussProvider(RooRealVar* observable) : AbstractProvider(observable) {}
+TwoGaussProvider::TwoGaussProvider(RooRealVar* _observable, RooRealVar* _channelWidth) : AbstractProvider(_observable, _channelWidth) {}
     
 TwoGaussProvider::~TwoGaussProvider() {
 }
 
 RooAbsPdf* TwoGaussProvider::initPdf(int i) {
     RooConstVar* fwhm2disp = Constants::fwhm2disp;
-    RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
+//    RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
 
     // 1st Gauss FWHM
     RooRealVar* g1FWHM = new RooRealVar("FWHM_gauss1", "1st gauss FWHM", 0.3, 0.1, 0.5, "ns");
@@ -47,5 +48,27 @@ RooAbsPdf* TwoGaussProvider::initPdf(int i) {
 
     // Zero channel start values are assigned later (relative to the MIN_CHANNEL value)
     RooRealVar* gMean = new RooRealVar("mean_gauss", "Resolution function mean", 1, "ch");
+
+//    RooGaussian* gauss1 = new RooGaussian("gauss1", "1st gauss", *observable, *gMean, *g1Dispersion);
+//    RooGaussian* gauss2 = new RooGaussian("gauss2", "2nd gauss", *observable, *gMean, *g2Dispersion);
+
+//    RooAddPdf* gauss = new RooAddPdf("twoGauss", "Two gauss model", RooArgList(*gauss2, *gauss1), RooArgList(*g2FractionNorm));
+//    gauss->fixAddCoefNormalization(RooArgSet(*observable));
+//	return gauss;
+
+    // Works much faster with TwoGaussian rather than with sum of two RooGaussian
     return new TwoGaussian("twoGauss", "Two gauss model", *observable, *gMean, *g1Dispersion, *g2Dispersion, *g2FractionNorm);
+}
+
+RooArgSet* TwoGaussProvider::getIndirectParameters(RooAbsPdf* pdf){
+    RooArgSet* indirectParameters = new RooArgSet();
+
+    // pdf parameters might have suffixed names so we account on that
+    // for "Int_exp2" we pull "Int_exp2_##" as well
+    RooRealVar* g2Fraction = RootHelper::getParameterByNameCommonOrLocal(pdf, "Int_gauss2");
+    if (g2Fraction){
+    	RooFormulaVar* g1Fraction = new RooFormulaVar("Int_gauss1", "100-@0", RooArgList(*g2Fraction));
+    	indirectParameters->add(*g1Fraction);
+    }
+    return indirectParameters;
 }

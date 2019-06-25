@@ -8,10 +8,12 @@
 #pragma link C++ class GrainPdf;
 #pragma link C++ class PowderPdf;
 #pragma link C++ class Powder2Pdf;
-#pragma link C++ class ParaPdf;
+#pragma link C++ class LiquidPdf;
+#pragma link C++ class LiquidSimplePdf;
 #pragma link C++ class ThreeExpPdf;
 #pragma link C++ class ThreeGaussian;
 #pragma link C++ class TrapPdf;
 #pragma link C++ class TwoExpPdf;
 #pragma link C++ class TwoGaussian;
+#pragma link C++ class ConstantPdf;
 #endif

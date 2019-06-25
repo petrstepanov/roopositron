@@ -27,19 +27,23 @@ enum PdfHashNames {
     kGrainPdf,
     kPowderPdf,
     kPowder2Pdf,
-	kParamagneticPdf
+	kLiquidPdf,
+	kLiquidSimplePdf
 };
 
-class PdfServer {
+class PdfFactory {
 public:   
-    PdfServer();
-    virtual ~PdfServer();
-    RooAbsPdf* getPdf(const char* name, RooRealVar* observable);
-    RooAbsPdf* getPdf(Int_t name, RooRealVar* observable);
+    PdfFactory();
+    virtual ~PdfFactory();
+    RooAbsPdf* getPdf(const char* modelName, RooRealVar* observable, RooRealVar* channelWidth);
+    // TODO: add resolution function indirect parameters
+    static RooArgSet* getIndirectParameters(const char* modelName, RooAbsPdf* pdf);
+
+//    RooAbsPdf* getPdf(Int_t name, RooRealVar* observable, RooRealVar* channelWidth);
 
 private:
     static PdfHashNames hashPdfName(const char* pdfName);
-    int pdfIndexes[16] = {0};
+    int pdfIndexes[32] = {0};
 };
 
 #endif /* PDFHASH_H */

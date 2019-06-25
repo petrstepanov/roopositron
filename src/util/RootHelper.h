@@ -18,6 +18,7 @@
 #include <TStopwatch.h>
 #include <RooAbsPdf.h>
 #include <RooRealVar.h>
+#include <RooArgSet.h>
 
 class RootHelper {
 public:
@@ -28,6 +29,9 @@ public:
     static RooRealVar* findParameterNameContains(RooAbsPdf* pdf, RooRealVar* observable, const char* substring);
     static RooAbsPdf* suffixPdfAndNodes(RooAbsPdf* pdf, RooRealVar* observable, const char* suffix);
     static void setRooRealVarValueLimits(RooRealVar* var, Double_t value, Double_t min, Double_t max);
+    static RooRealVar* getParameterNameContains(RooArgSet* rooRealVarSet, const char* nameSubstring);
+    static RooRealVar* getParameterByNameCommonOrLocal(RooAbsPdf* pdf, const char* name);
+    static RooAbsArg* findArgNameSubstring(RooAbsCollection* list, const char* nameSubstring);
 
 private:
     static TStopwatch* watch;

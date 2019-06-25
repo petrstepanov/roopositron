@@ -17,16 +17,12 @@
 #include "../pdfs/PowderPdf.h"
 #include "../../model/Constants.h"
 
-PowderProvider::PowderProvider(RooRealVar* observable) :
-		AbstractProvider(observable) {
-}
+PowderProvider::PowderProvider(RooRealVar* _observable, RooRealVar* _channelWidth) : AbstractProvider(_observable, _channelWidth) {}
 
 PowderProvider::~PowderProvider() {
 }
 
 RooAbsPdf* PowderProvider::initPdf(int i) {
-	RooConstVar* channelWidth = Constants::getInstance()->getRooChannelWidth();
-
 	// L("L", this, other.L),
 	// kv("kv", this, other.kv),
 	// Pps("Pps", this, other.Pps),
@@ -66,5 +62,5 @@ RooAbsPdf* PowderProvider::initPdf(int i) {
 	RooRealVar* Mratio = new RooRealVar("M/m", "Powder mass to positron mass ratio", 1E5, 1E2, 1E7, "");
 	RooRealVar* mu = new RooRealVar("#mu", "Probability of o-p conversion near surface", 1E-5, 0, 1E-3, "");
 
-	return new PowderPdf("powder", "Powder model", *observable, *Langstrom, *kappaVac, *pPs, *lambdaBulk, *lambdaVac, *lambdaBulk/* *lambdaPs*/, *Mratio, *mu, *l2g, /**l3g,*/ *V0, *Vth, channelWidth->getValV());
+	return new PowderPdf("powder", "Powder model", *observable, *Langstrom, *kappaVac, *pPs, *lambdaBulk, *lambdaVac, *lambdaBulk/* *lambdaPs*/, *Mratio, *mu, *l2g, /**l3g,*/ *V0, *Vth, *channelWidth);
 }

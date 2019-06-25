@@ -11,18 +11,18 @@
  * Created on November 9, 2016, 8:48 PM
  */
 
-#include "ParaPdf.h"
+#include "LiquidSimplePdf.h"
 
-ClassImp(ParaPdf);
+ClassImp(LiquidSimplePdf);
 
-ParaPdf::ParaPdf(const char *name, const char *title,
+LiquidSimplePdf::LiquidSimplePdf(const char *name, const char *title,
     RooAbsReal& _t,
     RooAbsReal& _Pps,
     RooAbsReal& _lplus,
     RooAbsReal& _lpo,
     RooAbsReal& _l2g,
     RooAbsReal& _lopc,
-    Double_t _chW
+	RooAbsReal& _chW
     ) :
     RooAbsPdf(name, title),
     t("t", "t", this, _t),
@@ -31,10 +31,10 @@ ParaPdf::ParaPdf(const char *name, const char *title,
     lpo("lpo", "lpo", this, _lpo),
     l2g("l2g", "l2g", this, _l2g),
     lopc("lopc", "lopc", this, _lopc),
-    chW(_chW) {
+	chW("chW", "chW", this, _chW) {
 }
 
-ParaPdf::ParaPdf(const ParaPdf& other, const char* name) :
+LiquidSimplePdf::LiquidSimplePdf(const LiquidSimplePdf& other, const char* name) :
 RooAbsPdf(other, name),
 t("t", this, other.t),
 Pps("Pps", this, other.Pps),
@@ -42,10 +42,10 @@ lplus("lplus", this, other.lplus),
 lpo("lpo", this, other.lpo),
 l2g("l2g", this, other.l2g),
 lopc("lpoc", this, other.lopc),
-chW(other.chW){
+chW("chW", this, other.chW){
 }
 
-Double_t ParaPdf::evaluate() const {
+Double_t LiquidSimplePdf::evaluate() const {
     if (t < 0) return 0.;  
     Double_t E = TMath::E();
 //    Double_t Pi = TMath::Pi();
@@ -60,33 +60,33 @@ Double_t ParaPdf::evaluate() const {
     
 }
 
-Double_t ParaPdf::Power(Double_t a, Double_t b) const{
+Double_t LiquidSimplePdf::Power(Double_t a, Double_t b) const{
     return TMath::Power(a, b);
 }
 
-Double_t ParaPdf::Sqrt(Double_t a) const{
+Double_t LiquidSimplePdf::Sqrt(Double_t a) const{
     return TMath::Sqrt(a);
 }
 
-Double_t ParaPdf::ArcTan(Double_t a) const{
+Double_t LiquidSimplePdf::ArcTan(Double_t a) const{
     return TMath::ATan(a);
 }
 
-Double_t ParaPdf::Coth(Double_t a) const{
+Double_t LiquidSimplePdf::Coth(Double_t a) const{
     return 1/TMath::TanH(a);
 }
 
-Double_t ParaPdf::Log(Double_t a) const{
+Double_t LiquidSimplePdf::Log(Double_t a) const{
     return TMath::Log(a);
 }
 
 
-Int_t ParaPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName) const {
+Int_t LiquidSimplePdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName) const {
    if (matchArgs(allVars,analVars,t)) return 1;
    return 0;
 }
 
-Double_t ParaPdf::indefiniteIntegral(Double_t y) const{
+Double_t LiquidSimplePdf::indefiniteIntegral(Double_t y) const{
 	Double_t E = TMath::E();
 	return
 			(-1 + Pps)/(chW*Power(E,chW*lplus*y)) -
@@ -97,7 +97,7 @@ Double_t ParaPdf::indefiniteIntegral(Double_t y) const{
 			;
 }
 
-Double_t ParaPdf::analyticalIntegral(Int_t code, const char* rangeName) const {
+Double_t LiquidSimplePdf::analyticalIntegral(Int_t code, const char* rangeName) const {
     assert(code == 1);
 
     if (code==1){

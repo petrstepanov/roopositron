@@ -143,6 +143,7 @@ RooAbsPdf* ReverseAddPdf::add(RooArgList* pdfList, RooRealVar* observable, const
 		I_i->add(*INorm);
 	}
 	RooAddPdf* pdf = new RooAddPdf(TString::Format("addPdf_%s", pdfName), TString::Format("Additive model %s", pdfName), *pdfInverseList, *I_i);
+
 	// https://sft.its.cern.ch/jira/browse/ROOT-9653
 	pdf->fixAddCoefNormalization(RooArgSet(*observable));
 	return pdf;
