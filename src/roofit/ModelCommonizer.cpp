@@ -125,18 +125,5 @@ RooRealVar* ModelCommonizer::getCommonReplacement(const char* localParameterName
 			}
 		}
 	}
-//	TIterator* it = commonParameters->createIterator();
-//	while (TObject* temp = it->Next()) {
-//		RooRealVar* commonParameter = dynamic_cast<RooRealVar*>(temp);
-//		if (commonParameter) {
-//			// Replace all tau_# with tau (adding underscore to not interfere with tau_2)
-//			std::string commonParameterName_ = commonParameter->GetName();
-//			commonParameterName_ += "_";
-//			Bool_t match = StringUtils::isSubstring(localParameterName, commonParameterName_.c_str());
-//			if (match) {
-//				return commonParameter;
-//			}
-//		}
-//	}
 	return NULL;
 }

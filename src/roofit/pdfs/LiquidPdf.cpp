@@ -12,7 +12,6 @@
  */
 
 #include "LiquidPdf.h"
-
 ClassImp(LiquidPdf);
 
 LiquidPdf::LiquidPdf(const char *name, const char *title,
@@ -27,7 +26,7 @@ LiquidPdf::LiquidPdf(const char *name, const char *title,
 		RooAbsReal& _l2g,
 		RooAbsReal& _chW
     ) :
-    RooAbsPdf(name, title),
+	MyRooAbsPdf(name, title),
     t("t", "t", this, _t),
     Pqf("Pqf", "Pqf", this, _Pqf),
     lb("lb", "lb", this, _lb),
@@ -41,7 +40,7 @@ LiquidPdf::LiquidPdf(const char *name, const char *title,
 }
 
 LiquidPdf::LiquidPdf(const LiquidPdf& other, const char* name) :
-RooAbsPdf(other, name),
+MyRooAbsPdf(other, name),
 t("t", this, other.t),
 Pqf("Pqf", this, other.Pqf),
 lb("lb", this, other.lb),

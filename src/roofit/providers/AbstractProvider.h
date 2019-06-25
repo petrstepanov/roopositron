@@ -25,6 +25,7 @@ public:
     virtual ~AbstractProvider();
 
     RooAbsPdf* getPdf(int i = 1);
+    static RooArgSet* getIndirectParameters(RooAbsPdf* pdf);
     
 protected:
     virtual RooAbsPdf* initPdf(int i)=0;  

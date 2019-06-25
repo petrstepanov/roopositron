@@ -15,8 +15,9 @@
 #define TWOEXPPROVIDER_H
 
 #include "AbstractProvider.h"
-#include "RooRealVar.h"
-#include "RooAbsPdf.h"
+#include <RooRealVar.h>
+#include <RooAbsPdf.h>
+#include <RooArgSet.h>
 
 class TwoExpProvider : public AbstractProvider {
 public:
@@ -24,6 +25,7 @@ public:
     virtual ~TwoExpProvider();
 
     RooAbsPdf* initPdf(int i);
+    static RooArgSet* getIndirectParameters(RooAbsPdf* pdf);
 };
 
 #endif /* EXPPROVIDER_H */

@@ -225,6 +225,7 @@ std::vector<std::string> Constants::getDecayModels() {
 	RooStringVar* var = (RooStringVar*) constants->find("decayModel");
 	return StringUtils::parseString(var->getVal());
 }
+
 int Constants::getSourceComponentsNumber() {
 	RooStringVar* var = (RooStringVar*) constants->find("sourceComponents");
 	return atoi(var->getVal());

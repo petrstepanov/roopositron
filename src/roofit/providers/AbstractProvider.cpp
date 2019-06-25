@@ -28,3 +28,6 @@ RooAbsPdf* AbstractProvider::getPdf(int i) {
 	return pdf;
 }
 
+RooArgSet* AbstractProvider::getIndirectParameters(RooAbsPdf* pdf) {
+	return new RooArgSet();
+}

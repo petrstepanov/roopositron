@@ -58,11 +58,11 @@ PdfHashNames PdfFactory::hashPdfName(const char* pdfName) {
 	return kExponentPdf;
 }
 
-RooAbsPdf* PdfFactory::getPdf(const char* name, RooRealVar* observable, RooRealVar* channelWidth) {
-	int hashName = hashPdfName(name);
+RooAbsPdf* PdfFactory::getPdf(const char* modelName, RooRealVar* observable, RooRealVar* channelWidth) {
+	int hashName = hashPdfName(modelName);
 	pdfIndexes[hashName]++;
 
-	switch (hashPdfName(name)) {
+	switch (hashName) {
 		case kOneGaussPdf: {
 			OneGaussProvider* ogp = new OneGaussProvider(observable, channelWidth);
 			return ogp->getPdf(pdfIndexes[kOneGaussPdf]);
@@ -127,5 +127,57 @@ RooAbsPdf* PdfFactory::getPdf(const char* name, RooRealVar* observable, RooRealV
 			return NULL;
 		}
 	}
+}
+
+// TODO: make methods in Provider classes static, remove constructors?
+RooArgSet* PdfFactory::getIndirectParameters(const char* modelName, RooAbsPdf* pdf) {
+	int hashName = hashPdfName(modelName);
+
+	switch (hashName) {
+		case kOneGaussPdf: {
+			break;
+		}
+		case kTwoGaussPdf: {
+			break;
+		}
+		case kThreeGaussPdf: {
+			break;
+		}
+		case kExponentPdf: {
+			break;
+		}
+		case kTwoExponentPdf: {
+			RooArgSet* indirectParameters = TwoExpProvider::getIndirectParameters(pdf);
+			return indirectParameters;
+			break;
+		}
+		case kThreeExponentPdf: {
+			RooArgSet* indirectParameters = ThreeExpProvider::getIndirectParameters(pdf);
+			return indirectParameters;
+			break;
+		}
+		case kTrappingPdf: {
+			break;
+		}
+		case kGrainPdf: {
+			break;
+		}
+		case kPowderPdf: {
+			break;
+		}
+		case kPowder2Pdf: {
+			break;
+		}
+		case kLiquidPdf: {
+			break;
+		}
+		case kLiquidSimplePdf: {
+			break;
+		}
+//		default: {
+//			return NULL;
+//		}
+	}
+	return new RooArgSet();
 }
 

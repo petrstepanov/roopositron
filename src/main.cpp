@@ -1,3 +1,4 @@
+
 #ifndef __CINT__
 #include <RooGlobalFunc.h>
 #endif
@@ -16,6 +17,14 @@
 #include <RooFFTConvPdf.h>
 #include <RooNumConvPdf.h>
 #include <RooSimultaneous.h>
+#include <RooPolynomial.h>
+#include <RooCategory.h>
+#include <RooChi2Var.h>
+#include <RooDecay.h>
+#include <RooPolynomial.h>
+#include <RooCategory.h>
+#include <RooChi2Var.h>
+#include <RooDecay.h>
 #include <RooPolynomial.h>
 #include <RooCategory.h>
 #include <RooChi2Var.h>
@@ -56,6 +65,8 @@
 #include "util/FileUtils.h"
 #include "util/RootHelper.h"
 #include "util/Debug.h"
+#include "roofit/myrooabspdf/MyRooAbsPdf.h"
+#include "roofit/myrooabspdf/HasIndirectParameters.h"
 
 #include <iostream>
 #include <sstream>
@@ -204,8 +215,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	#endif
 
 	// Create output folder out of model components' names and resolution function name, e.g. "exp-exp-2gauss"
-	TString minimizerType(constants->getMinimizerType());
-	minimizerType.ToLower();
+	// TString minimizerType(constants->getMinimizerType());
+	// minimizerType.ToLower();
 
 //  http://patorjk.com/software/taag/
 //	___________.__  __    __  .__
@@ -345,8 +356,34 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		}
 
 		// Add legend with list of model parameters
+		RooArgSet* indirectParameters = new RooArgSet();
+		// Add indirect parameters.
+		// For every decay model in the comma-separated list of models
+		std::vector<std::string> decayModelsList = constants->getDecayModels();
+		for (std::vector<std::string>::const_iterator it = decayModelsList.begin(); it != decayModelsList.end(); ++it) {
+			const char* modelId = ((std::string) *it).c_str();
+			RooArgSet tempIndirectParameters = PdfFactory::getIndirectParameters(modelId, spectra[i].model);
+			indirectParameters->add(tempIndirectParameters);
+		}
+
+//		MyRooAbsPdf* modelWithIndirectParameters = dynamic_cast<MyRooAbsPdf*>(spectra[i].model);
+//		if (modelWithIndirectParameters){
+//			indirectParameters = modelWithIndirectParameters->getIndirectParameters();
+//		}
 		RooArgSet* parameters = spectra[i].model->getParameters(spectraPlot[i]->getNormVars());
-		TPaveText* pt = GraphicsHelper::makePaveText(*parameters, GraphicsHelper::LEGEND_XMIN, 0.99, 0.9);
+		RooArgSet* allParameters = new RooArgSet(TString::Format("%s_all", parameters->GetName()).Data());
+		allParameters->add(*indirectParameters);
+		#ifdef USEDEBUG
+			std::cout << "Parameters:" << std::endl;
+			parameters->Print();
+		#endif
+		#ifdef USEDEBUG
+			std::cout << "Indirect parameters:" << std::endl;
+			indirectParameters->Print();
+		#endif
+
+		TPaveText* pt = GraphicsHelper::makePaveText(*allParameters, GraphicsHelper::LEGEND_XMIN, 0.99, 0.9);
+
 		spectraPlot[i]->addObject(pt);
 
 		// Set custom Y axis limits

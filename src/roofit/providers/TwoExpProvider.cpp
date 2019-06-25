@@ -16,7 +16,7 @@
 #include "RooFormulaVar.h"
 #include "../pdfs/TwoExpPdf.h"
 #include "../../model/Constants.h"
-#include "../../util/StringUtils.h"
+#include "../../util/RootHelper.h"
 #include <iostream>
 
 TwoExpProvider::TwoExpProvider(RooRealVar* _observable, RooRealVar* _channelWidth) : AbstractProvider(_observable, _channelWidth) {}
@@ -34,9 +34,22 @@ RooAbsPdf* TwoExpProvider::initPdf(int i) {
     RooRealVar* tau2 = new RooRealVar("#tau2", "2nd positron lifetime", 0.5, 0.3, 10, "ns");
     RooFormulaVar* tau2Ch = new RooFormulaVar("tau2Ch", "2nd positron lifetime, channels", "@0/@1", RooArgList(*tau2, *channelWidth));
 
-    RooRealVar* int2 = new RooRealVar("Int_exp2", "2nd exponent intensity", 20, 0, 100, "%");
-    RooFormulaVar* int2Norm = new RooFormulaVar("int2Norm", "@0/100", *int2);
+    RooRealVar* Int_exp2 = new RooRealVar("Int_exp2", "2nd exponent intensity", 20, 0, 100, "%");
+    RooFormulaVar* intExp2Norm = new RooFormulaVar("intExp2Norm", "@0/100", *Int_exp2);
 
     // Instantinate model
-    return new TwoExpPdf("twoExp", "two exponential pdf", *observable, *tau1Ch, *tau2Ch, *int2Norm);
+    return new TwoExpPdf("twoExp", "two exponential pdf", *observable, *tau1Ch, *tau2Ch, *intExp2Norm);
+}
+
+RooArgSet* TwoExpProvider::getIndirectParameters(RooAbsPdf* pdf){
+    RooArgSet* indirectParameters = new RooArgSet();
+
+    // pdf parameters might have suffixed names so we account on that
+    // for "Int_exp2" we pull "Int_exp2_##" as well
+    RooRealVar* Int_exp2 = RootHelper::getParameterByNameCommonOrLocal(pdf, "Int_exp2");
+    if (Int_exp2){
+    	RooFormulaVar* Int_exp1 = new RooFormulaVar("Int_exp1", "100-@0", RooArgList(*Int_exp2));
+    	indirectParameters->add(*Int_exp1);
+    }
+    return indirectParameters;
 }

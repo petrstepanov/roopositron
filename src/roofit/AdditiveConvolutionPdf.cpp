@@ -132,8 +132,6 @@ void AdditiveConvolutionPdf::constructModel() {
 	RooFormulaVar* Int_bg = new RooFormulaVar("Int_bg", "@0*@1/@2", RooArgList(*background, *bins, *integral));
 	RooPolynomial* bg = new RooPolynomial("bg", "y=1", *observable, RooArgSet());
 
-
-
 	// Add source and sample components together
 	modelNonConvoluted = new RooAddPdf("modelNonConvoluted", "Components model with source and background", RooArgList(*bg, *sumSourceComponents, *sumComponents), RooArgList(*Int_bg, *Int_sourceNorm), kTRUE);
 	modelNonConvoluted->fixAddCoefNormalization(RooArgSet(*observable));
@@ -147,6 +145,10 @@ void AdditiveConvolutionPdf::constructModel() {
 
 RooAbsPdf* AdditiveConvolutionPdf::getPdf() {
 	return model;
+}
+
+RooAbsPdf* AdditiveConvolutionPdf::getPdfNonConvoluted() {
+	return modelNonConvoluted;
 }
 
 RooAbsPdf* AdditiveConvolutionPdf::getResolutionFunction() {

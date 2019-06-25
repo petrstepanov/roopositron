@@ -75,6 +75,9 @@ RooAbsPdf* RootHelper::suffixPdfAndNodes(RooAbsPdf* pdf, RooRealVar* observable,
 	#endif
 	TString suffixedName = TString::Format("%s_%s", pdf->GetName(), suffix);
 	RooAbsPdf* suffixedPdf =  w->pdf(suffixedName.Data());
+
+	// Rename indirect parameters too!
+
 	return suffixedPdf;
 }
 
@@ -87,6 +90,28 @@ void RootHelper::setRooRealVarValueLimits(RooRealVar* var, Double_t value, Doubl
 	var->setVal(value);
 }
 
+RooRealVar* RootHelper::getParameterByNameCommonOrLocal(RooAbsPdf* pdf, const char* name){
+	// for given parameter name, say #tau1 will return either exact match or suffixed:
+	// #tau1 or #tau1_13 or #tau1_2
+
+	std::string nameString(name);
+
+	// TODO: check list is not empty otherwise pass observable
+	RooArgSet* parameters = pdf->getParameters(RooArgSet()); // pdf->getParameters(*observable);
+	TIterator* it = parameters->createIterator();
+	while (TObject* temp = it->Next()) {
+		if (RooRealVar* parameter = dynamic_cast<RooRealVar*>(temp)) {
+			std::string parameterName = parameter->GetName();
+			std::string parameterNameWithoutSuffix = StringUtils::getStringWithoutSuffix(parameterName);
+			if (nameString == parameterNameWithoutSuffix){
+				return parameter;
+			}
+		}
+	}
+	return NULL;
+}
+
+// Deprecated, use getParameterByNameCommonOrLocal()
 RooRealVar* RootHelper::getParameterNameContains(RooArgSet* rooRealVarSet, const char* nameSubstring){
 	TIterator* it = rooRealVarSet->createIterator();
 	while (TObject* temp = it->Next()) {

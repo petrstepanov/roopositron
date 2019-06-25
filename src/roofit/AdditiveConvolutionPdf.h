@@ -30,6 +30,7 @@ public:
     void constructModel();
 
     RooAbsPdf* getPdf();
+    RooAbsPdf* getPdfNonConvoluted();
     RooAbsPdf* getResolutionFunction();
     
 private:

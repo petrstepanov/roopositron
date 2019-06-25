@@ -24,6 +24,7 @@ public:
     virtual ~ThreeExpProvider();
 
     RooAbsPdf* initPdf(int i);
+    static RooArgSet* getIndirectParameters(RooAbsPdf* pdf);
 };
 
 #endif /* THREEEXPPROVIDER_H */

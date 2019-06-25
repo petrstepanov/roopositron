@@ -35,7 +35,10 @@ class PdfFactory {
 public:   
     PdfFactory();
     virtual ~PdfFactory();
-    RooAbsPdf* getPdf(const char* name, RooRealVar* observable, RooRealVar* channelWidth);
+    RooAbsPdf* getPdf(const char* modelName, RooRealVar* observable, RooRealVar* channelWidth);
+    // TODO: add resolution function indirect parameters
+    static RooArgSet* getIndirectParameters(const char* modelName, RooAbsPdf* pdf);
+
 //    RooAbsPdf* getPdf(Int_t name, RooRealVar* observable, RooRealVar* channelWidth);
 
 private:

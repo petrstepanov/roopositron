@@ -16,7 +16,6 @@
 #include "Debug.h"
 #include <TBox.h>
 #include <TPaveText.h>
-#include <RooRealVar.h>
 #include <iostream>
 
 const Double_t GraphicsHelper::FONT_SIZE_SMALL = 0.028;
@@ -62,6 +61,17 @@ void GraphicsHelper::printVariable(Int_t sigDigits, const char* options, Int_t& 
 	Debug("GraphicsHelper::printVariable", var->GetName() << "; notConstant " << notConstant << "; atMaximum " << atMaximum << "; atMinimum " << atMinimum);
 }
 
+void GraphicsHelper::printVariable(Int_t sigDigits, const char* options, Int_t& currentLine, RooFormulaVar* var, TPaveText* box, RooArgList* paramsList) {
+	TString formatted = TString::Format("%s = %f", var->GetName(), var->evaluate());
+	const char* formattedString = formatted.Data();
+	TText* t = box->AddText(formattedString);
+
+	paramsList->remove(*var);
+	currentLine++;
+
+	Debug("GraphicsHelper::printVariable", var->GetName());
+}
+
 TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, Double_t xmax, Double_t ymax) {
 
 	Bool_t showConstants = kTRUE;
@@ -77,8 +87,8 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 	TIterator* pIter = params.createIterator();
 
 	Double_t ymin(ymax), dy(0.03);
-	RooRealVar *var = 0;
-	while ((var = (RooRealVar*) pIter->Next())) {
+//	RooRealVar *var = 0;
+	while (RooRealVar* var = (RooRealVar*) pIter->Next()) {
 		if (showConstants || !var->isConstant())
 			ymin -= dy;
 	}
@@ -157,9 +167,14 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 
 	// Print other variables (model)
 	pIter = paramsList->createIterator();
-	while ((var = (RooRealVar*) pIter->Next())) {
-		if (var->isConstant() && !showConstants) continue;
-		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
+	while (TObject* obj = pIter->Next()) {
+		if (RooFormulaVar* formulaVar = dynamic_cast<RooFormulaVar*>(obj)){
+
+		}
+		else if (RooRealVar* realVar = dynamic_cast<RooRealVar*>(obj)){
+			if (realVar->isConstant() && !showConstants) continue;
+			printVariable(sigDigits, options, linesNumber, realVar, box, paramsList);
+		}
 	}
 
 	// Empty last line (for better padding)

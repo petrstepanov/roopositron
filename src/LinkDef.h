@@ -4,6 +4,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+#pragma link C++ class MyRooAbsPdf;
 #pragma link C++ class ExpPdf;
 #pragma link C++ class GrainPdf;
 #pragma link C++ class PowderPdf;

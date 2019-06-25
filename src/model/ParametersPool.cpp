@@ -246,18 +246,21 @@ Bool_t ParametersPool::saveToFile() {
 	while (TObject* temp = it->Next()) {
 		if (RooRealVar* parameter = dynamic_cast<RooRealVar*>(temp)) {
 			if (!StringUtils::stringContainsToken(parameter->GetName(), parametersExcludedFromImport)) {
-			std::string freeOrFixed = parameter->isConstant() ? "fixed" : "free";
+				std::string freeOrFixed = parameter->isConstant() ? "fixed" : "free";
 
-			// To prevent reading error from parameters file - we replace empty parameter units with "-"
-			std::string safeUnit = StringUtils::isEmpty(parameter->getUnit()) ? "-" : parameter->getUnit();
+				// To prevent reading error from parameters file - we replace empty parameter units with "-"
+				std::string safeUnit = StringUtils::isEmpty(parameter->getUnit()) ? "-" : parameter->getUnit();
 
-//			Double_t parameterMin = parameter->isConstant() ? parameter->getVal() : parameter->getMin();
-//			Double_t parameterMax = parameter->isConstant() ? parameter->getVal() : parameter->getMax();
-			Double_t parameterErr = parameter->isConstant() ? 0 : parameter->getError();
+	//			Double_t parameterMin = parameter->isConstant() ? parameter->getVal() : parameter->getMin();
+	//			Double_t parameterMax = parameter->isConstant() ? parameter->getVal() : parameter->getMax();
+				Double_t parameterErr = parameter->isConstant() ? 0 : parameter->getError();
 
-			// https://stackoverflow.com/questions/23776824/what-is-the-meaning-of-s-in-a-printf-format-string/23777065
-			fprintf(pFile, "%-*s%-*f%-*f%-*f%-*f%-*s%-*s%s\n", tab, parameter->GetName(), tab, parameter->getVal(), tab, parameter->getMin(), tab, parameter->getMax(), tab, parameterErr, tab,
-					safeUnit.c_str(), tab, freeOrFixed.c_str(), parameter->GetTitle());
+				// https://stackoverflow.com/questions/23776824/what-is-the-meaning-of-s-in-a-printf-format-string/23777065
+				fprintf(pFile, "%-*s%-*f%-*f%-*f%-*f%-*s%-*s%s\n", tab, parameter->GetName(), tab, parameter->getVal(), tab, parameter->getMin(), tab, parameter->getMax(), tab, parameterErr, tab,
+						safeUnit.c_str(), tab, freeOrFixed.c_str(), parameter->GetTitle());
+				#ifdef USEDEBUG
+						parameter->Print();
+				#endif
 			}
 		}
 	}

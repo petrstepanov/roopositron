@@ -15,10 +15,12 @@
 
 #include <cstring>
 #include <sstream>
-#include <iostream>
 #include <vector>
 #include <TString.h>
 #include "Debug.h"
+
+#include <iomanip>
+#include <regex>
 
 std::vector<std::string> StringUtils::parseString(const char* string, const char* delimeter) {
 	std::string s = string;
@@ -30,34 +32,25 @@ std::vector<std::string> StringUtils::parseString(std::string s, const char* d) 
 	size_t pos = 0;
 	std::string token;
 	std::vector<std::string> tokens;
-//    std::cout << "StringUtils::parseString" << std::endl;     
-//    std::cout << "parsing: \"" << s << "\""<< std::endl;
 	while ((pos = s.find(delimiter)) != std::string::npos) {
 		token = s.substr(0, pos);
-//	std::cout << "token: \"" << token << "\"" << std::endl;
 		tokens.push_back(token);
 		s.erase(0, pos + delimiter.length());
 	}
-//    std::cout << "token: \"" << s << "\"" << std::endl;
 	tokens.push_back(s);
 	return tokens;
 }
 
 std::string StringUtils::joinStrings(std::vector<std::string> tokens, const char* delimeter) {
-//    std::cout << "StringUtils::joinStrings" << std::endl;  
 	if (tokens.size() == 1) {
-//	std::cout << "token: \"" << tokens.front() << "\"" <<std::endl;
-//	std::cout << "join: \"" << tokens.front().c_str() << "\"" << std::endl;	
 		return tokens.front();
 	}
 	std::string string = "";
 	for (std::vector<std::string>::const_iterator it = tokens.begin(); it != tokens.end(); ++it) {
-//	std::cout << "token: \"" << *it << "\"" <<std::endl;
 		string += *it;
 		string += delimeter;
 	}
 	string = string.substr(0, string.length() - 1);
-//    std::cout << "join: \"" << string.c_str() << "\"" << std::endl;    
 	return string;
 }
 
@@ -159,4 +152,19 @@ bool StringUtils::isEmpty(const char* string) {
 			return false;
 	}
 	return true;
+}
+
+std::string getStringWithoutSuffix(std::string stringMaybeWithSuffix) {
+	const std::regex re("(.*)(_[0-9]+)$");
+	std::smatch match;
+
+	// If string has suffix return new string without suffix "_##"
+	if (std::regex_match(stringMaybeWithSuffix, match, re)){
+		// for "#tau1_source_10" returns "#tau1_source"
+		std::string stringWithoutSuffix = match[1].str();
+		return stringWithoutSuffix;
+	}
+
+	// If string does not have suffix return its copy
+	return stringMaybeWithSuffix;
 }

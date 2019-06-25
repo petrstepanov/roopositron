@@ -22,7 +22,9 @@
 #include "TAxis.h"
 #include "TMath.h"
 
-class LiquidPdf: public RooAbsPdf {
+#include "../myrooabspdf/MyRooAbsPdf.h"
+
+class LiquidPdf: public MyRooAbsPdf {
 public:
 	LiquidPdf() {
 	}
