@@ -21,6 +21,8 @@
 #include <vector>
 #include <string>
 #include <TH1F.h>
+#include <RooArgList.h>
+#include <RooRealVar.h>
 
 class FileUtils {
 public:

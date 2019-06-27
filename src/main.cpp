@@ -15,9 +15,9 @@
 #include <RooAddPdf.h>
 #include <RooMinuit.h>
 #include <RooFFTConvPdf.h>
-#include <RooNumConvPdf.h>
 #include <RooSimultaneous.h>
 #include <RooPolynomial.h>
+#include <RooNumIntConfig.h>
 #include <RooCategory.h>
 #include <RooChi2Var.h>
 #include <RooDecay.h>
@@ -43,7 +43,10 @@
 #include <TPaveStats.h>
 #include <TLegend.h>
 #include <TPaveText.h>
+#include <TObjString.h>
+#include <TList.h>
 #include <TGaxis.h>
+#include <TMatrixD.h>
 
 #include "RooWorkspace.h"
 
@@ -68,6 +71,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <utility>
 
 // Declare Map Container to perform simultaneous fit
 typedef std::map<std::string, RooDataHist*> dhistMap;
@@ -116,6 +120,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 	// Set convolution bins same as real number of axis bins (notices it works nice)
 	channels->setBins(BINS);
+//	channels->setBins(BINS, "default");
 	channels->setBins(constants->getConvolutionBins() != 0 ? constants->getConvolutionBins() : BINS, "cache");
 
 	// Construct a list of Spectrum struct     	 s to store individual spectra information
@@ -396,11 +401,22 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			timeAxis->SetTitleSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
 			timeAxis->SetTitleOffset(0.64);
 			timeAxis->SetTitleFont(42);
-			timeAxis->SetTitle("(ns)");
+//			timeAxis->SetTitle("(ns)");
 			timeAxis->SetLabelSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
 			timeAxis->SetLabelOffset(0.02);
 			timeAxis->SetLabelFont(42);
 			spectraPlot[i]->addObject(timeAxis);
+
+			// Add "(ns)" axis pave that overlays
+			TPaveText *nsBox = new TPaveText(0.9, 0.006, 1-0.01, 0.08, "NDC"); // "NDC" is relative coordinates
+			nsBox->SetTextAlign(ETextAlign::kHAlignRight + ETextAlign::kVAlignCenter);
+			nsBox->SetTextSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
+			nsBox->SetTextFont(42);
+			nsBox->SetBorderSize(0);
+			nsBox->SetMargin(0);
+			nsBox->SetFillColor(EColor::kWhite);
+			nsBox->AddText("(ns)");
+			spectraPlot[i]->addObject(nsBox);
 		}
 
 		// Update regular axis
@@ -408,7 +424,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		spectraPlot[i]->GetXaxis()->SetTitleSize(0);
 		spectraPlot[i]->GetXaxis()->SetTickLength(0);
 
-		spectraPlot[i]->GetYaxis()->SetLabelSize(scaleFactor * (GraphicsHelper::FONT_SIZE_NORMAL));
+		spectraPlot[i]->GetYaxis()->SetLabelSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
 		spectraPlot[i]->GetYaxis()->SetTitleSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
 		spectraPlot[i]->GetYaxis()->SetTitleOffset(0.9);
 
@@ -487,9 +503,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		chiFrame[i]->GetXaxis()->SetLabelSize(scaleFactor * (GraphicsHelper::FONT_SIZE_NORMAL));
 		chiFrame[i]->GetXaxis()->SetLabelOffset(0.04);
 
-#ifdef USEDEBUG
-		chiFrame[i]->Print("V");
-#endif
+		#ifdef USEDEBUG
+				chiFrame[i]->Print("V");
+		#endif
 	}
 	Debug("main", "Residual plots successfully created.");
 
@@ -498,8 +514,13 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		// Draw plots on correspondent pads
 		canvas[i]->cd(1);
 		spectraPlot[i]->Draw();
+		#ifdef USEDEBUG
+			spectraPlot[i]->Print();
+		#endif
+
 		canvas[i]->cd(2);
 		chiFrame[i]->Draw();
+		chiFrame[i]->Print();
 		canvas[i]->Modified();
 		canvas[i]->Update();
 
@@ -548,47 +569,51 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 	// TODO: move to FileUtils
 	for (unsigned i = 0; i < spectra.size(); i++) {
-		std::ofstream outputFile;
-		TString dataFilename = TString::Format("./%s-%s/data-%s-%s-%d.txt", (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
+		std::pair<TMatrixD,TList*> spectrumMatrixAndHeader = RootHelper::rooPlotToMatrix(channels, spectraPlot[i]);
+		std::pair<TMatrixD,TList*> residualsMatrixAndHeader = RootHelper::rooPlotToMatrix(channels, chiFrame[i]);
+		TMatrixD spectrumMatrix = (spectrumMatrixAndHeader.first);
+		TMatrixD residualsMatrix = (residualsMatrixAndHeader.first);
+
+		Int_t numberOfRows = TMath::Min(spectrumMatrix.GetNrows(), residualsMatrix.GetNrows());
+		Int_t numberOfColumns = spectrumMatrix.GetNcols() + residualsMatrix.GetNcols();
+
+		TMatrixD matrix(numberOfRows, numberOfColumns);
+		for (Int_t j=0; j<numberOfRows; j++){
+			for (Int_t i=0; i<numberOfColumns; i++){
+				if (i<spectrumMatrix.GetNcols()){
+					matrix(j,i) = spectrumMatrix(j,i);
+				}
+				else {
+					matrix(j,i) = residualsMatrix(j,i-spectrumMatrix.GetNcols());
+				}
+			}
+		}
+		TString dataFilename = TString::Format("./%s-%s/data-%s-%s-%d-.txt", (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
 				constants->getResolutionFunctionModel(), (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
 				constants->getResolutionFunctionModel(), i + 1);
+
+		std::ofstream outputFile;
 		outputFile.open(dataFilename.Data());
 
-		const unsigned FILE_COLUMN_WIDTH = 20;
-		// Write file header
-		outputFile << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Channel\"" << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Time, ns\"" << std::left
-				<< std::setw(FILE_COLUMN_WIDTH) << "\"Count\"" << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Error\"" << std::left
-				<< std::setw(FILE_COLUMN_WIDTH) << "\"Resolution\"" << std::left << std::setw(FILE_COLUMN_WIDTH) << "\"Fit\"" << std::left
-				<< std::setw(FILE_COLUMN_WIDTH) << "\"Chi^2\"" << std::endl;
-
-		const Int_t minChannel = constants->getMinChannel();
-		const Int_t maxChannel = constants->getMaxChannel();
-		for (unsigned j = minChannel; j <= maxChannel; j++) {
-
-			// Get channel width for current spectrum
-			Double_t channelWidth = 0;
-			RooArgSet* parameters = spectra[i].model->getParameters(*channels);
-			if (RooRealVar* channelWidthVar = RootHelper::getParameterNameContains(parameters, "channelWidth")){
-				channelWidth = channelWidthVar->getVal();
+		// Print header names to file
+		TList* columnNames = new TList();
+		columnNames->AddAll(spectrumMatrixAndHeader.second);
+		columnNames->AddAll(residualsMatrixAndHeader.second);
+		TIterator* it = columnNames->MakeIterator();
+		while (TObject* temp = it->Next()) {
+			if (TObjString* str = dynamic_cast<TObjString*>(temp)){
+				outputFile << (str->String()).Data() << "\t";
 			}
+		}
+ 		outputFile << std::endl;
 
-			Double_t time = (double) (j - minChannel) * channelWidth;
-			Double_t count = spectra[i].histogram->GetBinContent(j - minChannel + 1);
-			Double_t error = spectra[i].histogram->GetBinError(j - minChannel + 1);
-			Double_t resolution = spectraPlot[i]->getCurve("resolution")->Eval(j - minChannel + 0.5);
-			Double_t fit = spectraPlot[i]->getCurve("fit")->Eval(j - minChannel + 0.5);
-			Double_t channel, chi;
-			if (!DO_RANGE) {
-				hresid[i]->GetPoint(j - minChannel + 1, channel, chi);
-			} else {
-//                TODO: add code for ranges (two curves)
+		// Print matrix to file
+		for (Int_t j=0; j<numberOfRows; j++){
+			for (Int_t i=0; i<numberOfColumns; i++){
+				outputFile << matrix(j,i) << "\t";
 			}
-			outputFile << std::left << std::setw(FILE_COLUMN_WIDTH) << j << std::left << std::setw(FILE_COLUMN_WIDTH) << time << std::left
-					<< std::setw(FILE_COLUMN_WIDTH) << count << std::left << std::setw(FILE_COLUMN_WIDTH) << error << std::left << std::setw(FILE_COLUMN_WIDTH)
-					<< resolution << std::left << std::setw(FILE_COLUMN_WIDTH) << fit << std::left << std::setw(FILE_COLUMN_WIDTH) << chi;
 			outputFile << std::endl;
 		}
-		outputFile.close();
 	}
 	stopWatch->Print();
 	return 1;

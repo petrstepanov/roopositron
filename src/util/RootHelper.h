@@ -19,6 +19,11 @@
 #include <RooAbsPdf.h>
 #include <RooRealVar.h>
 #include <RooArgSet.h>
+#include <TMatrixD.h>
+#include <RooPlot.h>
+#include <TString.h>
+#include <TList.h>
+#include <utility>
 
 class RootHelper {
 public:
@@ -32,6 +37,7 @@ public:
     static RooRealVar* getParameterNameContains(RooArgSet* rooRealVarSet, const char* nameSubstring);
     static RooRealVar* getParameterByNameCommonOrLocal(RooAbsPdf* pdf, const char* name);
     static RooAbsArg* findArgNameSubstring(RooAbsCollection* list, const char* nameSubstring);
+    static std::pair<TMatrixD,TList*> rooPlotToMatrix(RooRealVar* axis, RooPlot* plot);
 
 private:
     static TStopwatch* watch;

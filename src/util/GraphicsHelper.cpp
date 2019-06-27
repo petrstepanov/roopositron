@@ -16,9 +16,11 @@
 #include "StringUtils.h"
 #include "Debug.h"
 #include <TBox.h>
+#include <TAttText.h>
 #include <TPaveText.h>
 #include <iostream>
 
+const Double_t GraphicsHelper::FONT_SIZE_SMALLER = 0.02;
 const Double_t GraphicsHelper::FONT_SIZE_SMALL = 0.028;
 const Double_t GraphicsHelper::FONT_SIZE_NORMAL = 0.05;
 const Double_t GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT = 0.35;
@@ -35,7 +37,6 @@ Double_t GraphicsHelper::getResidualsPadFontFactor(){
 	// This function fives a coefficient that evens the font size out
 	return 0.5/RESIDUALS_PAD_RELATIVE_HEIGHT;
 }
-
 
 void GraphicsHelper::drawRegion(RooPlot* frame, Int_t xMin, Int_t xMax) {
 	Double_t yMin = frame->GetMinimum(); // frame->GetYaxis()->GetXmin();
@@ -81,38 +82,26 @@ void GraphicsHelper::printVariable(Int_t sigDigits, const char* options, Int_t& 
 TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, Double_t xmax, Double_t ymax) {
 
 	Bool_t showConstants = kTRUE;
-
-	// parse the options
-//	TString opts = TString("NEU");
-//	opts.ToLower();
-
 	const char* options = "NEULP";
-
-
-	// calculate the box's size, adjusting for constant parameters
 	TIterator* pIter = params.createIterator();
+	Double_t dy = 0.0248; // Legend line height
 
-	Double_t ymin(ymax), dy(0.03);
-//	RooRealVar *var = 0;
-	while (RooRealVar* var = (RooRealVar*) pIter->Next()) {
-		if (showConstants || !var->isConstant())
-			ymin -= dy;
+	// Calculate bottom Legend coordinate (ymin)
+	Double_t ymin = ymax;
+	while (RooAbsArg* var = (RooAbsArg*) pIter->Next()) {
+		if (showConstants || !var->isConstant()) ymin -= dy;
 	}
+	ymin -= dy*5; // 2 empty lines (top and bottom) + 3 separators
 
-	ymin -= dy*5; // New line on top abd bottom plus three lines
-
-	// create the box and set its options
-	TPaveText *box = new TPaveText(xmin, ymax, xmax, ymin, "BRNDC");
-	if (!box)
-		return 0;
+	// Create the box and set its options
+	TPaveText *box = new TPaveText(xmin, ymax, xmax, ymin, "BRNDC"); //
 	box->SetName("myParamBox");
-	box->SetFillColor(0);
+	box->SetFillColor(EColor::kBlack);
 	box->SetBorderSize(1);
-	box->SetTextAlign(12);
+	box->SetTextAlign(ETextAlign::kHAlignLeft + ETextAlign::kVAlignCenter);
 	box->SetTextSize(FONT_SIZE_SMALL);
 	box->SetFillStyle(1001);
-	box->SetFillColorAlpha(0, 0.9);
-	//char buffer[512];
+	box->SetFillColorAlpha(EColor::kWhite, 0.9);
 
 	RooArgList* paramsList = new RooArgList(params);
 	paramsList->sort();

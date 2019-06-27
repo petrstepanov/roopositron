@@ -16,6 +16,12 @@
 #include <TSystemDirectory.h>
 #include <TSystemFile.h>
 #include <TList.h>
+#include <RooPlot.h>
+#include <RooHist.h>
+#include <RooCurve.h>
+#include <RooAbsBinning.h>
+#include "TMath.h"
+#include "TMatrixD.h"
 #include "../model/Constants.h"
 #include "../util/StringUtils.h"
 #include "../util/Debug.h"

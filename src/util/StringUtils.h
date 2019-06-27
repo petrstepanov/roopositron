@@ -17,12 +17,15 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <TString.h>
+#include <TList.h>
 
 class StringUtils {
 public:
     static std::vector<std::string> parseString(const char* string, const char* delimeter = ",");
     static std::vector<std::string> parseString(std::string string, const char* delimeter = ",");
     static std::string joinStrings(std::vector<std::string> tokens, const char* delimeter = "-");
+    static TString join(TList stringsList, const char* delimeter = "");
     static bool contains(const char* name, std::vector<std::string> names);
 //    static bool containsSubstring(const char* string, std::vector<std::string> vector);
     static bool stringContainsToken(const char* string, std::vector<std::string> vector);

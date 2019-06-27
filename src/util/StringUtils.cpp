@@ -17,6 +17,7 @@
 #include <sstream>
 #include <vector>
 #include <TString.h>
+#include <TObjString.h>
 #include "Debug.h"
 
 #include <iomanip>
@@ -51,6 +52,17 @@ std::string StringUtils::joinStrings(std::vector<std::string> tokens, const char
 		string += delimeter;
 	}
 	string = string.substr(0, string.length() - 1);
+	return string;
+}
+
+TString join(TList stringsList, const char* delimeter){
+	TString string("");
+	for (TObject* object : stringsList) {
+		if (TObjString* objString = dynamic_cast<TObjString*>(object)){
+			if (string.Length()) string+=delimeter;
+			string+=objString->String();
+		}
+	}
 	return string;
 }
 
