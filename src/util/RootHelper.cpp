@@ -206,8 +206,8 @@ std::pair<TMatrixD,TList*> RootHelper::rooPlotToMatrix(RooRealVar* axis, RooPlot
 	Debug("RootHelper::rooPlotToMatrix");
 
 	#ifdef USEDEBUG
-		columnNames->Print();
-		matrix.Print();
+//		columnNames->Print();
+//		matrix.Print();
 	#endif
 
 	return std::make_pair(matrix,columnNames);

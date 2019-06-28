@@ -85,6 +85,8 @@ RooArgList* Constants::initDefaultValues() {
 	constants->add(*constant);
 	constant = new RooStringVar("backgroundBins", " # number of left bins for fixed background calculation; set 0 for free background", "150");
 	constants->add(*constant);
+	constant = new RooStringVar("asciiDelimeter", " # column delimeter in plot ascii files", "\t");
+	constants->add(*constant);
 	constant = new RooStringVar("imageWidth", " # output image width", "1200");
 	constants->add(*constant);
 	constant = new RooStringVar("imageHeight", " # output image height", "800");
@@ -249,6 +251,12 @@ int Constants::getConvolutionBins() {
 int Constants::getBackgroundBins() {
 	RooStringVar* var = (RooStringVar*) constants->find("backgroundBins");
 	return atoi(var->getVal());
+}
+
+std::string Constants::getDelimeter() {
+	RooStringVar* var = (RooStringVar*) constants->find("asciiDelimeter");
+	std::string delimeter(var->getVal());
+	return delimeter;
 }
 
 int Constants::getImageWidth() {

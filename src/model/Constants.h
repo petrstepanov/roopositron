@@ -42,6 +42,7 @@ public:
     int getConvolutionBins();
     int getImageWidth();
     int getImageHeight();
+    std::string getDelimeter();
     void print();
 
     static RooConstVar* fwhm2disp;

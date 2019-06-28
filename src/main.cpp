@@ -408,12 +408,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			spectraPlot[i]->addObject(timeAxis);
 
 			// Add "(ns)" axis pave that overlays
-			TPaveText *nsBox = new TPaveText(0.9, 0.006, 1-0.01, 0.08, "NDC"); // "NDC" is relative coordinates
+			TPaveText *nsBox = new TPaveText(0.9, 0.006, 1/*-0.01*/, 0.08, "NDC"); // "NDC" is relative coordinates
 			nsBox->SetTextAlign(ETextAlign::kHAlignRight + ETextAlign::kVAlignCenter);
 			nsBox->SetTextSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
 			nsBox->SetTextFont(42);
 			nsBox->SetBorderSize(0);
-			nsBox->SetMargin(0);
+			nsBox->SetMargin(0.1);
 			nsBox->SetFillColor(EColor::kWhite);
 			nsBox->AddText("(ns)");
 			spectraPlot[i]->addObject(nsBox);
@@ -423,27 +423,28 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		spectraPlot[i]->GetXaxis()->SetLabelColor(0);
 		spectraPlot[i]->GetXaxis()->SetTitleSize(0);
 		spectraPlot[i]->GetXaxis()->SetTickLength(0);
+		spectraPlot[i]->GetXaxis()->SetTickLength(scaleFactor * spectraPlot[i]->GetXaxis()->GetTickLength());
 
 		spectraPlot[i]->GetYaxis()->SetLabelSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
 		spectraPlot[i]->GetYaxis()->SetTitleSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
 		spectraPlot[i]->GetYaxis()->SetTitleOffset(0.9);
 
-#ifdef USEDEBUG
-		spectraPlot[i]->Print("V");
-#endif
+		#ifdef USEDEBUG
+			spectraPlot[i]->Print("V");
+		#endif
 	}
 	Debug("main", "Spectra plots successfully created.");
 
 	// Draw residuals plot (bottom)
-	RooPlot** chiFrame = new RooPlot*[spectra.size()];
+	RooPlot** residualsPlot = new RooPlot*[spectra.size()];
 	RooHist** hresid = new RooHist*[spectra.size()];
 	for (unsigned i = 0; i < spectra.size(); i++) {
-		chiFrame[i] = channels->frame(RooFit::Title(" "));
+		residualsPlot[i] = channels->frame(RooFit::Title(" "));
 		RooChi2Var* chi2 = new RooChi2Var(TString::Format("#chi^{2}_{%d}", i + 1), "chi-square", *spectra[i].model, *spectra[i].dataHistogram);
 		RooAbsCollection* freeParameters = (spectra[i].model->getParameters(*spectra[i].dataHistogram))->selectByAttrib("Constant", kFALSE);
 		Int_t degreesFreedom = spectra[i].numberOfBins - freeParameters->getSize();
 		Double_t chi2Value = chi2->getVal() / degreesFreedom;
-
+		TObject* o = new TObject();
 		// If doing ranges we have to manually construct chi frames from the curves
 		// https://root-forum.cern.ch/t/pull-histogram-with-multiple-ranges/20935
 		if (DO_RANGE) {
@@ -455,8 +456,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			hresid1->SetMarkerSize(GraphicsHelper::MARKER_SIZE);
 			hresid2->SetMarkerSize(GraphicsHelper::MARKER_SIZE);
 			// Draw options: "P" - with marker https://root.cern.ch/doc/v608/classTHistPainter.html
-			chiFrame[i]->addPlotable(hresid1, "P");
-			chiFrame[i]->addPlotable(hresid2, "P");
+			residualsPlot[i]->addPlotable(hresid1, "P");
+			residualsPlot[i]->addPlotable(hresid2, "P");
 			Debug("main", "hresid2 draw option: " << hresid2->GetDrawOption());
 			// Since "HIST" draw option (no error bars) makes no effect? We manually ser errors to zero
 			HistProcessor::setZeroErrors(hresid1);
@@ -464,14 +465,14 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		} else {
 			hresid[i] = spectraPlot[i]->pullHist();
 			hresid[i]->SetMarkerSize(GraphicsHelper::MARKER_SIZE);
-			chiFrame[i]->addPlotable(hresid[i], "P");
+			residualsPlot[i]->addPlotable(hresid[i], "P");
 			Debug("main", "hresid[" << i << "] draw option: " << hresid[i]->GetDrawOption());
 			HistProcessor::setZeroErrors(hresid[i]);
 		}
 
 		// Draw region excluded from plot
 		if (DO_RANGE) {
-			GraphicsHelper::drawRegion(chiFrame[i], constants->getExcludeMinChannel(), constants->getExcludeMaxChannel());
+			GraphicsHelper::drawRegion(residualsPlot[i], constants->getExcludeMinChannel(), constants->getExcludeMaxChannel());
 		}
 
 		// Add legend with chi^2 value
@@ -482,29 +483,30 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		leg->SetBorderSize(1);
 		leg->SetFillColor(0);
 		leg->SetTextAlign(12);
-		chiFrame[i]->addObject(leg);
+		residualsPlot[i]->addObject(leg);
 
 		// Draw horizontal line
 		TLine* hr = new TLine(1, 0, channels->getBins(), 0);
 		hr->SetLineStyle(1); // https://root.cern.ch/doc/master/classTAttLine.html#L3
 		hr->SetLineWidth(2);
 		hr->SetLineColor(GraphicsHelper::GRAPH_COLOR);
-		chiFrame[i]->addObject(hr);
+		residualsPlot[i]->addObject(hr);
 
 		// Update axis
-		chiFrame[i]->GetYaxis()->SetTitle("Fit residuals");
-		chiFrame[i]->GetYaxis()->SetTitleOffset(0.48);
-		chiFrame[i]->GetYaxis()->SetTitleSize(scaleFactor * (GraphicsHelper::FONT_SIZE_NORMAL));
-		chiFrame[i]->GetYaxis()->SetLabelSize(scaleFactor * (GraphicsHelper::FONT_SIZE_NORMAL));
-		chiFrame[i]->GetYaxis()->SetLabelOffset(0.01);
+		residualsPlot[i]->GetYaxis()->SetTitle("Fit residuals");
+		residualsPlot[i]->GetYaxis()->SetTitleOffset(0.48);
+		residualsPlot[i]->GetYaxis()->SetTitleSize(scaleFactor * (GraphicsHelper::FONT_SIZE_NORMAL));
+		residualsPlot[i]->GetYaxis()->SetLabelSize(scaleFactor * (GraphicsHelper::FONT_SIZE_NORMAL));
+		residualsPlot[i]->GetYaxis()->SetLabelOffset(0.01);
 
-		chiFrame[i]->GetXaxis()->SetTitleSize(scaleFactor * (GraphicsHelper::FONT_SIZE_NORMAL));
-		chiFrame[i]->GetXaxis()->SetTitleOffset(2);
-		chiFrame[i]->GetXaxis()->SetLabelSize(scaleFactor * (GraphicsHelper::FONT_SIZE_NORMAL));
-		chiFrame[i]->GetXaxis()->SetLabelOffset(0.04);
+		residualsPlot[i]->GetXaxis()->SetTitleSize(scaleFactor * (GraphicsHelper::FONT_SIZE_NORMAL));
+		residualsPlot[i]->GetXaxis()->SetTitleOffset(2);
+		residualsPlot[i]->GetXaxis()->SetLabelSize(scaleFactor * (GraphicsHelper::FONT_SIZE_NORMAL));
+		residualsPlot[i]->GetXaxis()->SetLabelOffset(0.04);
+		residualsPlot[i]->GetXaxis()->SetTickLength(scaleFactor * residualsPlot[i]->GetXaxis()->GetTickLength());
 
 		#ifdef USEDEBUG
-				chiFrame[i]->Print("V");
+			residualsPlot[i]->Print("V");
 		#endif
 	}
 	Debug("main", "Residual plots successfully created.");
@@ -514,13 +516,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		// Draw plots on correspondent pads
 		canvas[i]->cd(1);
 		spectraPlot[i]->Draw();
-		#ifdef USEDEBUG
-			spectraPlot[i]->Print();
-		#endif
-
 		canvas[i]->cd(2);
-		chiFrame[i]->Draw();
-		chiFrame[i]->Print();
+		residualsPlot[i]->Draw();
+		canvas[i]->SetEditable(kFALSE);
 		canvas[i]->Modified();
 		canvas[i]->Update();
 
@@ -570,7 +568,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	// TODO: move to FileUtils
 	for (unsigned i = 0; i < spectra.size(); i++) {
 		std::pair<TMatrixD,TList*> spectrumMatrixAndHeader = RootHelper::rooPlotToMatrix(channels, spectraPlot[i]);
-		std::pair<TMatrixD,TList*> residualsMatrixAndHeader = RootHelper::rooPlotToMatrix(channels, chiFrame[i]);
+		std::pair<TMatrixD,TList*> residualsMatrixAndHeader = RootHelper::rooPlotToMatrix(channels, residualsPlot[i]);
 		TMatrixD spectrumMatrix = (spectrumMatrixAndHeader.first);
 		TMatrixD residualsMatrix = (residualsMatrixAndHeader.first);
 
@@ -588,7 +586,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 				}
 			}
 		}
-		TString dataFilename = TString::Format("./%s-%s/data-%s-%s-%d-.txt", (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
+		TString dataFilename = TString::Format("./%s-%s/data-%s-%s-%d.txt", (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
 				constants->getResolutionFunctionModel(), (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
 				constants->getResolutionFunctionModel(), i + 1);
 
@@ -610,7 +608,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		// Print matrix to file
 		for (Int_t j=0; j<numberOfRows; j++){
 			for (Int_t i=0; i<numberOfColumns; i++){
-				outputFile << matrix(j,i) << "\t";
+				outputFile << matrix(j,i) << constants->getDelimeter();
 			}
 			outputFile << std::endl;
 		}
