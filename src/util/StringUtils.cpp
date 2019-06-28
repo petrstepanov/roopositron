@@ -180,3 +180,12 @@ std::string StringUtils::getStringWithoutSuffix(std::string stringMaybeWithSuffi
 	// If string does not have suffix return its copy
 	return stringMaybeWithSuffix;
 }
+
+std::string StringUtils::unescape(std::string string){
+	TString s(string.c_str());
+	// https://en.cppreference.com/w/cpp/language/escape
+	s.ReplaceAll("\\t", "\t");
+	s.ReplaceAll("\\n", "\n");
+	std::string cs = s.Data();
+	return cs;
+}

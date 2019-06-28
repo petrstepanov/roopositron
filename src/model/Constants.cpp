@@ -85,7 +85,7 @@ RooArgList* Constants::initDefaultValues() {
 	constants->add(*constant);
 	constant = new RooStringVar("backgroundBins", " # number of left bins for fixed background calculation; set 0 for free background", "150");
 	constants->add(*constant);
-	constant = new RooStringVar("asciiDelimeter", " # column delimeter in plot ascii files", "\t");
+	constant = new RooStringVar("asciiDelimeter", " # column delimeter in plot ascii files", "\\t");
 	constants->add(*constant);
 	constant = new RooStringVar("imageWidth", " # output image width", "1200");
 	constants->add(*constant);
@@ -167,7 +167,9 @@ void Constants::writeToFile(RooArgList* constants, std::string filename) {
 		RooStringVar* constant = dynamic_cast<RooStringVar*>(temp);
 		constant->Print();
 		if (constant) {
-			myfile << std::left << std::setw(TAB_SIZE) << constant->GetName() << std::left << std::setw(TAB_SIZE * 2) << constant->getVal()
+			TString value(constant->getVal());
+//			value.ReplaceAll("\\", "\\\\");
+			myfile << std::left << std::setw(TAB_SIZE) << constant->GetName() << std::left << std::setw(TAB_SIZE * 2) << value.Data()
 					<< constant->GetTitle() << std::endl;
 		}
 	}

@@ -47,7 +47,7 @@
 #include <TList.h>
 #include <TGaxis.h>
 #include <TMatrixD.h>
-
+#include <TCollection.h>
 #include "RooWorkspace.h"
 
 #include "model/Constants.h"
@@ -594,21 +594,40 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		outputFile.open(dataFilename.Data());
 
 		// Print header names to file
+		std::string delimeter = StringUtils::unescape(constants->getDelimeter());
 		TList* columnNames = new TList();
 		columnNames->AddAll(spectrumMatrixAndHeader.second);
 		columnNames->AddAll(residualsMatrixAndHeader.second);
-		TIterator* it = columnNames->MakeIterator();
-		while (TObject* temp = it->Next()) {
-			if (TObjString* str = dynamic_cast<TObjString*>(temp)){
-				outputFile << (str->String()).Data() << "\t";
+//		TIterator* it = columnNames->MakeIterator();
+//		while (TObject* temp = it->Next()) {
+//			if (TObjString* str = dynamic_cast<TObjString*>(temp)){
+//				if (it != columnNames->end()){
+//					outputFile << (str->String()).Data() << delimeter.c_str();
+//				} else {
+//					outputFile << (str->String()).Data();
+//				}
+//			}
+//		}
+		for (Int_t i=0; i<columnNames->GetSize(); i++){
+			TObject* object = columnNames->At(i);
+			if (TObjString* str = dynamic_cast<TObjString*>(object)){
+				outputFile << (str->String()).Data();
+			}
+			if (i != columnNames->GetSize()-1){
+				outputFile << delimeter.c_str();
 			}
 		}
- 		outputFile << std::endl;
+
+		outputFile << std::endl;
 
 		// Print matrix to file
 		for (Int_t j=0; j<numberOfRows; j++){
 			for (Int_t i=0; i<numberOfColumns; i++){
-				outputFile << matrix(j,i) << constants->getDelimeter();
+				if (i != numberOfColumns-1){
+					outputFile << matrix(j,i) << delimeter.c_str();
+				} else {
+					outputFile << matrix(j,i);
+				}
 			}
 			outputFile << std::endl;
 		}
