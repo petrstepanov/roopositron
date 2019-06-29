@@ -48,6 +48,7 @@
 #include <TGaxis.h>
 #include <TMatrixD.h>
 #include <TCollection.h>
+#include <TIterator.h>
 #include "RooWorkspace.h"
 
 #include "model/Constants.h"
@@ -89,6 +90,7 @@ struct Spectrum {
 	Double_t maximumCount;        // maximum count across all bins
 	Double_t averageBackground;
 	RooAbsPdf* model;
+//	RooAbsPdf* modelNonConvoluted;
 	RooAbsPdf* resolutionFunction;
 };
 
@@ -180,7 +182,11 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		}
 		else {
 			// Prefix all parameters in not-first model
-			spectra[i].model = RootHelper::suffixPdfAndNodes(pdf, channels, TString::Format("%d", i+1));
+			// TODO: check if renames or creates new pdf!
+			pdf->Print("V");
+			RooAbsPdf* renamedPdf = RootHelper::suffixPdfAndNodes(pdf, channels, TString::Format("%d", i+1));
+			renamedPdf->Print("V");
+			spectra[i].model = renamedPdf;
 		}
 
 		// Save resolution function
@@ -633,6 +639,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		}
 	}
 	stopWatch->Print();
+
 	return 1;
 }
 

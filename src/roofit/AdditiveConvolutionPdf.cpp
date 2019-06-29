@@ -118,22 +118,22 @@ void AdditiveConvolutionPdf::initResolutionModel(const char* resolutionId) {
 void AdditiveConvolutionPdf::constructModel() {
 	Debug("AdditiveConvolutionPdf::constructModel");
 	// Sum theoretical components
-	RooAbsPdf* sumComponents = ReverseAddPdf::add(componentsList, observable);
+	sumMaterialComponents = ReverseAddPdf::add(componentsList, observable);
 
 	// Source contribution
 	RooRealVar* Int_source = new RooRealVar("Int_source", "Source contribution", 11, 5, 20, "%");
-	RooFormulaVar* Int_sourceNorm = new RooFormulaVar("sourceContributionNorm", "@0/100", *Int_source);
+	RooFormulaVar* Int_sourceNorm = new RooFormulaVar("Int_sourceNorm", "@0/100", *Int_source);
 	RooAbsPdf* sumSourceComponents = ReverseAddPdf::add(sourceComponentsList, observable, "Source");
 
 	// Flat background
 	RooRealVar* background = new RooRealVar("background", "Average background counts", 100, "counts");
 	RooRealVar* bins = new RooRealVar("bins", "Histogram bins", 1E3);
 	RooRealVar* integral = new RooRealVar("integral", "Full histogram integral", 1E6);
-	RooFormulaVar* Int_bg = new RooFormulaVar("Int_bg", "@0*@1/@2", RooArgList(*background, *bins, *integral));
+	RooFormulaVar* Int_bgNorm = new RooFormulaVar("Int_bgNorm", "@0*@1/@2", RooArgList(*background, *bins, *integral));
 	RooPolynomial* bg = new RooPolynomial("bg", "y=1", *observable, RooArgSet());
 
 	// Add source and sample components together
-	modelNonConvoluted = new RooAddPdf("modelNonConvoluted", "Components model with source and background", RooArgList(*bg, *sumSourceComponents, *sumComponents), RooArgList(*Int_bg, *Int_sourceNorm), kTRUE);
+	modelNonConvoluted = new RooAddPdf("modelNonConvoluted", "Components model with source and background", RooArgList(*bg, *sumSourceComponents, *sumMaterialComponents), RooArgList(*Int_bgNorm, *Int_sourceNorm), kTRUE);
 	modelNonConvoluted->fixAddCoefNormalization(RooArgSet(*observable));
 
 
@@ -147,8 +147,8 @@ RooAbsPdf* AdditiveConvolutionPdf::getPdf() {
 	return model;
 }
 
-RooAbsPdf* AdditiveConvolutionPdf::getPdfNonConvoluted() {
-	return modelNonConvoluted;
+RooAbsPdf* AdditiveConvolutionPdf::getPdfInMaterial() {
+	return sumMaterialComponents;
 }
 
 RooAbsPdf* AdditiveConvolutionPdf::getResolutionFunction() {

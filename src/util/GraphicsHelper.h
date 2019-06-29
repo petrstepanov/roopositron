@@ -33,6 +33,7 @@ public:
 	static const Double_t RESIDUALS_PAD_RELATIVE_HEIGHT;
 	static const Double_t LEGEND_XMIN;
 	static const Double_t MARKER_SIZE;
+	static const Style_t COLORS[16];
 
 	static const Style_t GRAPH_COLOR = kViolet + 6;
 

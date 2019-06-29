@@ -30,7 +30,7 @@ public:
     void constructModel();
 
     RooAbsPdf* getPdf();
-    RooAbsPdf* getPdfNonConvoluted();
+    RooAbsPdf* getPdfInMaterial();
     RooAbsPdf* getResolutionFunction();
     
 private:
@@ -46,6 +46,7 @@ private:
     RooArgList* sourceComponentsList = new RooArgList();
     RooAbsPdf* resolutionFunction;
     
+    RooAbsPdf* sumMaterialComponents;
     RooAbsPdf* modelNonConvoluted;
     RooAbsPdf* model;
 
