@@ -90,8 +90,6 @@ struct Spectrum {
 	Double_t maximumCount;        // maximum count across all bins
 	Double_t averageBackground;
 	RooAbsPdf* model;
-//	RooAbsPdf* modelNonConvoluted;
-	RooAbsPdf* resolutionFunction;
 };
 
 // ASCII font generator is here: http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Resolution%0AFunction
@@ -150,45 +148,41 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 
 	// Construct additive decay models
-	for (unsigned i = 0; i < spectra.size(); i++) {
-		AdditiveConvolutionPdf* acp = new AdditiveConvolutionPdf(constants->getDecayModels(), constants->getResolutionFunctionModel(), constants->getSourceComponentsNumber(), channels);
-		RooAbsPdf* pdf = acp->getPdf();
+	AdditiveConvolutionPdf* acp = new AdditiveConvolutionPdf(constants->getDecayModels(), constants->getResolutionFunctionModel(), constants->getSourceComponentsNumber(), channels);
+	// Update fitting parameters starting values from pool (if exist in pool)
+	pool->updateModelParameters(acp->getPdf()->getParameters(RooArgSet(*channels)));
 
-		// Starting values for fitting parameters are taken from pool (if exist in pool)
-		pool->updateModelParameters(pdf->getParameters(RooArgSet(*channels)));
+	for (unsigned i = 0; i < spectra.size(); i++) {
+		if (i == 0) {
+			// First spectrum gets model from provider
+			spectra[i].model = acp->getPdf();
+		}
+		else {
+			// Prefix all parameters in not-first model
+			// RooWorkspace suffixes the pdf by copying its instance and all child objects.
+			spectra[i].model = RootHelper::suffixPdfAndNodes(acp->getPdf(), channels, TString::Format("%d", i+1));
+		}
 
 		// Set mean gauss values
-		if (RooRealVar* gaussMean = (RooRealVar*) (pdf->getParameters(*channels))->find("mean_gauss")) {
+		if (RooRealVar* gaussMean = RootHelper::getParameterByNameCommonOrLocal(spectra[i].model, "mean_gauss")) {
 			gaussMean->setConstant(kFALSE);
+			gaussMean->Print();
 			RootHelper::setRooRealVarValueLimits(gaussMean, spectra[i].binWithMaximumCount, spectra[i].binWithMaximumCount - 50, spectra[i].binWithMaximumCount + 50);
 		}
 		// Set average background counts
-		if (RooRealVar* avgBgCount = (RooRealVar*) (pdf->getParameters(*channels))->find("background")) {
+		if (RooRealVar* avgBgCount = RootHelper::getParameterByNameCommonOrLocal(spectra[i].model, "background")) {
 			RootHelper::setRooRealVarValueLimits(avgBgCount, spectra[i].averageBackground, spectra[i].averageBackground/2, spectra[i].averageBackground*2);
 		}
 		// Set bins
-		if (RooRealVar* bins = (RooRealVar*) (pdf->getParameters(*channels))->find("bins")) {
+		if (RooRealVar* bins = RootHelper::getParameterByNameCommonOrLocal(spectra[i].model, "bins")) {
 			RootHelper::setRooRealVarValueLimits(bins, spectra[i].numberOfBins, spectra[i].numberOfBins, spectra[i].numberOfBins);
 			bins->setConstant(kTRUE);
 		}
 		// Set full integral
-		if (RooRealVar* fullIntegral = (RooRealVar*) (pdf->getParameters(*channels))->find("integral")) {
+		if (RooRealVar* fullIntegral = RootHelper::getParameterByNameCommonOrLocal(spectra[i].model, "integral")) {
 			RootHelper::setRooRealVarValueLimits(fullIntegral, spectra[i].integral, spectra[i].integral, spectra[i].integral);
 			fullIntegral->setConstant(kTRUE);
 		}
-
-		if (i == 0) {
-			spectra[i].model = pdf;
-		}
-		else {
-			// Prefix all parameters in not-first model
-			// RooWorkspace renames pdf but creates a copy of objects.
-			// Question: how to rename PDF without creating new objects?
-			spectra[i].model = RootHelper::suffixPdfAndNodes(pdf, channels, TString::Format("%d", i+1));
-		}
-
-		// Save resolution function
-		spectra[i].resolutionFunction = acp->getResolutionFunction();
 	}
 
 	// When fitting multiple spectra perform single first spectrum fit (1st in the list)
@@ -351,7 +345,10 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		spectra[i].dataHistogram->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kBlack), RooFit::LineWidth(0), RooFit::MarkerSize(GraphicsHelper::MARKER_SIZE), RooFit::MarkerColor(kBlack), RooFit::Name("data"));
 
 		// Draw Resolution Function
-		spectra[i].resolutionFunction->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kGray + 1), RooFit::LineWidth(1), RooFit::Name("resolution"));
+		RooAbsPdf* resolutionFunction = RootHelper::getComponentNameContains(spectra[i].model, "resolution");
+		resolutionFunction->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kGray + 1), RooFit::LineWidth(1), RooFit::Name("resolution"));
+
+		// Draw model in sample
 
 		// Draw grayed out region excluded from plot
 		if (DO_RANGE) {
@@ -388,13 +385,13 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 		// Draw nanosecond axis
 		Double_t scaleFactor = GraphicsHelper::getSpectrumPadFontFactor();
-		if (RooRealVar* rooRealVar = RootHelper::findParameterNameContains(spectra[i].model, channels, "mean_gauss")) {
+		if (RooRealVar* rooRealVar = RootHelper::getParameterNameContains(spectra[i].model, "mean_gauss")) {
 			Double_t zeroChannel = rooRealVar->getVal();
 
 			// Get channel width for current spectrum
 			Double_t channelWidth = 0;
-			RooArgSet* parameters = spectra[i].model->getParameters(*channels);
-			if (RooRealVar* channelWidthVar = RootHelper::getParameterNameContains(parameters, "channelWidth")){
+//			RooArgSet* parameters = spectra[i].model->getParameters(*channels);
+			if (RooRealVar* channelWidthVar = RootHelper::getParameterNameContains(spectra[i].model, "channelWidth")){
 				channelWidth = channelWidthVar->getVal();
 			}
 

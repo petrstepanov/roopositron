@@ -57,7 +57,7 @@ RooAbsPdf* TwoGaussProvider::initPdf(int i) {
 //	return gauss;
 
     // Works much faster with TwoGaussian rather than with sum of two RooGaussian
-    return new TwoGaussian("twoGauss", "Two gauss model", *observable, *gMean, *g1Dispersion, *g2Dispersion, *g2FractionNorm);
+    return new TwoGaussian("resolutionTwoGauss", "Two gauss model", *observable, *gMean, *g1Dispersion, *g2Dispersion, *g2FractionNorm);
 }
 
 RooArgSet* TwoGaussProvider::getIndirectParameters(RooAbsPdf* pdf){
