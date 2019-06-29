@@ -182,11 +182,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		}
 		else {
 			// Prefix all parameters in not-first model
-			// TODO: check if renames or creates new pdf!
-			pdf->Print("V");
-			RooAbsPdf* renamedPdf = RootHelper::suffixPdfAndNodes(pdf, channels, TString::Format("%d", i+1));
-			renamedPdf->Print("V");
-			spectra[i].model = renamedPdf;
+			// RooWorkspace renames pdf but creates a copy of objects.
+			// Question: how to rename PDF without creating new objects?
+			spectra[i].model = RootHelper::suffixPdfAndNodes(pdf, channels, TString::Format("%d", i+1));
 		}
 
 		// Save resolution function

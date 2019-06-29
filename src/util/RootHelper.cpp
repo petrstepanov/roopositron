@@ -78,9 +78,6 @@ RooAbsPdf* RootHelper::suffixPdfAndNodes(RooAbsPdf* pdf, RooRealVar* observable,
 	#endif
 	TString suffixedName = TString::Format("%s_%s", pdf->GetName(), suffix);
 	RooAbsPdf* suffixedPdf =  w->pdf(suffixedName.Data());
-
-	// Rename indirect parameters too!
-
 	return suffixedPdf;
 }
 
