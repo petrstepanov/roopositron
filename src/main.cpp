@@ -347,7 +347,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		spectraPlot[i]->GetXaxis()->SetRangeUser(0, BINS);
 
 		// Instantinate legend with empty first line
-		TLegend* legend = new TLegend(/*x1*/ GraphicsHelper::LEGEND_XMIN-0.24, /*y1*/ 1-0.1-0.3, /*x2*/ GraphicsHelper::LEGEND_XMIN, /*y2*/ 1-0.1);
+		TLegend* legend = new TLegend(/*x1*/ GraphicsHelper::LEGEND_XMIN-0.22, /*y1*/ 1-0.1-0.3, /*x2*/ GraphicsHelper::LEGEND_XMIN, /*y2*/ 1-0.1);
 		legend->SetTextSize(GraphicsHelper::FONT_SIZE_SMALL);
 		legend->SetTextFont(GraphicsHelper::FONT_TEXT);
 		legend->SetBorderSize(0);
