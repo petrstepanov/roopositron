@@ -301,9 +301,11 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	m->setMinimizerType(constants->getMinimizerType());
 	// m->setEps(1000);
 	// m->setStrategy(RooMinimizer::Speed); // RooMinimizer::Speed, RooMinimizer::Balance, RooMinimizer::Robustness
+
 	Int_t resultMigrad = m->migrad();
 	Int_t resultHesse = m->hesse();
 	Debug("main", "Fitting completed: migrad=" << resultMigrad << ", hesse=" << resultHesse);
+
 	stopWatch->Stop();
 
 //	  ________                    .__    .__
@@ -341,23 +343,49 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		spectraPlot[i]->SetTitle(TString::Format("Spectrum %d \"%s\"", i + 1, spectra[i].filename.Data()));
 		spectraPlot[i]->GetXaxis()->SetRangeUser(0, BINS);
 
+		// Instantinate legend with empty first line
+		TLegend* legend = new TLegend(/*x1*/ GraphicsHelper::LEGEND_XMIN-0.3, /*y1*/ 1-0.1-0.3, /*x2*/ GraphicsHelper::LEGEND_XMIN, /*y2*/ 1-0.1);
+		legend->AddEntry("","","");
+
 		// Plot data points
 		spectra[i].dataHistogram->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kBlack), RooFit::LineWidth(0), RooFit::MarkerSize(GraphicsHelper::MARKER_SIZE), RooFit::MarkerColor(kBlack), RooFit::Name("data"));
+		legend->AddEntry(spectraPlot[i]->getHist("data"), "Experimental spectrum", "lep");
 
 		// Draw Resolution Function
-		RooAbsPdf* resolutionFunction = RootHelper::getComponentNameContains(spectra[i].model, "resolution");
+		RooAbsPdf* resolutionFunction = RootHelper::getComponentNameContains(spectra[i].model, "pdfResolution");
 		resolutionFunction->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kGray + 1), RooFit::LineWidth(1), RooFit::Name("resolution"));
+		legend->AddEntry(spectraPlot[i]->getCurve("resolution"), resolutionFunction->getTitle(), "l");
 
-		// Draw model in sample
+		// Draw components. Problem: RooFFTConvPdf does not print components
+		// Only print components that have "drawOnRooPlot" attribute set
+		RooAbsPdf* modelNonConvoluted = RootHelper::getComponentNameContains(spectra[i].model, "modelNonConvoluted");
+		modelNonConvoluted->getComponents()->Print("V");
+		TIterator* it = modelNonConvoluted->getComponents()->createIterator();
+		Int_t colorIndex = 0;
+		while (TObject* temp = it->Next()) {
+			if (RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(temp)) {
+				if (component->getAttribute("drawOnRooPlot")){
+					Style_t color = GraphicsHelper::COLORS[colorIndex++];
+					modelNonConvoluted->plotOn(spectraPlot[i], RooFit::LineStyle(kDashed), RooFit::LineColor(color), RooFit::LineWidth(2), RooFit::Name(component->GetName()), RooFit::Components(component->GetName()));
+					legend->AddEntry(spectraPlot[i]->getCurve(component->GetName()), component->GetTitle(), "l");
+				}
+			}
+		}
 
-		// Draw grayed out region excluded from plot
+		// Draw fitting model
 		if (DO_RANGE) {
+			// Draw grayed out region excluded from plot
 			GraphicsHelper::drawRegion(spectraPlot[i], constants->getExcludeMinChannel(), constants->getExcludeMaxChannel());
 			spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(GraphicsHelper::GRAPH_COLOR), RooFit::LineWidth(2), RooFit::LineStyle(kDashed));
 			spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(GraphicsHelper::GRAPH_COLOR), RooFit::LineWidth(2), RooFit::Name("fit"), RooFit::Range("LEFT,RIGHT"), RooFit::NormRange("LEFT,RIGHT"));
 		} else {
 			spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(GraphicsHelper::GRAPH_COLOR), RooFit::LineWidth(2), RooFit::Name("fit"), RooFit::Normalization(spectra[i].integral, RooAbsReal::NumEvent));
 		}
+		legend->AddEntry(spectraPlot[i]->getCurve("fit"), "Fitting model", "l");
+
+		// Add empty last line to legend
+		legend->AddEntry("","","");
+		legend->SetY1NDC(legend->GetY2NDC() - GraphicsHelper::LEGEND_LINE_HEIGHT*legend->GetNRows());
 
 		// Add legend with list of model parameters
 		RooArgSet* parameters = spectra[i].model->getParameters(spectraPlot[i]->getNormVars());
@@ -375,11 +403,16 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		RooArgSet* allParameters = new RooArgSet();
 		allParameters->add(*parameters);
 		allParameters->add(*indirectParameters);
-		TPaveText* pt = GraphicsHelper::makePaveText(*allParameters, GraphicsHelper::LEGEND_XMIN, 0.99, 0.9);
+		TPaveText* pt = GraphicsHelper::makePaveText(*allParameters, GraphicsHelper::LEGEND_XMIN, 1-0.01, 1-0.1);
 		spectraPlot[i]->addObject(pt);
 
+		legend->SetTextSize(pt->GetTextSize());
+		legend->SetTextFont(pt->GetTextFont());
+		spectraPlot[i]->addObject(legend);
+
 		// Set custom Y axis limits
-		Double_t yMin = pow(10, MathUtil::orderOfMagnitude(spectra[i].averageBackground)); // Minimum is order of magnitude of the average background value
+		Double_t yMin = spectra[i].averageBackground / 5;
+//		 Double_t yMin = pow(10, MathUtil::orderOfMagnitude(spectra[i].averageBackground)); // Minimum is order of magnitude of the average background value
 		Double_t yMax = spectraPlot[i]->GetMaximum(); // Maximum is default (whatever ROOT plots)
 		spectraPlot[i]->GetYaxis()->SetRangeUser(yMin, yMax);
 
@@ -429,7 +462,6 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		spectraPlot[i]->GetYaxis()->SetLabelSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
 		spectraPlot[i]->GetYaxis()->SetTitleSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
 		spectraPlot[i]->GetYaxis()->SetTitleOffset(0.9);
-
 		#ifdef USEDEBUG
 			spectraPlot[i]->Print("V");
 		#endif
@@ -519,6 +551,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		spectraPlot[i]->Draw();
 		canvas[i]->cd(2);
 		residualsPlot[i]->Draw();
+
 		canvas[i]->SetEditable(kFALSE);
 		canvas[i]->Modified();
 		canvas[i]->Update();

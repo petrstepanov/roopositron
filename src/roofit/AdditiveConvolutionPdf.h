@@ -30,8 +30,6 @@ public:
     void constructModel();
 
     RooAbsPdf* getPdf();
-    RooAbsPdf* getPdfInMaterial();
-    RooAbsPdf* getResolutionFunction();
     
 private:
     void initComponents(std::vector<std::string> componentIds, int sourceComponents);
@@ -46,8 +44,6 @@ private:
     RooArgList* sourceComponentsList = new RooArgList();
     RooAbsPdf* resolutionFunction;
     
-    RooAbsPdf* sumMaterialComponents;
-    RooAbsPdf* modelNonConvoluted;
     RooAbsPdf* model;
 
 };

@@ -43,7 +43,7 @@ RooAbsPdf* ThreeExpProvider::initPdf(int i) {
     RooFormulaVar* intExp3Norm = new RooFormulaVar("intExp3Norm", "@0/100", *Int_exp3);
 
     // Instantiate model
-    return new ThreeExpPdf("threeExp", "three exponential pdf", *observable, *tau1Ch, *tau2Ch, *tau3Ch, *intExp2Norm, *intExp3Norm);
+    return new ThreeExpPdf("threeExp", "Three exponential decay", *observable, *tau1Ch, *tau2Ch, *tau3Ch, *intExp2Norm, *intExp3Norm);
 }
 
 RooArgSet* ThreeExpProvider::getIndirectParameters(RooAbsPdf* pdf){

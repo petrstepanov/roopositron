@@ -116,26 +116,33 @@ void AdditiveConvolutionPdf::initResolutionModel(const char* resolutionId) {
 }
 
 void AdditiveConvolutionPdf::constructModel() {
-	Debug("AdditiveConvolutionPdf::constructModel");
 	// Sum theoretical components
-	sumMaterialComponents = ReverseAddPdf::add(componentsList, observable);
+	RooAbsPdf* sumMaterialComponents = ReverseAddPdf::add(componentsList, observable, "pdfMaterial");
+	TIterator* it = componentsList->createIterator();
+	while(TObject* object = it->Next()){
+		if (RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(object)){
+			pdf->setAttribute("drawOnRooPlot", kTRUE);
+		}
+	}
 
 	// Source contribution
 	RooRealVar* Int_source = new RooRealVar("Int_source", "Source contribution", 11, 5, 20, "%");
 	RooFormulaVar* Int_sourceNorm = new RooFormulaVar("Int_sourceNorm", "@0/100", *Int_source);
-	RooAbsPdf* sumSourceComponents = ReverseAddPdf::add(sourceComponentsList, observable, "Source");
+	RooAbsPdf* sumSourceComponents = ReverseAddPdf::add(sourceComponentsList, observable, "pdfSource");
+	sumSourceComponents->SetTitle("Source contribution");
+	sumSourceComponents->setAttribute("drawOnRooPlot", kTRUE);
 
 	// Flat background
 	RooRealVar* background = new RooRealVar("background", "Average background counts", 100, "counts");
 	RooRealVar* bins = new RooRealVar("bins", "Histogram bins", 1E3);
 	RooRealVar* integral = new RooRealVar("integral", "Full histogram integral", 1E6);
 	RooFormulaVar* Int_bgNorm = new RooFormulaVar("Int_bgNorm", "@0*@1/@2", RooArgList(*background, *bins, *integral));
-	RooPolynomial* bg = new RooPolynomial("bg", "y=1", *observable, RooArgSet());
+	RooPolynomial* bg = new RooPolynomial("bg", "Background", *observable, RooArgSet());
+	bg->setAttribute("drawOnRooPlot", kTRUE);
 
 	// Add source and sample components together
-	modelNonConvoluted = new RooAddPdf("modelNonConvoluted", "Components model with source and background", RooArgList(*bg, *sumSourceComponents, *sumMaterialComponents), RooArgList(*Int_bgNorm, *Int_sourceNorm), kTRUE);
+	RooAbsPdf* modelNonConvoluted = new RooAddPdf("modelNonConvoluted", "Components model with source and background", RooArgList(*bg, *sumSourceComponents, *sumMaterialComponents), RooArgList(*Int_bgNorm, *Int_sourceNorm), kTRUE);
 	modelNonConvoluted->fixAddCoefNormalization(RooArgSet(*observable));
-
 
 	// Convolute model
 	model = new RooFFTConvPdf("model", "Convoluted model with source contribution", *observable, *modelNonConvoluted, *resolutionFunction);
@@ -145,12 +152,4 @@ void AdditiveConvolutionPdf::constructModel() {
 
 RooAbsPdf* AdditiveConvolutionPdf::getPdf() {
 	return model;
-}
-
-RooAbsPdf* AdditiveConvolutionPdf::getPdfInMaterial() {
-	return sumMaterialComponents;
-}
-
-RooAbsPdf* AdditiveConvolutionPdf::getResolutionFunction() {
-	return resolutionFunction;
 }

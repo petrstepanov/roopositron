@@ -26,6 +26,7 @@ const Double_t GraphicsHelper::FONT_SIZE_NORMAL = 0.05;
 const Double_t GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT = 0.35;
 const Double_t GraphicsHelper::LEGEND_XMIN = 0.7;
 const Double_t GraphicsHelper::MARKER_SIZE = 0.4;
+const Double_t GraphicsHelper::LEGEND_LINE_HEIGHT = 0.0248;
 const Style_t GraphicsHelper::COLORS[16] = {kSpring - 5, kAzure + 8, kPink + 1, kGray + 1, kViolet - 4, kRed - 7, kViolet + 6};
 
 Double_t GraphicsHelper::getSpectrumPadFontFactor(){
@@ -84,14 +85,13 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 	Bool_t showConstants = kTRUE;
 	const char* options = "NEULP";
 	TIterator* pIter = params.createIterator();
-	Double_t dy = 0.0248; // Legend line height
 
 	// Calculate bottom Legend coordinate (ymin)
 	Double_t ymin = ymax;
 	while (RooAbsArg* var = (RooAbsArg*) pIter->Next()) {
-		if (showConstants || !var->isConstant()) ymin -= dy;
+		if (showConstants || !var->isConstant()) ymin -= LEGEND_LINE_HEIGHT;
 	}
-	ymin -= dy*5; // 2 empty lines (top and bottom) + 3 separators
+	ymin -= LEGEND_LINE_HEIGHT*5; // 2 empty lines (top and bottom) + 3 separators
 
 	// Create the box and set its options
 	TPaveText *box = new TPaveText(xmin, ymax, xmax, ymin, "BRNDC"); //
