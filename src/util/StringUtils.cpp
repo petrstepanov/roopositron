@@ -189,3 +189,19 @@ std::string StringUtils::unescape(std::string string){
 	std::string cs = s.Data();
 	return cs;
 }
+
+std::string StringUtils::removeBrackets(const char* string){
+	std::string stringMaybeWithBrackets = string;
+	const std::regex re("(.*)( \\([0-9]+\\))$");
+	std::smatch match;
+
+	// If string has suffix return new string without suffix "_##"
+	if (std::regex_match(stringMaybeWithBrackets, match, re)){
+		// for "#tau1_source_10" returns "#tau1_source"
+		std::string stringWithoutBrackets = match[1].str();
+		return stringWithoutBrackets;
+	}
+
+	// If string does not have suffix return its copy
+	return stringMaybeWithBrackets;
+}

@@ -328,11 +328,14 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		canvas[i]->cd(1)->SetPad(0, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT, 1, 1);
 		gPad->SetMargin(0.07, 0.01, 0.08, 0.1);
 		gPad->SetLogy();
-		gPad->SetGrid();
+		// gPad->SetGrid();
 
 		canvas[i]->cd(2)->SetPad(0, 0, 1, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT);
 		gPad->SetMargin(0.07, 0.01, 0.3, 0.05);
-		gPad->SetGrid();
+		// gPad->SetGrid();
+
+		// Set Grid color (same as axis color)
+		// gStyle->SetAxisColor(kRed, "xy");
 	}
 
 	// Draw spectrum plot (top)
@@ -344,7 +347,11 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		spectraPlot[i]->GetXaxis()->SetRangeUser(0, BINS);
 
 		// Instantinate legend with empty first line
-		TLegend* legend = new TLegend(/*x1*/ GraphicsHelper::LEGEND_XMIN-0.3, /*y1*/ 1-0.1-0.3, /*x2*/ GraphicsHelper::LEGEND_XMIN, /*y2*/ 1-0.1);
+		TLegend* legend = new TLegend(/*x1*/ GraphicsHelper::LEGEND_XMIN-0.24, /*y1*/ 1-0.1-0.3, /*x2*/ GraphicsHelper::LEGEND_XMIN, /*y2*/ 1-0.1);
+		legend->SetTextSize(GraphicsHelper::FONT_SIZE_SMALL);
+		legend->SetTextFont(GraphicsHelper::FONT_TEXT);
+		legend->SetBorderSize(0);
+		legend->SetFillStyle(kFEmpty);
 		legend->AddEntry("","","");
 
 		// Plot data points
@@ -354,12 +361,11 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		// Draw Resolution Function
 		RooAbsPdf* resolutionFunction = RootHelper::getComponentNameContains(spectra[i].model, "pdfResolution");
 		resolutionFunction->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kGray + 1), RooFit::LineWidth(1), RooFit::Name("resolution"));
-		legend->AddEntry(spectraPlot[i]->getCurve("resolution"), resolutionFunction->getTitle(), "l");
+		legend->AddEntry(spectraPlot[i]->getCurve("resolution"), "Resolution function", "l");
 
 		// Draw components. Problem: RooFFTConvPdf does not print components
 		// Only print components that have "drawOnRooPlot" attribute set
 		RooAbsPdf* modelNonConvoluted = RootHelper::getComponentNameContains(spectra[i].model, "modelNonConvoluted");
-		modelNonConvoluted->getComponents()->Print("V");
 		TIterator* it = modelNonConvoluted->getComponents()->createIterator();
 		Int_t colorIndex = 0;
 		while (TObject* temp = it->Next()) {
@@ -367,7 +373,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 				if (component->getAttribute("drawOnRooPlot")){
 					Style_t color = GraphicsHelper::COLORS[colorIndex++];
 					modelNonConvoluted->plotOn(spectraPlot[i], RooFit::LineStyle(kDashed), RooFit::LineColor(color), RooFit::LineWidth(2), RooFit::Name(component->GetName()), RooFit::Components(component->GetName()));
-					legend->AddEntry(spectraPlot[i]->getCurve(component->GetName()), component->GetTitle(), "l");
+					std::string legendTitle = StringUtils::removeBrackets(component->GetTitle()); // RooWorkspace adds brackets (#) to object titles
+					legend->AddEntry(spectraPlot[i]->getCurve(component->GetName()), legendTitle.c_str(), "l");
 				}
 			}
 		}
@@ -386,6 +393,8 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		// Add empty last line to legend
 		legend->AddEntry("","","");
 		legend->SetY1NDC(legend->GetY2NDC() - GraphicsHelper::LEGEND_LINE_HEIGHT*legend->GetNRows());
+		std::cout << legend->GetTextSize() << " " << legend->GetTextFont() << std::endl;
+		spectraPlot[i]->addObject(legend);
 
 		// Add legend with list of model parameters
 		RooArgSet* parameters = spectra[i].model->getParameters(spectraPlot[i]->getNormVars());
@@ -405,10 +414,6 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		allParameters->add(*indirectParameters);
 		TPaveText* pt = GraphicsHelper::makePaveText(*allParameters, GraphicsHelper::LEGEND_XMIN, 1-0.01, 1-0.1);
 		spectraPlot[i]->addObject(pt);
-
-		legend->SetTextSize(pt->GetTextSize());
-		legend->SetTextFont(pt->GetTextFont());
-		spectraPlot[i]->addObject(legend);
 
 		// Set custom Y axis limits
 		Double_t yMin = spectra[i].averageBackground / 5;
@@ -513,6 +518,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		TPaveText* leg = new TPaveText(GraphicsHelper::LEGEND_XMIN, 0.85, 0.99, 0.95, "BRNDC");  // x1 y1 x2 y2  0.75, 0.99, 0.9
 		leg->AddText(TString::Format("#chi^{2} = %.1f / %d = %.3f", chi2->getVal(), degreesFreedom, chi2Value));
 		leg->SetTextSize(scaleFactor * GraphicsHelper::FONT_SIZE_SMALL * 1.3);
+		leg->SetTextFont(GraphicsHelper::FONT_TEXT);
 		leg->SetBorderSize(1);
 		leg->SetFillColor(0);
 		leg->SetTextAlign(12);
@@ -538,6 +544,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		residualsPlot[i]->GetXaxis()->SetLabelOffset(0.04);
 		residualsPlot[i]->GetXaxis()->SetTickLength(scaleFactor * residualsPlot[i]->GetXaxis()->GetTickLength());
 
+		// gStyle->SetAxisColor(kGreen);
+		// gPad->RedrawAxis();
+
 		#ifdef USEDEBUG
 			residualsPlot[i]->Print("V");
 		#endif
@@ -549,6 +558,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		// Draw plots on correspondent pads
 		canvas[i]->cd(1);
 		spectraPlot[i]->Draw();
+//		gStyle->SetAxisColor(kGreen);
+//		gPad->RedrawAxis();
+
 		canvas[i]->cd(2);
 		residualsPlot[i]->Draw();
 

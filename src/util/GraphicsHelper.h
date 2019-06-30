@@ -30,6 +30,7 @@ public:
 	static const Double_t FONT_SIZE_SMALLER;
 	static const Double_t FONT_SIZE_SMALL;
 	static const Double_t FONT_SIZE_NORMAL;
+	static const Font_t FONT_TEXT;
 	static const Double_t RESIDUALS_PAD_RELATIVE_HEIGHT;
 	static const Double_t LEGEND_XMIN;
 	static const Double_t LEGEND_LINE_HEIGHT;
