@@ -39,6 +39,7 @@ public:
     static bool isEmpty(const char*);
     static std::string getStringWithoutSuffix(std::string stringMaybeWithSuffix);
     static std::string unescape(std::string string);
+    static std::string removeBrackets(const char* string);
 };
 
 #endif /* STRINGUTILS_H */

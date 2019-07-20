@@ -23,10 +23,12 @@
 const Double_t GraphicsHelper::FONT_SIZE_SMALLER = 0.02;
 const Double_t GraphicsHelper::FONT_SIZE_SMALL = 0.028;
 const Double_t GraphicsHelper::FONT_SIZE_NORMAL = 0.05;
+const Font_t GraphicsHelper::FONT_TEXT = 42; // https://root.cern.ch/doc/master/classTAttText.html#T5
 const Double_t GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT = 0.35;
 const Double_t GraphicsHelper::LEGEND_XMIN = 0.7;
-const Double_t GraphicsHelper::MARKER_SIZE = 0.4;
-const Style_t GraphicsHelper::COLORS[16] = {kSpring - 5, kAzure + 8, kPink + 1, kGray + 1, kViolet - 4, kRed - 7, kViolet + 6};
+const Double_t GraphicsHelper::MARKER_SIZE = 0.3;
+const Double_t GraphicsHelper::LEGEND_LINE_HEIGHT = 0.0248;
+const Style_t GraphicsHelper::COLORS[16] = {kGray, kOrange + 1, kSpring - 5, kAzure + 8, kPink + 1, kViolet - 4, kRed - 7, kViolet + 6};
 
 Double_t GraphicsHelper::getSpectrumPadFontFactor(){
 	return 0.5/(1-RESIDUALS_PAD_RELATIVE_HEIGHT);
@@ -84,14 +86,13 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 	Bool_t showConstants = kTRUE;
 	const char* options = "NEULP";
 	TIterator* pIter = params.createIterator();
-	Double_t dy = 0.0248; // Legend line height
 
 	// Calculate bottom Legend coordinate (ymin)
 	Double_t ymin = ymax;
 	while (RooAbsArg* var = (RooAbsArg*) pIter->Next()) {
-		if (showConstants || !var->isConstant()) ymin -= dy;
+		if (showConstants || !var->isConstant()) ymin -= LEGEND_LINE_HEIGHT;
 	}
-	ymin -= dy*5; // 2 empty lines (top and bottom) + 3 separators
+	ymin -= LEGEND_LINE_HEIGHT*5; // 2 empty lines (top and bottom) + 3 separators
 
 	// Create the box and set its options
 	TPaveText *box = new TPaveText(xmin, ymax, xmax, ymin, "BRNDC"); //
@@ -100,6 +101,7 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 	box->SetBorderSize(1);
 	box->SetTextAlign(ETextAlign::kHAlignLeft + ETextAlign::kVAlignCenter);
 	box->SetTextSize(FONT_SIZE_SMALL);
+	box->SetTextFont(FONT_TEXT);
 	box->SetFillStyle(1001);
 	box->SetFillColorAlpha(EColor::kWhite, 0.9);
 

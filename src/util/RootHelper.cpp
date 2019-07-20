@@ -55,19 +55,19 @@ void RootHelper::printPdfCoefficientNames(RooAbsPdf* pdf, RooRealVar* observable
 	std::cout << std::endl;
 }
 
-RooRealVar* RootHelper::findParameterNameContains(RooAbsPdf* pdf, RooRealVar* observable, const char* substring) {
-	RooArgSet* params = pdf->getParameters(*observable);
-	TIterator* it = params->createIterator();
-	TObject* temp;
-	while ((temp = it->Next())) {
-		if (RooRealVar* var = dynamic_cast<RooRealVar*>(temp)) {
-			if (StringUtils::isSubstring(var->GetName(), substring)){
-				return var;
-			}
-		}
-	}
-	return NULL;
-}
+//RooRealVar* RootHelper::findParameterNameContains(RooAbsPdf* pdf, RooRealVar* observable, const char* substring) {
+//	RooArgSet* params = pdf->getParameters(*observable);
+//	TIterator* it = params->createIterator();
+//	TObject* temp;
+//	while ((temp = it->Next())) {
+//		if (RooRealVar* var = dynamic_cast<RooRealVar*>(temp)) {
+//			if (StringUtils::isSubstring(var->GetName(), substring)){
+//				return var;
+//			}
+//		}
+//	}
+//	return NULL;
+//}
 
 RooAbsPdf* RootHelper::suffixPdfAndNodes(RooAbsPdf* pdf, RooRealVar* observable, const char* suffix){
 	Debug("RootHelper::suffixPdfAndNodes");
@@ -93,7 +93,6 @@ void RootHelper::setRooRealVarValueLimits(RooRealVar* var, Double_t value, Doubl
 RooRealVar* RootHelper::getParameterByNameCommonOrLocal(RooAbsPdf* pdf, const char* name){
 	// for given parameter name, say #tau1 will return either exact match or suffixed:
 	// #tau1 or #tau1_13 or #tau1_2
-
 	std::string nameString(name);
 
 	// TODO: check list is not empty otherwise pass observable
@@ -111,13 +110,47 @@ RooRealVar* RootHelper::getParameterByNameCommonOrLocal(RooAbsPdf* pdf, const ch
 	return NULL;
 }
 
+RooAbsPdf* RootHelper::getComponentByNameCommonOrLocal(RooAbsPdf* pdf, const char* name){
+	// for given parameter name, say #tau1 will return either exact match or suffixed:
+	// #tau1 or #tau1_13 or #tau1_2
+	std::string nameString(name);
+
+	RooArgSet* components = pdf->getComponents();
+	TIterator* it = components->createIterator();
+	while (TObject* temp = it->Next()) {
+		if (RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(temp)) {
+			std::string componentName = component->GetName();
+			std::string componentNameWithoutSuffix = StringUtils::getStringWithoutSuffix(componentName);
+			if (nameString == componentNameWithoutSuffix){
+				return component;
+			}
+		}
+	}
+	return NULL;
+}
+
+
 // Deprecated, use getParameterByNameCommonOrLocal()
-RooRealVar* RootHelper::getParameterNameContains(RooArgSet* rooRealVarSet, const char* nameSubstring){
-	TIterator* it = rooRealVarSet->createIterator();
+RooRealVar* RootHelper::getParameterNameContains(RooAbsPdf* pdf, const char* nameSubstring){
+	RooArgSet* parameters = pdf->getParameters(RooArgSet());
+	TIterator* it = parameters->createIterator();
 	while (TObject* temp = it->Next()) {
 		if (RooRealVar* rrv = dynamic_cast<RooRealVar*>(temp)) {
 			if (StringUtils::isSubstring(rrv->GetName(), nameSubstring)){
 				return rrv;
+			}
+		}
+	}
+	return nullptr;
+}
+
+RooAbsPdf* RootHelper::getComponentNameContains(RooAbsPdf* pdf, const char* nameSubstring){
+	RooArgSet* components = pdf->getComponents();
+	TIterator* it = components->createIterator();
+	while (TObject* temp = it->Next()) {
+		if (RooAbsPdf* rap = dynamic_cast<RooAbsPdf*>(temp)) {
+			if (StringUtils::isSubstring(rap->GetName(), nameSubstring)){
+				return rap;
 			}
 		}
 	}

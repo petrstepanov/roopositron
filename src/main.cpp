@@ -90,8 +90,6 @@ struct Spectrum {
 	Double_t maximumCount;        // maximum count across all bins
 	Double_t averageBackground;
 	RooAbsPdf* model;
-//	RooAbsPdf* modelNonConvoluted;
-	RooAbsPdf* resolutionFunction;
 };
 
 // ASCII font generator is here: http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Resolution%0AFunction
@@ -150,45 +148,41 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 
 	// Construct additive decay models
-	for (unsigned i = 0; i < spectra.size(); i++) {
-		AdditiveConvolutionPdf* acp = new AdditiveConvolutionPdf(constants->getDecayModels(), constants->getResolutionFunctionModel(), constants->getSourceComponentsNumber(), channels);
-		RooAbsPdf* pdf = acp->getPdf();
+	AdditiveConvolutionPdf* acp = new AdditiveConvolutionPdf(constants->getDecayModels(), constants->getResolutionFunctionModel(), constants->getSourceComponentsNumber(), channels);
+	// Update fitting parameters starting values from pool (if exist in pool)
+	pool->updateModelParameters(acp->getPdf()->getParameters(RooArgSet(*channels)));
 
-		// Starting values for fitting parameters are taken from pool (if exist in pool)
-		pool->updateModelParameters(pdf->getParameters(RooArgSet(*channels)));
+	for (unsigned i = 0; i < spectra.size(); i++) {
+		if (i == 0) {
+			// First spectrum gets model from provider
+			spectra[i].model = acp->getPdf();
+		}
+		else {
+			// Prefix all parameters in not-first model
+			// RooWorkspace suffixes the pdf by copying its instance and all child objects.
+			spectra[i].model = RootHelper::suffixPdfAndNodes(acp->getPdf(), channels, TString::Format("%d", i+1));
+		}
 
 		// Set mean gauss values
-		if (RooRealVar* gaussMean = (RooRealVar*) (pdf->getParameters(*channels))->find("mean_gauss")) {
+		if (RooRealVar* gaussMean = RootHelper::getParameterByNameCommonOrLocal(spectra[i].model, "mean_gauss")) {
 			gaussMean->setConstant(kFALSE);
+			gaussMean->Print();
 			RootHelper::setRooRealVarValueLimits(gaussMean, spectra[i].binWithMaximumCount, spectra[i].binWithMaximumCount - 50, spectra[i].binWithMaximumCount + 50);
 		}
 		// Set average background counts
-		if (RooRealVar* avgBgCount = (RooRealVar*) (pdf->getParameters(*channels))->find("background")) {
+		if (RooRealVar* avgBgCount = RootHelper::getParameterByNameCommonOrLocal(spectra[i].model, "background")) {
 			RootHelper::setRooRealVarValueLimits(avgBgCount, spectra[i].averageBackground, spectra[i].averageBackground/2, spectra[i].averageBackground*2);
 		}
 		// Set bins
-		if (RooRealVar* bins = (RooRealVar*) (pdf->getParameters(*channels))->find("bins")) {
+		if (RooRealVar* bins = RootHelper::getParameterByNameCommonOrLocal(spectra[i].model, "bins")) {
 			RootHelper::setRooRealVarValueLimits(bins, spectra[i].numberOfBins, spectra[i].numberOfBins, spectra[i].numberOfBins);
 			bins->setConstant(kTRUE);
 		}
 		// Set full integral
-		if (RooRealVar* fullIntegral = (RooRealVar*) (pdf->getParameters(*channels))->find("integral")) {
+		if (RooRealVar* fullIntegral = RootHelper::getParameterByNameCommonOrLocal(spectra[i].model, "integral")) {
 			RootHelper::setRooRealVarValueLimits(fullIntegral, spectra[i].integral, spectra[i].integral, spectra[i].integral);
 			fullIntegral->setConstant(kTRUE);
 		}
-
-		if (i == 0) {
-			spectra[i].model = pdf;
-		}
-		else {
-			// Prefix all parameters in not-first model
-			// RooWorkspace renames pdf but creates a copy of objects.
-			// Question: how to rename PDF without creating new objects?
-			spectra[i].model = RootHelper::suffixPdfAndNodes(pdf, channels, TString::Format("%d", i+1));
-		}
-
-		// Save resolution function
-		spectra[i].resolutionFunction = acp->getResolutionFunction();
 	}
 
 	// When fitting multiple spectra perform single first spectrum fit (1st in the list)
@@ -307,9 +301,11 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	m->setMinimizerType(constants->getMinimizerType());
 	// m->setEps(1000);
 	// m->setStrategy(RooMinimizer::Speed); // RooMinimizer::Speed, RooMinimizer::Balance, RooMinimizer::Robustness
+
 	Int_t resultMigrad = m->migrad();
 	Int_t resultHesse = m->hesse();
 	Debug("main", "Fitting completed: migrad=" << resultMigrad << ", hesse=" << resultHesse);
+
 	stopWatch->Stop();
 
 //	  ________                    .__    .__
@@ -332,11 +328,14 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		canvas[i]->cd(1)->SetPad(0, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT, 1, 1);
 		gPad->SetMargin(0.07, 0.01, 0.08, 0.1);
 		gPad->SetLogy();
-		gPad->SetGrid();
+		// gPad->SetGrid();
 
 		canvas[i]->cd(2)->SetPad(0, 0, 1, GraphicsHelper::RESIDUALS_PAD_RELATIVE_HEIGHT);
 		gPad->SetMargin(0.07, 0.01, 0.3, 0.05);
-		gPad->SetGrid();
+		// gPad->SetGrid();
+
+		// Set Grid color (same as axis color)
+		// gStyle->SetAxisColor(kRed, "xy");
 	}
 
 	// Draw spectrum plot (top)
@@ -347,20 +346,55 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		spectraPlot[i]->SetTitle(TString::Format("Spectrum %d \"%s\"", i + 1, spectra[i].filename.Data()));
 		spectraPlot[i]->GetXaxis()->SetRangeUser(0, BINS);
 
+		// Instantinate legend with empty first line
+		TLegend* legend = new TLegend(/*x1*/ GraphicsHelper::LEGEND_XMIN-0.22, /*y1*/ 1-0.1-0.3, /*x2*/ GraphicsHelper::LEGEND_XMIN, /*y2*/ 1-0.1);
+		legend->SetTextSize(GraphicsHelper::FONT_SIZE_SMALL);
+		legend->SetTextFont(GraphicsHelper::FONT_TEXT);
+		legend->SetBorderSize(0);
+		legend->SetFillStyle(kFEmpty);
+		legend->AddEntry("","","");
+
 		// Plot data points
 		spectra[i].dataHistogram->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kBlack), RooFit::LineWidth(0), RooFit::MarkerSize(GraphicsHelper::MARKER_SIZE), RooFit::MarkerColor(kBlack), RooFit::Name("data"));
+		legend->AddEntry(spectraPlot[i]->getHist("data"), "Experimental spectrum", "lep");
 
 		// Draw Resolution Function
-		spectra[i].resolutionFunction->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kGray + 1), RooFit::LineWidth(1), RooFit::Name("resolution"));
+		RooAbsPdf* resolutionFunction = RootHelper::getComponentNameContains(spectra[i].model, "pdfResolution");
+		resolutionFunction->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kGray + 1), RooFit::LineWidth(1), RooFit::Name("resolution"));
+		legend->AddEntry(spectraPlot[i]->getCurve("resolution"), "Resolution function", "l");
 
-		// Draw grayed out region excluded from plot
+		// Draw components. Problem: RooFFTConvPdf does not print components
+		// Only print components that have "drawOnRooPlot" attribute set
+		RooAbsPdf* modelNonConvoluted = RootHelper::getComponentNameContains(spectra[i].model, "modelNonConvoluted");
+		TIterator* it = modelNonConvoluted->getComponents()->createIterator();
+		Int_t colorIndex = 0;
+		while (TObject* temp = it->Next()) {
+			if (RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(temp)) {
+				if (component->getAttribute("drawOnRooPlot")){
+					Style_t color = GraphicsHelper::COLORS[colorIndex++];
+					modelNonConvoluted->plotOn(spectraPlot[i], RooFit::LineStyle(kDashed), RooFit::LineColor(color), RooFit::LineWidth(2), RooFit::Name(component->GetName()), RooFit::Components(component->GetName()));
+					std::string legendTitle = StringUtils::removeBrackets(component->GetTitle()); // RooWorkspace adds brackets (#) to object titles
+					legend->AddEntry(spectraPlot[i]->getCurve(component->GetName()), legendTitle.c_str(), "l");
+				}
+			}
+		}
+
+		// Draw fitting model
 		if (DO_RANGE) {
+			// Draw grayed out region excluded from plot
 			GraphicsHelper::drawRegion(spectraPlot[i], constants->getExcludeMinChannel(), constants->getExcludeMaxChannel());
 			spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(GraphicsHelper::GRAPH_COLOR), RooFit::LineWidth(2), RooFit::LineStyle(kDashed));
 			spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(GraphicsHelper::GRAPH_COLOR), RooFit::LineWidth(2), RooFit::Name("fit"), RooFit::Range("LEFT,RIGHT"), RooFit::NormRange("LEFT,RIGHT"));
 		} else {
 			spectra[i].model->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(GraphicsHelper::GRAPH_COLOR), RooFit::LineWidth(2), RooFit::Name("fit"), RooFit::Normalization(spectra[i].integral, RooAbsReal::NumEvent));
 		}
+		legend->AddEntry(spectraPlot[i]->getCurve("fit"), "Fitting model", "l");
+
+		// Add empty last line to legend
+		legend->AddEntry("","","");
+		legend->SetY1NDC(legend->GetY2NDC() - GraphicsHelper::LEGEND_LINE_HEIGHT*legend->GetNRows());
+		std::cout << legend->GetTextSize() << " " << legend->GetTextFont() << std::endl;
+		spectraPlot[i]->addObject(legend);
 
 		// Add legend with list of model parameters
 		RooArgSet* parameters = spectra[i].model->getParameters(spectraPlot[i]->getNormVars());
@@ -378,23 +412,24 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		RooArgSet* allParameters = new RooArgSet();
 		allParameters->add(*parameters);
 		allParameters->add(*indirectParameters);
-		TPaveText* pt = GraphicsHelper::makePaveText(*allParameters, GraphicsHelper::LEGEND_XMIN, 0.99, 0.9);
+		TPaveText* pt = GraphicsHelper::makePaveText(*allParameters, GraphicsHelper::LEGEND_XMIN, 1-0.01, 1-0.1);
 		spectraPlot[i]->addObject(pt);
 
 		// Set custom Y axis limits
-		Double_t yMin = pow(10, MathUtil::orderOfMagnitude(spectra[i].averageBackground)); // Minimum is order of magnitude of the average background value
+		Double_t yMin = spectra[i].averageBackground / 5;
+//		 Double_t yMin = pow(10, MathUtil::orderOfMagnitude(spectra[i].averageBackground)); // Minimum is order of magnitude of the average background value
 		Double_t yMax = spectraPlot[i]->GetMaximum(); // Maximum is default (whatever ROOT plots)
 		spectraPlot[i]->GetYaxis()->SetRangeUser(yMin, yMax);
 
 		// Draw nanosecond axis
 		Double_t scaleFactor = GraphicsHelper::getSpectrumPadFontFactor();
-		if (RooRealVar* rooRealVar = RootHelper::findParameterNameContains(spectra[i].model, channels, "mean_gauss")) {
+		if (RooRealVar* rooRealVar = RootHelper::getParameterNameContains(spectra[i].model, "mean_gauss")) {
 			Double_t zeroChannel = rooRealVar->getVal();
 
 			// Get channel width for current spectrum
 			Double_t channelWidth = 0;
-			RooArgSet* parameters = spectra[i].model->getParameters(*channels);
-			if (RooRealVar* channelWidthVar = RootHelper::getParameterNameContains(parameters, "channelWidth")){
+//			RooArgSet* parameters = spectra[i].model->getParameters(*channels);
+			if (RooRealVar* channelWidthVar = RootHelper::getParameterNameContains(spectra[i].model, "channelWidth")){
 				channelWidth = channelWidthVar->getVal();
 			}
 
@@ -432,7 +467,6 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		spectraPlot[i]->GetYaxis()->SetLabelSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
 		spectraPlot[i]->GetYaxis()->SetTitleSize(scaleFactor * GraphicsHelper::FONT_SIZE_NORMAL);
 		spectraPlot[i]->GetYaxis()->SetTitleOffset(0.9);
-
 		#ifdef USEDEBUG
 			spectraPlot[i]->Print("V");
 		#endif
@@ -484,6 +518,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		TPaveText* leg = new TPaveText(GraphicsHelper::LEGEND_XMIN, 0.85, 0.99, 0.95, "BRNDC");  // x1 y1 x2 y2  0.75, 0.99, 0.9
 		leg->AddText(TString::Format("#chi^{2} = %.1f / %d = %.3f", chi2->getVal(), degreesFreedom, chi2Value));
 		leg->SetTextSize(scaleFactor * GraphicsHelper::FONT_SIZE_SMALL * 1.3);
+		leg->SetTextFont(GraphicsHelper::FONT_TEXT);
 		leg->SetBorderSize(1);
 		leg->SetFillColor(0);
 		leg->SetTextAlign(12);
@@ -509,6 +544,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		residualsPlot[i]->GetXaxis()->SetLabelOffset(0.04);
 		residualsPlot[i]->GetXaxis()->SetTickLength(scaleFactor * residualsPlot[i]->GetXaxis()->GetTickLength());
 
+		// gStyle->SetAxisColor(kGreen);
+		// gPad->RedrawAxis();
+
 		#ifdef USEDEBUG
 			residualsPlot[i]->Print("V");
 		#endif
@@ -520,8 +558,12 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		// Draw plots on correspondent pads
 		canvas[i]->cd(1);
 		spectraPlot[i]->Draw();
+//		gStyle->SetAxisColor(kGreen);
+//		gPad->RedrawAxis();
+
 		canvas[i]->cd(2);
 		residualsPlot[i]->Draw();
+
 		canvas[i]->SetEditable(kFALSE);
 		canvas[i]->Modified();
 		canvas[i]->Update();

@@ -38,7 +38,7 @@ RooAbsPdf* TwoExpProvider::initPdf(int i) {
     RooFormulaVar* intExp2Norm = new RooFormulaVar("intExp2Norm", "@0/100", *Int_exp2);
 
     // Instantinate model
-    return new TwoExpPdf("twoExp", "two exponential pdf", *observable, *tau1Ch, *tau2Ch, *intExp2Norm);
+    return new TwoExpPdf("twoExp", "Two exponential decay", *observable, *tau1Ch, *tau2Ch, *intExp2Norm);
 }
 
 RooArgSet* TwoExpProvider::getIndirectParameters(RooAbsPdf* pdf){
