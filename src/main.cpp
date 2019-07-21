@@ -49,7 +49,7 @@
 #include <TMatrixD.h>
 #include <TCollection.h>
 #include <TIterator.h>
-#include "RooWorkspace.h"
+#include <RooWorkspace.h>
 
 #include "model/Constants.h"
 #include "model/ParametersPool.h"
