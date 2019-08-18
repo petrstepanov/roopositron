@@ -29,6 +29,7 @@ public:
     static std::vector<std::string> getFilenamesInCurrentDrectory(const char* extension);
     static TH1F* importTH1F(std::string filename, int i);
     static void createDirectory(std::string directoryName);
+    static void savePlotsToFile(RooPlot* spectrumPlot, RooPlot* residualsPlot, const char* fileName,  RooRealVar* observable);
     
 private:
     std::string getCurrentPath();

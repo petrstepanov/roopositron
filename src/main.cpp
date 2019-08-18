@@ -613,70 +613,10 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 	// TODO: move to FileUtils
 	for (unsigned i = 0; i < spectra.size(); i++) {
-		std::pair<TMatrixD,TList*> spectrumMatrixAndHeader = RootHelper::rooPlotToMatrix(channels, spectraPlot[i]);
-		std::pair<TMatrixD,TList*> residualsMatrixAndHeader = RootHelper::rooPlotToMatrix(channels, residualsPlot[i]);
-		TMatrixD spectrumMatrix = (spectrumMatrixAndHeader.first);
-		TMatrixD residualsMatrix = (residualsMatrixAndHeader.first);
-
-		Int_t numberOfRows = TMath::Min(spectrumMatrix.GetNrows(), residualsMatrix.GetNrows());
-		Int_t numberOfColumns = spectrumMatrix.GetNcols() + residualsMatrix.GetNcols();
-
-		TMatrixD matrix(numberOfRows, numberOfColumns);
-		for (Int_t j=0; j<numberOfRows; j++){
-			for (Int_t i=0; i<numberOfColumns; i++){
-				if (i<spectrumMatrix.GetNcols()){
-					matrix(j,i) = spectrumMatrix(j,i);
-				}
-				else {
-					matrix(j,i) = residualsMatrix(j,i-spectrumMatrix.GetNcols());
-				}
-			}
-		}
-		TString dataFilename = TString::Format("./%s-%s/data-%s-%s-%d.txt", (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
+		TString fileName = TString::Format("./%s-%s/data-%s-%s-%d.txt", (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
 				constants->getResolutionFunctionModel(), (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
 				constants->getResolutionFunctionModel(), i + 1);
-
-		std::ofstream outputFile;
-		outputFile.open(dataFilename.Data());
-
-		// Print header names to file
-		std::string delimeter = StringUtils::unescape(constants->getDelimeter());
-		TList* columnNames = new TList();
-		columnNames->AddAll(spectrumMatrixAndHeader.second);
-		columnNames->AddAll(residualsMatrixAndHeader.second);
-//		TIterator* it = columnNames->MakeIterator();
-//		while (TObject* temp = it->Next()) {
-//			if (TObjString* str = dynamic_cast<TObjString*>(temp)){
-//				if (it != columnNames->end()){
-//					outputFile << (str->String()).Data() << delimeter.c_str();
-//				} else {
-//					outputFile << (str->String()).Data();
-//				}
-//			}
-//		}
-		for (Int_t i=0; i<columnNames->GetSize(); i++){
-			TObject* object = columnNames->At(i);
-			if (TObjString* str = dynamic_cast<TObjString*>(object)){
-				outputFile << (str->String()).Data();
-			}
-			if (i != columnNames->GetSize()-1){
-				outputFile << delimeter.c_str();
-			}
-		}
-
-		outputFile << std::endl;
-
-		// Print matrix to file
-		for (Int_t j=0; j<numberOfRows; j++){
-			for (Int_t i=0; i<numberOfColumns; i++){
-				if (i != numberOfColumns-1){
-					outputFile << matrix(j,i) << delimeter.c_str();
-				} else {
-					outputFile << matrix(j,i);
-				}
-			}
-			outputFile << std::endl;
-		}
+		FileUtils::savePlotsToFile(spectraPlot[i], residualsPlot[i], fileName.Data(), channels);
 	}
 	stopWatch->Print();
 

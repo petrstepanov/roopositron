@@ -138,7 +138,8 @@ RooAbsPdf* ReverseAddPdf::add(RooArgList* pdfList, RooRealVar* observable, const
 		// I_i = [I4, I3, I2]
 		const char* componentName = pdfInverseList->at(i)->GetName();
 		const char* componentTitle = pdfInverseList->at(i)->GetTitle();
-		RooRealVar* I = new RooRealVar(TString::Format("Int_%s", componentName), TString::Format("Intensity of %s", componentTitle), 20, 0, 100, "%");
+		Double_t defaultIntensity = 100. / (Double_t) pdfList->getSize();
+		RooRealVar* I = new RooRealVar(TString::Format("Int_%s", componentName), TString::Format("Intensity of %s", componentTitle), defaultIntensity, 0, 100, "%");
 		RooFormulaVar* INorm = new RooFormulaVar(TString::Format("Int_%s_norm", componentName), TString::Format("Intensity of %s, normalized", componentTitle), "@0/100", *I);
 		I_i->add(*INorm);
 	}

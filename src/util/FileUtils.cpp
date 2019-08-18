@@ -23,8 +23,9 @@
 #include "TMath.h"
 #include "TMatrixD.h"
 #include "../model/Constants.h"
-#include "../util/StringUtils.h"
-#include "../util/Debug.h"
+#include "StringUtils.h"
+#include "RootHelper.h"
+#include "Debug.h"
 
 TH1F* FileUtils::importTH1F(std::string filename, int i) {
 	Constants* constants = Constants::getInstance();
@@ -105,4 +106,70 @@ std::vector<std::string> FileUtils::getFilenamesInCurrentDrectory(const char* ex
 		}
 	}
 	return lFileNames;
+}
+
+void FileUtils::savePlotsToFile(RooPlot* spectrumPlot, RooPlot* residualsPlot, const char* fileName, RooRealVar* observable){
+	std::pair<TMatrixD,TList*> spectrumMatrixAndHeader = RootHelper::rooPlotToMatrix(observable, spectrumPlot);
+	std::pair<TMatrixD,TList*> residualsMatrixAndHeader = RootHelper::rooPlotToMatrix(observable, residualsPlot);
+	TMatrixD spectrumMatrix = (spectrumMatrixAndHeader.first);
+	TMatrixD residualsMatrix = (residualsMatrixAndHeader.first);
+
+	Int_t numberOfRows = TMath::Min(spectrumMatrix.GetNrows(), residualsMatrix.GetNrows());
+	Int_t numberOfColumns = spectrumMatrix.GetNcols() + residualsMatrix.GetNcols();
+
+	TMatrixD matrix(numberOfRows, numberOfColumns);
+	for (Int_t j=0; j<numberOfRows; j++){
+		for (Int_t i=0; i<numberOfColumns; i++){
+			if (i<spectrumMatrix.GetNcols()){
+				matrix(j,i) = spectrumMatrix(j,i);
+			}
+			else {
+				matrix(j,i) = residualsMatrix(j,i-spectrumMatrix.GetNcols());
+			}
+		}
+	}
+
+	std::ofstream outputFile;
+	outputFile.open(fileName);
+
+	// Print header names to file
+	Constants* constants = Constants::getInstance();
+	std::string delimeter = StringUtils::unescape(constants->getDelimeter());
+
+	TList* columnNames = new TList();
+	columnNames->AddAll(spectrumMatrixAndHeader.second);
+	columnNames->AddAll(residualsMatrixAndHeader.second);
+//		TIterator* it = columnNames->MakeIterator();
+//		while (TObject* temp = it->Next()) {
+//			if (TObjString* str = dynamic_cast<TObjString*>(temp)){
+//				if (it != columnNames->end()){
+//					outputFile << (str->String()).Data() << delimeter.c_str();
+//				} else {
+//					outputFile << (str->String()).Data();
+//				}
+//			}
+//		}
+	for (Int_t i=0; i<columnNames->GetSize(); i++){
+		TObject* object = columnNames->At(i);
+		if (TObjString* str = dynamic_cast<TObjString*>(object)){
+			outputFile << (str->String()).Data();
+		}
+		if (i != columnNames->GetSize()-1){
+			outputFile << delimeter.c_str();
+		}
+	}
+
+	outputFile << std::endl;
+
+	// Print matrix to file
+	for (Int_t j=0; j<numberOfRows; j++){
+		for (Int_t i=0; i<numberOfColumns; i++){
+			if (i != numberOfColumns-1){
+				outputFile << matrix(j,i) << delimeter.c_str();
+			} else {
+				outputFile << matrix(j,i);
+			}
+		}
+		outputFile << std::endl;
+	}
 }
