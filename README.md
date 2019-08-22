@@ -1,5 +1,6 @@
-# positronfit
-Positron lifetime fitting software
+# rooPositron
+
+Terminal-based positron lifetime fitting software.
 
 Program is written in object-oriented C++ using CERN ROOT libraries. Fitting is performed via RooFit package functionality.
 
