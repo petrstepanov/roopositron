@@ -1,6 +1,6 @@
 # RooPositron
 
-Terminal-based positron lifetime fitting software.
+A flexible terminal-based positron lifetime fitting software. Supports integration of custom models.
 
 Program is written in object-oriented C++ using CERN ROOT libraries. Fitting is performed via RooFit package functionality.
 
@@ -12,4 +12,4 @@ Following fitting models are supported:
 
 Multiple spectra with various channel width can be fitted simultaneously.
 
-
+User manual is under construction.
