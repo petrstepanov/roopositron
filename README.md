@@ -1,4 +1,4 @@
-# rooPositron
+# RooPositron
 
 Terminal-based positron lifetime fitting software.
 
