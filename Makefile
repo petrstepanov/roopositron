@@ -12,7 +12,7 @@ OBJ_DIR=build
 BIN_DIR=dist
 
 # Replace with your application name
-APP_NAME=positronfit
+APP_NAME=roopositron
 
 DICT_NAME=$(APP_NAME)-dictionary
 DICT_FILENAME=$(DICT_NAME).cxx             # app-dictionary.cxx
@@ -41,6 +41,11 @@ SHARED_LIBRARY_DS=$(APP_NAME)-library.so.dSYM   # .so debug symbols (generated o
 
 # convenience variable for making directories
 dir_guard=@mkdir -p $(@D)
+
+# for 'install' target PREFIX is environment variable, but if it is not set, then set default value
+ifeq ($(PREFIX),)
+    PREFIX := /usr/local
+endif
 
 # Empty target ensures that list of all 'end products' are called
 all: release
@@ -117,5 +122,11 @@ ifeq ($(OS),Darwin)
 	mv $(SHARED_LIBRARY_DS) $(BIN_DIR)/$(SHARED_LIBRARY_DS)
 endif
 
+install:
+	install -d $(DESTDIR)$(PREFIX)/bin/
+	install -m 755 $(EXECUTABLE) $(DESTDIR)$(PREFIX)/bin/
+	install -m 755 $(BIN_DIR)/$(SHARED_LIBRARY) $(DESTDIR)$(PREFIX)/bin/
+	install -m 755 $(BIN_DIR)/$(DICT_PCM_FILENAME) $(DESTDIR)$(PREFIX)/bin/
+
 # List of special targets that do not generate files
-.PHONY: clean directories move_files move_debug_symbols echo
+.PHONY: clean directories move_files move_debug_symbols echo install
