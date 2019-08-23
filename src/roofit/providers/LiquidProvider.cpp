@@ -38,7 +38,7 @@ RooAbsPdf* LiquidProvider::initPdf(int i) {
 //	RooAbsReal& _l2g,            // Two-gamma annihilation rate of p-Ps
 //	RooAbsReal& _chW);
 
-	RooRealVar* Pqf = new RooRealVar("Pqf", "Probability of forming qf-Ps", 0.5, 0, 1, "");
+	RooRealVar* Pqf = new RooRealVar("P_qf", "Probability of forming qf-Ps", 0.5, 0, 1, "");
 	RooRealVar* lb = new RooRealVar("#lambda_b", " Transformation rate of qf-Ps in to Ps", 1, 1E-3, 1E3, "1/ns");
 	RooRealVar* lqf = new RooRealVar("#lambda_qf", "Annihilation rate of qf-Ps", 1, 1E-3, 1E3, "1/ns");
 	RooRealVar* lplus = new RooRealVar("#lambda_+", "Annihilation rate of solvated positron", 1, 1E-3, 1E3, "1/ns");
@@ -68,7 +68,7 @@ RooArgSet* LiquidProvider::getIndirectParameters(RooAbsPdf* pdf){
     // pdf parameters might have suffixed names so we account on that
     // for "Int_exp2" we pull "Int_exp2_##" as well
 
-	RooRealVar* Pqf = RootHelper::getParameterByNameCommonOrLocal(pdf, "Pqf");
+	RooRealVar* Pqf = RootHelper::getParameterByNameCommonOrLocal(pdf, "P_qf");
 	RooRealVar* lb = RootHelper::getParameterByNameCommonOrLocal(pdf, "#lambda_b");
 	RooRealVar* lplus = RootHelper::getParameterByNameCommonOrLocal(pdf, "#lambda_+");
 	RooRealVar* lpo = RootHelper::getParameterByNameCommonOrLocal(pdf, "#lambda_po");
