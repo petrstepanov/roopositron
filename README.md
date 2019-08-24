@@ -20,7 +20,7 @@ Multiple spectra with various channel width can be fitted simultaneously.
 
 ```
 make
-make install
+sudo make install
 ```
 
 ## Installation on Windows
