@@ -30,6 +30,8 @@ const Double_t GraphicsHelper::MARKER_SIZE = 0.3;
 const Double_t GraphicsHelper::LEGEND_LINE_HEIGHT = 0.0248;
 const Style_t GraphicsHelper::COLORS[16] = {kGray, kOrange + 1, kSpring - 5, kAzure + 8, kPink + 1, kViolet - 4, kRed - 7, kViolet + 6};
 
+const char* GraphicsHelper::ATTR_IS_PRINTED = "attrIsPrinted";
+
 Double_t GraphicsHelper::getSpectrumPadFontFactor(){
 	return 0.5/(1-RESIDUALS_PAD_RELATIVE_HEIGHT);
 }
@@ -50,38 +52,60 @@ void GraphicsHelper::drawRegion(RooPlot* frame, Int_t xMin, Int_t xMax) {
 	Debug("GraphicsHelper::drawRegion", "xMin: " << xMin << ", xMax: " << xMax << "yMin: " << yMin << ", yMax: " << yMax);
 }
 
-void GraphicsHelper::printVariable(Int_t sigDigits, const char* options, Int_t& currentLine, RooAbsArg* rooAbsArg, TPaveText* box, RooArgList* paramsList) {
+void GraphicsHelper::printVariable(Int_t sigDigits, const char* options, Int_t& currentLine, RooAbsArg* rooAbsArg, TPaveText* box) {
+	// Debug what are we printing
+	#ifdef USEDEBUG
+		std::cout << "GraphicsHelper::printVariable" << std::endl;
+		rooAbsArg->Print();
+	#endif
+
+	// Don't print variable that was printed before
+	if (rooAbsArg->getAttribute(ATTR_IS_PRINTED) == kTRUE) return;
+
 	if (RooRealVar* var = dynamic_cast<RooRealVar*>(rooAbsArg)){
 		TString* formatted = var->format(sigDigits, options);
 		const char* formattedString = formatted->Data();
 
-		Bool_t notConstant = !var->isConstant();
+		Bool_t isConstant = var->isConstant();
 		Bool_t atMaximum = var->getVal() + var->getError() > var->getMax();
 		Bool_t atMinimum = var->getVal() - var->getError() < var->getMin();
-		if (notConstant && (atMaximum || atMinimum)){
+
+		#ifdef USEDEBUG
+			std::cout << "GraphicsHelper::printVariable" << std::endl;
+			std::cout << var->GetName() << "; constant " << isConstant << "; atMinimum " << atMinimum << "; atMaximum " << atMaximum << std::endl;
+		#endif
+
+		if (!isConstant && (atMaximum || atMinimum)){
 			TText* t = box->AddText(TString::Format("%s (at limit)", formattedString).Data());
 			t->SetTextColor(kOrange+8);
 		} else {
 			box->AddText(formattedString);
 		}
-		paramsList->remove(*var);
+		// Mark variable as printed
+		rooAbsArg->setAttribute(ATTR_IS_PRINTED, kTRUE);
 		currentLine++;
-		Debug("GraphicsHelper::printVariable", var->GetName() << "; notConstant " << notConstant << "; atMaximum " << atMaximum << "; atMinimum " << atMinimum);
 	}
 	else if (RooFormulaVar* var = dynamic_cast<RooFormulaVar*>(rooAbsArg)){
+		#ifdef USEDEBUG
+			std::cout << "GraphicsHelper::printVariable" << std::endl;
+			std::cout << var->GetName() << std::endl;
+		#endif
 		TString fmt("%s = %.#f (indirect)");
 		fmt.ReplaceAll("#", TString::Format("%d", sigDigits).Data());
 		TString formatted = TString::Format(fmt.Data(), var->GetName(), var->evaluate());
 		const char* formattedString = formatted.Data();
 		TText* t = box->AddText(formattedString);
 		t->SetTextColor(kGray+1);
-		paramsList->remove(*var);
+		// Mark variable as printed
+		rooAbsArg->setAttribute(ATTR_IS_PRINTED, kTRUE);
 		currentLine++;
-		Debug("GraphicsHelper::printVariable", var->GetName());
 	}
 }
 
 TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, Double_t xmax, Double_t ymax) {
+
+	std::cout << "GraphicsHelper::makePaveText" << std::endl;
+	params.Print("V");
 
 	Bool_t showConstants = kTRUE;
 	const char* options = "NEULP";
@@ -119,21 +143,21 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 	Int_t sigDigits = 0;
 	// Print "bins", "integral" and "background" variables first
 	if (RooAbsArg* var = RootHelper::findArgNameSubstring(paramsList, "bins")) {
-		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
+		printVariable(sigDigits, options, linesNumber, var, box);
 	}
 
 	if (RooAbsArg* var = RootHelper::findArgNameSubstring(paramsList, "integral")) {
-		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
+		printVariable(sigDigits, options, linesNumber, var, box);
 	}
 
 	sigDigits = 3;
 	if (RooAbsArg* var = RootHelper::findArgNameSubstring(paramsList, "background")) {
-		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
+		printVariable(sigDigits, options, linesNumber, var, box);
 	}
 
 	sigDigits = 5;
 	if (RooAbsArg* var = RootHelper::findArgNameSubstring(paramsList, "channelWidth")) {
-		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
+		printVariable(sigDigits, options, linesNumber, var, box);
 	}
 
 	// Add horizontal rule
@@ -143,8 +167,9 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 
 	sigDigits = 3;
 	// Print source contribution related variables
-	while (RooAbsArg* var = RootHelper::findArgNameSubstring(paramsList, "ource")) {
-		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
+	RooArgList* sourceVarsList = RootHelper::findArgsNameSubstring(paramsList, "ource");
+	for (auto arg : *sourceVarsList) {
+		printVariable(sigDigits, options, linesNumber, arg, box);
 	}
 
 	// Add horizontal rule
@@ -153,8 +178,9 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 	linesNumber++;
 
 	// Print resolution function related variables
-	while (RooAbsArg* var = RootHelper::findArgNameSubstring(paramsList, "gauss")) {
-		printVariable(sigDigits, options, linesNumber, var, box, paramsList);
+	RooArgList* gaussVarsList = RootHelper::findArgsNameSubstring(paramsList, "gauss");
+	for (auto arg : *gaussVarsList) {
+		printVariable(sigDigits, options, linesNumber, arg, box);
 	}
 
 	// Add horizontal rule
@@ -166,8 +192,9 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 	pIter = paramsList->createIterator();
 	while (TObject* obj = pIter->Next()) {
 		if (RooAbsArg* var = dynamic_cast<RooAbsArg*>(obj)){
+
 			//if (realVar->isConstant() && !showConstants) continue;
-			printVariable(sigDigits, options, linesNumber, var, box, paramsList);
+			printVariable(sigDigits, options, linesNumber, var, box);
 		}
 	}
 
@@ -180,6 +207,16 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 		Debug("GraphicsHelper::makePaveText", "line at: " << *it << "; total lines: " << linesNumber);
 		Double_t y = ((Double_t)*it + 0.5)/(Double_t)linesNumber;
 		box->AddLine(0, 1-y, 1, 1-y);
+	}
+
+	// Remove printed flags
+	pIter = params.createIterator();
+	while (TObject* obj = pIter->Next()) {
+		if (RooAbsArg* var = dynamic_cast<RooAbsArg*>(obj)){
+			if (var->getAttribute(ATTR_IS_PRINTED) == kTRUE){
+				var->setAttribute(ATTR_IS_PRINTED, kFALSE);
+			}
+		}
 	}
 
 	delete pIter;

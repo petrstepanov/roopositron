@@ -43,7 +43,8 @@ public:
 	static Double_t getResidualsPadFontFactor();
 
 private:
-	static void printVariable(Int_t sigDigits, const char* options, Int_t& currentLine, RooAbsArg* rooAbsReal, TPaveText* box, RooArgList* paramsList);
+	static void printVariable(Int_t sigDigits, const char* options, Int_t& currentLine, RooAbsArg* rooAbsReal, TPaveText* box);
+	static const char* ATTR_IS_PRINTED;
 };
 
 #endif /* GRAPHICSHELPER_H */

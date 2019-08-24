@@ -171,6 +171,22 @@ RooAbsArg* RootHelper::findArgNameSubstring(RooAbsCollection* list, const char* 
 	return NULL;
 }
 
+// Finds RooRealVar in list by a name substring and with certain attribute value
+RooArgList* RootHelper::findArgsNameSubstring(RooAbsCollection* list, const char* nameSubstring) {
+	RooArgList* argsList = new RooArgList();
+	TIterator* it = list->createIterator();
+	while (TObject* temp = it->Next()) {
+		if (RooAbsArg* rooAbsArg = dynamic_cast<RooAbsArg*>(temp)) {
+			const char* name = rooAbsArg->GetName();
+			if (StringUtils::isSubstring(name, nameSubstring)) {
+				argsList->add(*rooAbsArg);
+			}
+		}
+	}
+	return argsList;
+}
+
+
 // Makes data points - a pair of Matrix (ascii columns) with column captions TList (TString)
 std::pair<TMatrixD,TList*> RootHelper::rooPlotToMatrix(RooRealVar* axis, RooPlot* plot){
 	Int_t numberOfColumns = 1; // originally we have one column just for channels
