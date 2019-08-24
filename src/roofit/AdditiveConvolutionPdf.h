@@ -30,7 +30,19 @@ public:
     void constructModel();
 
     RooAbsPdf* getPdf();
+
     
+    static const char* VAR_BINS_NAME;
+    static const char* VAR_INTEGRAL_NAME;
+    static const char* VAR_INT_SOURCE_NAME;
+    static const char* PDF_SOURCE_NAME;
+    static const char* PDF_MATERIAL_NAME;
+    static const char* VAR_BACKGROUND_COUNT_NAME;
+    static const char* PDF_BACKGROUND_NAME;
+    static const char* PDF_NON_CONVOLUTED_NAME;
+    static const char* PDF_RESOLUTION_FUNCTION_NAME;
+    static const char* PDF_CONVOLUTED_NAME;
+
 private:
     void initComponents(std::vector<std::string> componentIds, int sourceComponents);
     void initResolutionModel(const char* resolutionId);

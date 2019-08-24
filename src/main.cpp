@@ -31,6 +31,7 @@
 #include <RooDecay.h>
 #include <RooPlot.h>
 #include <RooHist.h>
+#include <RooFFTConvPdf.h>
 #include <TBrowser.h>
 #include <TRandom.h>
 #include <TApplication.h>
@@ -81,6 +82,7 @@ typedef std::pair<std::string, RooDataHist*> dhistPair;
 struct Spectrum {
 	TString filename;
 	TH1F* histogram;              // ROOT histogram
+//	TH1F* histogramMaterial;      // Spectrum minus background and source contribution
 	RooDataHist* dataHistogram;   // RooFit histogram
 	Double_t integral;            // total counts
 	Int_t numberOfBins;
@@ -129,7 +131,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		Spectrum s;
 		s.filename = TString(filenames[i].c_str());
 		s.histogram = FileUtils::importTH1F(filenames[i], i);
-		s.dataHistogram = new RooDataHist(TString::Format("dataHistogram_%d", i + 1), s.filename.Data(), RooArgSet(*channels), RooFit::Import(*(s.histogram)));
+		s.dataHistogram = new RooDataHist(TString::Format("dataHistogram_%d", i + 1), s.filename.Data(), RooArgList(*channels), s.histogram);
 		s.numberOfBins = s.histogram->GetXaxis()->GetNbins();
 		s.integral = s.histogram->Integral();
 		s.binWithMinimumCount = s.histogram->GetMinimumBin();
@@ -170,16 +172,16 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			RootHelper::setRooRealVarValueLimits(gaussMean, spectra[i].binWithMaximumCount, spectra[i].binWithMaximumCount - 50, spectra[i].binWithMaximumCount + 50);
 		}
 		// Set average background counts
-		if (RooRealVar* avgBgCount = RootHelper::getParameterByNameCommonOrLocal(spectra[i].model, "background")) {
+		if (RooRealVar* avgBgCount = RootHelper::getParameterByNameCommonOrLocal(spectra[i].model, AdditiveConvolutionPdf::VAR_BACKGROUND_COUNT_NAME)) {
 			RootHelper::setRooRealVarValueLimits(avgBgCount, spectra[i].averageBackground, spectra[i].averageBackground/2, spectra[i].averageBackground*2);
 		}
 		// Set bins
-		if (RooRealVar* bins = RootHelper::getParameterByNameCommonOrLocal(spectra[i].model, "bins")) {
+		if (RooRealVar* bins = RootHelper::getParameterByNameCommonOrLocal(spectra[i].model, AdditiveConvolutionPdf::VAR_BINS_NAME)) {
 			RootHelper::setRooRealVarValueLimits(bins, spectra[i].numberOfBins, spectra[i].numberOfBins, spectra[i].numberOfBins);
 			bins->setConstant(kTRUE);
 		}
 		// Set full integral
-		if (RooRealVar* fullIntegral = RootHelper::getParameterByNameCommonOrLocal(spectra[i].model, "integral")) {
+		if (RooRealVar* fullIntegral = RootHelper::getParameterByNameCommonOrLocal(spectra[i].model, AdditiveConvolutionPdf::VAR_INTEGRAL_NAME)) {
 			RootHelper::setRooRealVarValueLimits(fullIntegral, spectra[i].integral, spectra[i].integral, spectra[i].integral);
 			fullIntegral->setConstant(kTRUE);
 		}
@@ -347,7 +349,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		spectraPlot[i]->GetXaxis()->SetRangeUser(0, BINS);
 
 		// Instantinate legend with empty first line
-		TLegend* legend = new TLegend(/*x1*/ GraphicsHelper::LEGEND_XMIN-0.22, /*y1*/ 1-0.1-0.3, /*x2*/ GraphicsHelper::LEGEND_XMIN, /*y2*/ 1-0.1);
+		TLegend* legend = new TLegend(/*x1*/ GraphicsHelper::LEGEND_XMIN-0.34, /*y1*/ 1-0.1-0.3, /*x2*/ GraphicsHelper::LEGEND_XMIN, /*y2*/ 1-0.1);
 		legend->SetTextSize(GraphicsHelper::FONT_SIZE_SMALL);
 		legend->SetTextFont(GraphicsHelper::FONT_TEXT);
 		legend->SetBorderSize(0);
@@ -359,13 +361,13 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		legend->AddEntry(spectraPlot[i]->getHist("data"), "Experimental spectrum", "lep");
 
 		// Draw Resolution Function
-		RooAbsPdf* resolutionFunction = RootHelper::getComponentNameContains(spectra[i].model, "pdfResolution");
+		RooAbsPdf* resolutionFunction = RootHelper::getComponentNameContains(spectra[i].model, AdditiveConvolutionPdf::PDF_RESOLUTION_FUNCTION_NAME);
 		resolutionFunction->plotOn(spectraPlot[i], RooFit::LineStyle(kSolid), RooFit::LineColor(kGray + 1), RooFit::LineWidth(1), RooFit::Name("resolution"));
 		legend->AddEntry(spectraPlot[i]->getCurve("resolution"), "Resolution function", "l");
 
 		// Draw components. Problem: RooFFTConvPdf does not print components
 		// Only print components that have "drawOnRooPlot" attribute set
-		RooAbsPdf* modelNonConvoluted = RootHelper::getComponentNameContains(spectra[i].model, "modelNonConvoluted");
+		RooAbsPdf* modelNonConvoluted = RootHelper::getComponentNameContains(spectra[i].model, AdditiveConvolutionPdf::PDF_NON_CONVOLUTED_NAME);
 		TIterator* it = modelNonConvoluted->getComponents()->createIterator();
 		Int_t colorIndex = 0;
 		while (TObject* temp = it->Next()) {
@@ -377,6 +379,38 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 					legend->AddEntry(spectraPlot[i]->getCurve(component->GetName()), legendTitle.c_str(), "l");
 				}
 			}
+		}
+
+		{
+			// Obtain: background + source contribution * resolution function
+			RooAbsPdf* bgPdf = RootHelper::getComponentNameContains(spectra[i].model, AdditiveConvolutionPdf::PDF_BACKGROUND_NAME);
+			RooRealVar* bgCount = RootHelper::getParameterNameContains(spectra[i].model, AdditiveConvolutionPdf::VAR_BACKGROUND_COUNT_NAME);
+			RooRealVar* bins = RootHelper::getParameterNameContains(spectra[i].model, AdditiveConvolutionPdf::VAR_BINS_NAME);
+			RooRealVar* integral = RootHelper::getParameterNameContains(spectra[i].model, AdditiveConvolutionPdf::VAR_INTEGRAL_NAME);
+			Double_t intBg = bgCount->getVal() * bins->getVal() / integral->getVal();
+			RooAbsPdf* sourcePdf = RootHelper::getComponentNameContains(spectra[i].model, AdditiveConvolutionPdf::PDF_SOURCE_NAME);
+			Double_t intSource = RootHelper::getParameterNameContains(spectra[i].model, AdditiveConvolutionPdf::VAR_INT_SOURCE_NAME)->getVal()/100;
+
+			// Add background
+			Double_t bgFraction = intBg/(intBg + (1-intBg)*intSource); // Background fraction with respect to source contribution
+			RooRealVar* bgFractionVar = new RooRealVar(TString::Format("bgFractionVar%d", i).Data(), "Background fraction with respect to source contribution", bgFraction);
+			RooAddPdf* sourceAndBgPdf = new RooAddPdf(TString::Format("sBgPdf%d", i).Data(), "Source contribution with background", *bgPdf, *sourcePdf, *bgFractionVar);
+			sourceAndBgPdf->fixAddCoefNormalization(RooArgSet(*channels));
+
+			// Convolute source contribution with resolution function
+			RooFFTConvPdf* sourceAndBgConvolutedPdf = new RooFFTConvPdf(TString::Format("scp%d", i).Data(), "Source Convoluted PDF", *channels, *sourceAndBgPdf, *resolutionFunction);
+
+			Double_t normalization = intBg + (1-intBg)*intSource;
+			// sourceAndBgConvolutedPdf->plotOn(spectraPlot[i], RooFit::LineColor(kGray+1), RooFit::LineStyle(kDashed), RooFit::LineWidth(2), RooFit::Name("sourceAndBgConv"), RooFit::Normalization(normalization, RooAbsReal::Relative));
+			sourceAndBgConvolutedPdf->plotOn(spectraPlot[i], RooFit::Invisible(), RooFit::LineStyle(kDashed), RooFit::LineWidth(1), RooFit::Name("sourceAndBgConv"), RooFit::Normalization(normalization, RooAbsReal::Relative));
+			// legend->AddEntry(spectraPlot[i]->getCurve("sourceAndBgConv"), "Source contribution and Background (convoluted)", "l");
+
+			// Next subtract that curve from the hist?
+			const char* histMaterialName = TString::Format("%sMaterial", spectra[i].histogram->GetName()).Data();
+			TH1F* materialHist = HistProcessor::subtractCurve(histMaterialName, spectra[i].histogram, spectraPlot[i]->getCurve("sourceAndBgConv"));
+			RooDataHist* materialDataHist = new RooDataHist(TString::Format("materialDataHist_%d", i + 1), "Material data histogram", RooArgList(*channels), materialHist);
+			materialDataHist->plotOn(spectraPlot[i], RooFit::LineWidth(0), RooFit::MarkerSize(GraphicsHelper::MARKER_SIZE), RooFit::MarkerColor(kGray), RooFit::Name("material"));
+			legend->AddEntry(spectraPlot[i]->getHist("material"), "Spectrum without source contribution and bg", "lep");
 		}
 
 		// Draw fitting model
@@ -501,7 +535,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			HistProcessor::setZeroErrors(hresid1);
 			HistProcessor::setZeroErrors(hresid2);
 		} else {
-			hresid[i] = spectraPlot[i]->pullHist();
+			hresid[i] = spectraPlot[i]->pullHist("data", "fit");
 			hresid[i]->SetMarkerSize(GraphicsHelper::MARKER_SIZE);
 			residualsPlot[i]->addPlotable(hresid[i], "P");
 			Debug("main", "hresid[" << i << "] draw option: " << hresid[i]->GetDrawOption());

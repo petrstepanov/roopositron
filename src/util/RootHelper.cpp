@@ -129,7 +129,6 @@ RooAbsPdf* RootHelper::getComponentByNameCommonOrLocal(RooAbsPdf* pdf, const cha
 	return NULL;
 }
 
-
 // Deprecated, use getParameterByNameCommonOrLocal()
 RooRealVar* RootHelper::getParameterNameContains(RooAbsPdf* pdf, const char* nameSubstring){
 	RooArgSet* parameters = pdf->getParameters(RooArgSet());

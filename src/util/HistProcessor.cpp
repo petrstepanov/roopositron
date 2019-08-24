@@ -46,3 +46,24 @@ void HistProcessor::setZeroErrors(RooHist* h){
 		h->SetPointEYlow(i, 0);
 	}
 }
+
+TH1F* HistProcessor::subtractCurve(const char *newname, TH1F* hist, RooCurve* curve){
+	Double_t xMin = hist->GetXaxis()->GetXmin();
+	Double_t xMax = hist->GetXaxis()->GetXmax();
+	Double_t nBins = hist->GetXaxis()->GetNbins();
+
+//        RootHelper::deleteObject("histMinusCurve");
+	TH1F* histMinusCurve = new TH1F(newname, "Histogram minus curve", nBins, xMin, xMax);
+	for (int i = 1; i <= nBins; i++){
+		Double_t bg = (curve == NULL) ? 0.0 : curve->Eval(hist->GetXaxis()->GetBinCenter(i));
+		if (hist->GetBinContent(i) - bg >= 0) {
+			histMinusCurve->SetBinContent(i, hist->GetBinContent(i) - bg);
+			histMinusCurve->SetBinError(i, hist->GetBinError(i));
+		}
+		else {
+			histMinusCurve->SetBinContent(i, 0);
+			histMinusCurve->SetBinError(i, 0);
+		}
+	}
+	return histMinusCurve;
+}
