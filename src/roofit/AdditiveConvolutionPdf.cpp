@@ -51,18 +51,19 @@ AdditiveConvolutionPdf::AdditiveConvolutionPdf(std::vector<std::string> componen
 AdditiveConvolutionPdf::~AdditiveConvolutionPdf() {
 }
 
+const char* AdditiveConvolutionPdf::VAR_MEAN_GAUSS_NAME = "meanGauss";
 const char* AdditiveConvolutionPdf::VAR_BINS_NAME = "bins";
 const char* AdditiveConvolutionPdf::VAR_INTEGRAL_NAME = "integral";
 const char* AdditiveConvolutionPdf::VAR_INT_SOURCE_NAME = "Int_source";
-const char* AdditiveConvolutionPdf::PDF_SOURCE_NAME = "pdfSource";
-const char* AdditiveConvolutionPdf::PDF_MATERIAL_NAME = "pdfMaterial";
+const char* AdditiveConvolutionPdf::PDF_SOURCE_NAME = "sourcePdf";
+const char* AdditiveConvolutionPdf::PDF_MATERIAL_NAME = "materialPdf";
 
 const char* AdditiveConvolutionPdf::VAR_BACKGROUND_COUNT_NAME = "background";
-const char* AdditiveConvolutionPdf::PDF_BACKGROUND_NAME = "bg";
+const char* AdditiveConvolutionPdf::PDF_BACKGROUND_NAME = "backgroundPdf";
 
-const char* AdditiveConvolutionPdf::PDF_NON_CONVOLUTED_NAME = "modelNonConvoluted";
-const char* AdditiveConvolutionPdf::PDF_RESOLUTION_FUNCTION_NAME = "pdfResolution";
-const char* AdditiveConvolutionPdf::PDF_CONVOLUTED_NAME = "model";
+const char* AdditiveConvolutionPdf::PDF_NON_CONVOLUTED_NAME = "modelNonConvolutedPdf";
+const char* AdditiveConvolutionPdf::PDF_RESOLUTION_FUNCTION_NAME = "resolutionPdf";
+const char* AdditiveConvolutionPdf::PDF_CONVOLUTED_NAME = "modelConvolutedPdf";
 
 void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentIds, int sourceComponents) {
 	Debug("AdditiveConvolutionPdf::initComponents")
@@ -131,20 +132,20 @@ void AdditiveConvolutionPdf::initResolutionModel(const char* resolutionId) {
 
 void AdditiveConvolutionPdf::constructModel() {
 	// Sum theoretical components
-	RooAbsPdf* sumMaterialComponents = ReverseAddPdf::add(componentsList, observable, PDF_MATERIAL_NAME);
 	TIterator* it = componentsList->createIterator();
 	while(TObject* object = it->Next()){
 		if (RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(object)){
 			pdf->setAttribute("drawOnRooPlot", kTRUE);
 		}
 	}
+	RooAbsPdf* sumMaterialComponents = ReverseAddPdf::add(componentsList, observable, PDF_MATERIAL_NAME);
 
 	// Source contribution
 	RooRealVar* Int_source = new RooRealVar(VAR_INT_SOURCE_NAME, "Source contribution", 11, 5, 20, "%");
 	RooFormulaVar* Int_sourceNorm = new RooFormulaVar("Int_sourceNorm", "@0/100", *Int_source);
 	RooAbsPdf* sumSourceComponents = ReverseAddPdf::add(sourceComponentsList, observable);
 	sumSourceComponents->SetName(PDF_SOURCE_NAME);
-	sumSourceComponents->SetTitle("Source contribution");
+	sumSourceComponents->SetTitle("Source contribution PDF");
 	sumSourceComponents->setAttribute("drawOnRooPlot", kTRUE);
 
 	// Flat background

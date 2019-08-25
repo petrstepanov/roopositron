@@ -1,4 +1,3 @@
-
 #ifndef __CINT__
 #include <RooGlobalFunc.h>
 #endif
@@ -166,7 +165,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		}
 
 		// Set mean gauss values
-		if (RooRealVar* gaussMean = RootHelper::getParameterByNameCommonOrLocal(spectra[i].model, "mean_gauss")) {
+		if (RooRealVar* gaussMean = RootHelper::getParameterByNameCommonOrLocal(spectra[i].model, AdditiveConvolutionPdf::VAR_MEAN_GAUSS_NAME)) {
 			gaussMean->setConstant(kFALSE);
 			gaussMean->Print();
 			RootHelper::setRooRealVarValueLimits(gaussMean, spectra[i].binWithMaximumCount, spectra[i].binWithMaximumCount - 50, spectra[i].binWithMaximumCount + 50);
@@ -372,7 +371,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		Int_t colorIndex = 0;
 		while (TObject* temp = it->Next()) {
 			if (RooAbsPdf* component = dynamic_cast<RooAbsPdf*>(temp)) {
-				if (component->getAttribute("drawOnRooPlot")){
+				if (component->getAttribute("drawOnRooPlot") == kTRUE){
 					Style_t color = GraphicsHelper::COLORS[colorIndex++];
 					modelNonConvoluted->plotOn(spectraPlot[i], RooFit::LineStyle(kDashed), RooFit::LineColor(color), RooFit::LineWidth(2), RooFit::Name(component->GetName()), RooFit::Components(component->GetName()));
 					std::string legendTitle = StringUtils::removeBrackets(component->GetTitle()); // RooWorkspace adds brackets (#) to object titles

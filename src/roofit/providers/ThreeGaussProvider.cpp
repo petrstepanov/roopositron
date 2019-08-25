@@ -14,6 +14,7 @@
 #include "ThreeGaussProvider.h"
 #include "RooFormulaVar.h"
 #include "../pdfs/ThreeGaussian.h"
+#include "../../roofit/AdditiveConvolutionPdf.h"
 #include "../../model/Constants.h"
 #include "../../util/RootHelper.h"
 
@@ -46,9 +47,9 @@ RooAbsPdf* ThreeGaussProvider::initPdf(int i) {
 	RooFormulaVar* g3FractionNorm = new RooFormulaVar("gauss3FracNorm", "@0/100", *g3Fraction);
 
 	// Zero channel start values are assigned later (relative to the MIN_CHANNEL value)
-    RooRealVar* gMean = new RooRealVar("mean_gauss", "Resolution function mean", 1, "ch");
+    RooRealVar* gMean = new RooRealVar(AdditiveConvolutionPdf::VAR_MEAN_GAUSS_NAME, "Resolution function mean", 1, "ch");
 
-	return new ThreeGaussian("pdfResolutionThreeGauss", "Resolution function", *observable, *gMean, *g1Dispersion, *g3Dispersion, *g2Dispersion, *g3FractionNorm, *g2FractionNorm);
+	return new ThreeGaussian("pdfResolution3Gauss", "Resolution function", *observable, *gMean, *g1Dispersion, *g3Dispersion, *g2Dispersion, *g3FractionNorm, *g2FractionNorm);
 }
 
 RooArgSet* ThreeGaussProvider::getIndirectParameters(RooAbsPdf* pdf){

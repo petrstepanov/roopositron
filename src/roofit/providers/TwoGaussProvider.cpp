@@ -14,6 +14,7 @@
 #include "TwoGaussProvider.h"
 #include "RooFormulaVar.h"
 #include "../pdfs/TwoGaussian.h"
+#include "../../roofit/AdditiveConvolutionPdf.h"
 #include "../../model/Constants.h"
 #include "../../util/RootHelper.h"
 
@@ -47,7 +48,7 @@ RooAbsPdf* TwoGaussProvider::initPdf(int i) {
 //	}
 
     // Zero channel start values are assigned later (relative to the MIN_CHANNEL value)
-    RooRealVar* gMean = new RooRealVar("mean_gauss", "Resolution function mean", 1, "ch");
+    RooRealVar* gMean = new RooRealVar(AdditiveConvolutionPdf::VAR_MEAN_GAUSS_NAME, "Resolution function mean", 1, "ch");
 
 //    RooGaussian* gauss1 = new RooGaussian("gauss1", "1st gauss", *observable, *gMean, *g1Dispersion);
 //    RooGaussian* gauss2 = new RooGaussian("gauss2", "2nd gauss", *observable, *gMean, *g2Dispersion);

@@ -14,6 +14,7 @@
 #include "ParametersPool.h"
 #include "Constants.h"
 #include "TSystem.h"
+#include "../roofit/AdditiveConvolutionPdf.h"
 #include "../util/ObjectNamer.h"
 #include "../util/RootHelper.h"
 #include "../util/StringUtils.h"
@@ -23,22 +24,22 @@
 
 ParametersPool::ParametersPool(std::string ioPath) {
 	// Calculated parameters - aren't saved to file to avoid confusion
-	parametersExcludedFromImport.push_back("mean_gauss");
-	parametersExcludedFromImport.push_back("bins");
-	parametersExcludedFromImport.push_back("integral");
-	parametersExcludedFromImport.push_back("background");
+	parametersExcludedFromImport.push_back(AdditiveConvolutionPdf::VAR_MEAN_GAUSS_NAME);
+	parametersExcludedFromImport.push_back(AdditiveConvolutionPdf::VAR_BINS_NAME);
+	parametersExcludedFromImport.push_back(AdditiveConvolutionPdf::VAR_INTEGRAL_NAME);
+	parametersExcludedFromImport.push_back(AdditiveConvolutionPdf::VAR_BACKGROUND_COUNT_NAME);
 
 	// Don't user input gauss FWHM's and Intensities
 	// Always use default values. Otherwise it's too much input going on
-	parametersExcludedFromInput.push_back("mean_gauss");
-	parametersExcludedFromInput.push_back("background");
+	parametersExcludedFromInput.push_back(AdditiveConvolutionPdf::VAR_MEAN_GAUSS_NAME);
+	parametersExcludedFromInput.push_back(AdditiveConvolutionPdf::VAR_BACKGROUND_COUNT_NAME);
+	parametersExcludedFromInput.push_back(AdditiveConvolutionPdf::VAR_BINS_NAME);
+	parametersExcludedFromInput.push_back(AdditiveConvolutionPdf::VAR_INTEGRAL_NAME);
 	parametersExcludedFromInput.push_back("FWHM_gauss1");
 	parametersExcludedFromInput.push_back("FWHM_gauss2");
-	parametersExcludedFromInput.push_back("Int_gauss2");
 	parametersExcludedFromInput.push_back("FWHM_gauss3");
+	parametersExcludedFromInput.push_back("Int_gauss2");
 	parametersExcludedFromInput.push_back("Int_gauss3");
-	parametersExcludedFromInput.push_back("bins");
-	parametersExcludedFromInput.push_back("integral");
 
 	filePathName = (ioPath == "") ? DEFAULT_FILENAME : ioPath + "/" + DEFAULT_FILENAME;
 	parametersPool = readPoolParametersFromFile();

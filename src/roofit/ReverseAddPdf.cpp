@@ -124,14 +124,12 @@ RooAbsPdf* ReverseAddPdf::add(RooArgList* pdfList, RooRealVar* observable, const
 		}
 	}
 
-	const char* newPdfName = TString::Format("addPdf_%s", pdfName);
-
 	// If one component given just return it
 	unsigned numberOfComponents = pdfList->getSize();
 	if (numberOfComponents == 1) {
 		RooAbsArg* arg = pdfList->at(0);
 		RooAbsPdf* pdf = dynamic_cast<RooAbsPdf*>(arg);
-		pdf->SetName(newPdfName);
+		pdf->SetName(pdfName);
 		return pdf;
 	}
 
@@ -146,7 +144,7 @@ RooAbsPdf* ReverseAddPdf::add(RooArgList* pdfList, RooRealVar* observable, const
 		RooFormulaVar* INorm = new RooFormulaVar(TString::Format("Int_%s_norm", componentName), TString::Format("Intensity of %s, normalized", componentTitle), "@0/100", *I);
 		I_i->add(*INorm);
 	}
-	RooAddPdf* pdf = new RooAddPdf(newPdfName, TString::Format("Additive model %s", pdfName), *pdfInverseList, *I_i);
+	RooAddPdf* pdf = new RooAddPdf(pdfName, TString::Format("Additive model %s", pdfName), *pdfInverseList, *I_i);
 
 	// https://sft.its.cern.ch/jira/browse/ROOT-9653
 	pdf->fixAddCoefNormalization(RooArgSet(*observable));
