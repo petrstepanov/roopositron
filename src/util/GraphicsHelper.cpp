@@ -178,7 +178,7 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 	linesNumber++;
 
 	// Print resolution function related variables
-	RooArgList* gaussVarsList = RootHelper::findArgsNameSubstring(paramsList, "gauss");
+	RooArgList* gaussVarsList = RootHelper::findArgsNameSubstring(paramsList, "auss");
 	for (auto arg : *gaussVarsList) {
 		printVariable(sigDigits, options, linesNumber, arg, box);
 	}
