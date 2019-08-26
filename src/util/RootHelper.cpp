@@ -187,10 +187,12 @@ RooArgList* RootHelper::findArgsNameSubstring(RooAbsCollection* list, const char
 
 
 // Makes data points - a pair of Matrix (ascii columns) with column captions TList (TString)
-std::pair<TMatrixD,TList*> RootHelper::rooPlotToMatrix(RooRealVar* axis, RooPlot* plot){
+std::pair<TMatrixD,TList*> RootHelper::rooPlotToMatrix(RooRealVar* axis, RooPlot* plot, Double_t conversionValue, Double_t zeroChannel, const char* conversionUnit){
+	// Calculate number of columns in matrix
 	Int_t numberOfColumns = 1; // originally we have one column just for channels
 
-	// Calculate number of RooHists and RooCurves in RooPlot
+	if (conversionValue != 0) numberOfColumns++;  // add column for channels converted into say nanoseconds
+
 	for (int i=0; i < plot->numItems(); i++){
 		TObject* object = plot->getObject(i);
 		if (RooHist* hist = dynamic_cast<RooHist*>(object)){
@@ -200,16 +202,15 @@ std::pair<TMatrixD,TList*> RootHelper::rooPlotToMatrix(RooRealVar* axis, RooPlot
 			numberOfColumns++; // RooCurve has only value column
 		}
 	}
-	// Number of columns in data matrix is 1 (channels) + numberOfRooHists*2 (value, error) + numberOfRooCurves (value)
-	Int_t currentColumn = 0;
 
-	// Number of rows is just number of axis bins
+	// Calculate number of rows in matrix (just number of axis bins)
 	const RooAbsBinning* binning = &(axis->getBinning());
 	Int_t numberOfRows = binning->numBins();
 
-	// Matrix with data columns
+	// Start filling matrix with data columns
 	TMatrixD matrix(numberOfRows, numberOfColumns);
 	TList* columnNames = new TList();
+	Int_t currentColumn = 0;
 
 	// Fill first column with channel center bin coordinates
 	columnNames->Add(new TObjString("channel"));
@@ -218,6 +219,16 @@ std::pair<TMatrixD,TList*> RootHelper::rooPlotToMatrix(RooRealVar* axis, RooPlot
 		column(i) = (Double_t)binning->binCenter(i);
 	}
 	currentColumn++;
+
+	// Next second column with channels converted to something  (e.g. nanoseconds)
+	if (conversionValue !=0){
+		columnNames->Add(new TObjString(conversionUnit));
+		TMatrixDColumn column(matrix, currentColumn); // get first column
+		for (int i = 0; i < numberOfRows; i++){
+			column(i) = ((Double_t)binning->binCenter(i) - zeroChannel) * conversionValue;
+		}
+		currentColumn++;
+	}
 
 	// Iterate through RooHists and RooCurves in the list of RooPlots
 	for (int p=0; p < plot->numItems(); p++){

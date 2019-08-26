@@ -40,7 +40,7 @@ public:
     static RooAbsPdf* getComponentByNameCommonOrLocal(RooAbsPdf* pdf, const char* name);
     static RooAbsArg* findArgNameSubstring(RooAbsCollection* list, const char* nameSubstring);
     static RooArgList* findArgsNameSubstring(RooAbsCollection* list, const char* nameSubstring);
-    static std::pair<TMatrixD,TList*> rooPlotToMatrix(RooRealVar* axis, RooPlot* plot);
+    static std::pair<TMatrixD,TList*> rooPlotToMatrix(RooRealVar* axis, RooPlot* plot, Double_t conversionValue = 0, Double_t zeroChannel = 0, const char* conversionUnit = "");
 
 private:
     static TStopwatch* watch;

@@ -34,23 +34,7 @@
 #include "providers/ExpSourceProvider.h"
 #include "PdfFactory.h"
 
-AdditiveConvolutionPdf::AdditiveConvolutionPdf(std::vector<std::string> componentIds, const char* resolutionId, int sourceComponents, RooRealVar* observable) {
-	Debug("AdditiveConvolutionPdf::AdditiveConvolutionPdf");
-	this->observable = observable;
-
-	Double_t channelWidthValue = Constants::getInstance()->getDefaultChannelWidth();
-	this->channelWidth = new RooRealVar("channelWidth", "Width of channel", channelWidthValue, 0, 0.1, "ns");
-	this->channelWidth->setConstant(kTRUE);
-
-	pdfFactory = new PdfFactory();
-	initComponents(componentIds, sourceComponents);
-	initResolutionModel(resolutionId);
-	constructModel();
-}
-
-AdditiveConvolutionPdf::~AdditiveConvolutionPdf() {
-}
-
+const char* AdditiveConvolutionPdf::VAR_CHANNEL_WIDTH_NAME = "channelWidth";
 const char* AdditiveConvolutionPdf::VAR_MEAN_GAUSS_NAME = "meanGauss";
 const char* AdditiveConvolutionPdf::VAR_BINS_NAME = "bins";
 const char* AdditiveConvolutionPdf::VAR_INTEGRAL_NAME = "integral";
@@ -64,6 +48,23 @@ const char* AdditiveConvolutionPdf::PDF_BACKGROUND_NAME = "backgroundPdf";
 const char* AdditiveConvolutionPdf::PDF_NON_CONVOLUTED_NAME = "modelNonConvolutedPdf";
 const char* AdditiveConvolutionPdf::PDF_RESOLUTION_FUNCTION_NAME = "resolutionPdf";
 const char* AdditiveConvolutionPdf::PDF_CONVOLUTED_NAME = "modelConvolutedPdf";
+
+AdditiveConvolutionPdf::AdditiveConvolutionPdf(std::vector<std::string> componentIds, const char* resolutionId, int sourceComponents, RooRealVar* observable) {
+	Debug("AdditiveConvolutionPdf::AdditiveConvolutionPdf");
+	this->observable = observable;
+
+	Double_t channelWidthValue = Constants::getInstance()->getDefaultChannelWidth();
+	this->channelWidth = new RooRealVar(VAR_CHANNEL_WIDTH_NAME, "Width of channel", channelWidthValue, 0, 0.1, "ns");
+	this->channelWidth->setConstant(kTRUE);
+
+	pdfFactory = new PdfFactory();
+	initComponents(componentIds, sourceComponents);
+	initResolutionModel(resolutionId);
+	constructModel();
+}
+
+AdditiveConvolutionPdf::~AdditiveConvolutionPdf() {
+}
 
 void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentIds, int sourceComponents) {
 	Debug("AdditiveConvolutionPdf::initComponents")

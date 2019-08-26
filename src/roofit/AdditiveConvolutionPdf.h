@@ -31,6 +31,7 @@ public:
 
     RooAbsPdf* getPdf();
 
+    static const char* VAR_CHANNEL_WIDTH_NAME;
     static const char* VAR_MEAN_GAUSS_NAME;
     static const char* VAR_BINS_NAME;
     static const char* VAR_INTEGRAL_NAME;

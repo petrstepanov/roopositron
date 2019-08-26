@@ -29,16 +29,11 @@ public:
     static std::vector<std::string> getFilenamesInCurrentDrectory(const char* extension);
     static TH1F* importTH1F(std::string filename, int i);
     static void createDirectory(std::string directoryName);
-    static void savePlotsToFile(RooPlot* spectrumPlot, RooPlot* residualsPlot, const char* fileName,  RooRealVar* observable);
+    static void savePlotsToFile(RooPlot* spectrumPlot, RooPlot* residualsPlot, const char* fileName,  RooRealVar* observable, Double_t conversionValue = 0, Double_t zeroChannel = 0, const char* conversionUnit = "");
     
 private:
     std::string getCurrentPath();
-    const char kPathSeparator =
-#ifdef _WIN32
-    '\\';
-#else
-    '/';
-#endif
+    const char kPathSeparator = '/';
 };
 
 #endif /* MY_FILEUTILS */

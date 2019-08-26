@@ -649,7 +649,14 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		TString fileName = TString::Format("./%s-%s/data-%s-%s-%d.txt", (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
 				constants->getResolutionFunctionModel(), (StringUtils::joinStrings(constants->getDecayModels())).c_str(),
 				constants->getResolutionFunctionModel(), i + 1);
-		FileUtils::savePlotsToFile(spectraPlot[i], residualsPlot[i], fileName.Data(), channels);
+
+		RooRealVar* channelWidthVar = RootHelper::getParameterNameContains(spectra[i].model, AdditiveConvolutionPdf::VAR_CHANNEL_WIDTH_NAME);
+		Double_t channelWidth = (channelWidthVar) ? channelWidthVar->getVal() : 0;
+
+		RooRealVar* meanGaussVar = RootHelper::getParameterNameContains(spectra[i].model, AdditiveConvolutionPdf::VAR_MEAN_GAUSS_NAME);
+		Double_t meanGauss = (meanGaussVar) ? meanGaussVar->getVal() : 0;
+
+		FileUtils::savePlotsToFile(spectraPlot[i], residualsPlot[i], fileName.Data(), channels, channelWidth, meanGauss, "time_ns");
 	}
 	stopWatch->Print();
 

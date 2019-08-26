@@ -108,8 +108,8 @@ std::vector<std::string> FileUtils::getFilenamesInCurrentDrectory(const char* ex
 	return lFileNames;
 }
 
-void FileUtils::savePlotsToFile(RooPlot* spectrumPlot, RooPlot* residualsPlot, const char* fileName, RooRealVar* observable){
-	std::pair<TMatrixD,TList*> spectrumMatrixAndHeader = RootHelper::rooPlotToMatrix(observable, spectrumPlot);
+void FileUtils::savePlotsToFile(RooPlot* spectrumPlot, RooPlot* residualsPlot, const char* fileName, RooRealVar* observable, Double_t conversionValue, Double_t zeroChannel, const char* conversionUnit){
+	std::pair<TMatrixD,TList*> spectrumMatrixAndHeader = RootHelper::rooPlotToMatrix(observable, spectrumPlot, conversionValue, zeroChannel, conversionUnit);
 	std::pair<TMatrixD,TList*> residualsMatrixAndHeader = RootHelper::rooPlotToMatrix(observable, residualsPlot);
 	TMatrixD spectrumMatrix = (spectrumMatrixAndHeader.first);
 	TMatrixD residualsMatrix = (residualsMatrixAndHeader.first);
