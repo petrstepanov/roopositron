@@ -456,13 +456,13 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 		// Draw nanosecond axis
 		Double_t scaleFactor = GraphicsHelper::getSpectrumPadFontFactor();
-		if (RooRealVar* rooRealVar = RootHelper::getParameterNameContains(spectra[i].model, "mean_gauss")) {
+		if (RooRealVar* rooRealVar = RootHelper::getParameterNameContains(spectra[i].model, AdditiveConvolutionPdf::VAR_MEAN_GAUSS_NAME)) {
 			Double_t zeroChannel = rooRealVar->getVal();
 
 			// Get channel width for current spectrum
 			Double_t channelWidth = 0;
 //			RooArgSet* parameters = spectra[i].model->getParameters(*channels);
-			if (RooRealVar* channelWidthVar = RootHelper::getParameterNameContains(spectra[i].model, "channelWidth")){
+			if (RooRealVar* channelWidthVar = RootHelper::getParameterNameContains(spectra[i].model, AdditiveConvolutionPdf::VAR_CHANNEL_WIDTH_NAME)){
 				channelWidth = channelWidthVar->getVal();
 			}
 
