@@ -4,7 +4,7 @@ A flexible terminal-based positron lifetime fitting software. Supports integrati
 
 Program is written in object-oriented C++ using CERN ROOT libraries. Fitting is performed via RooFit package functionality.
 
-<img src="http://petrstepanov.com/img/roopositron.png" alt="RooPositron desktop application" style="width: 100%;"/>
+<img src="http://petrstepanov.com/static/roopositron.png" alt="RooPositron desktop application" style="width: 100%;"/>
 
 Following fitting models are supported:
 * Multiexponential
