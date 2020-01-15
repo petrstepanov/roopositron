@@ -60,7 +60,9 @@ First thing the application checks if Constants file is present in current folde
     </thead>
     <tbody>
         <tr>
-            <td>`channels`</td>
+            <td>
+            `channels`
+            </td>
             <td>8192</td>
             <td>Default width of analyzer channel, in nanoseconds. In case of fitting multiple spectra, individual channel width for every spectrum can be set later in 'parameters.txt' file. Default value is 0.006186.</td>
         </tr>
