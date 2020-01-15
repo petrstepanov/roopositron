@@ -48,40 +48,21 @@ Application uses './constants.txt' located in the same folder, where spectrum pr
 * "fit-*.png" and "fit-*.root" are raster and vector images of the fit
 * "data-*.txt" ASCII files generated from the plots with columns that allow plotting in other programs.
 
-First thing the application checks if Constants file is present in current folder. In case the file is missing the application with create Constants file with default values. Below find the list of constants:
+First thing the application checks if Constants file is present in current folder. In case the file is missing the application with create Constants file with default values. Below find the list of variables in './constants.txt':
 
-**channels**
-Total number of bins to read from input files. Default value is 8192.
-
-**defaultChannelWidth**
-Default width of analyzer channel, unit is nanoseconds. In case of fitting multiple spectra, individual channel width for every spectrum can be set later in 'parameters.txt' file. Default value is 0.006186.
-
-**skipLines**
-Number of lines to skip in input .Spe files. Usually Maestro files have header with some information. Default value is 12.
-
-**minChannel**
-Trim spectra on the left by setting the minimum channel number for the fit. Please make sure the spectrum range [minChannel, minChannel+backgroundBins] is flat without humps. These bins are used for automatic background level evaluation. Default value is 600.
-
-**maxChannel**
-Trim spectra on the right end. Default value is 4000.
-
-**excludeMinChannel** and **excludeMaxChannel**
-Exclude a range of channels from the spectra fit and chi^2. Useful if experimantal spectra have parasyte humps. Set values to 0 to avoid excluding refions from fit. Default values are 0.
-
-**minimizerType**
-Type of minimizer function used during the fit. Use one of the following values: "Minuit", "Minuit2", "Fumili", "GSLMultiMin". Default value is "Minuit". Learn more here 
-
-**decayModel**
-Comma-separated list of names of the fitting models to be used. Following models are currently available: "exp", "2exp", "3exp", "trapping", "grain", "powder", "liquid". If specified two or more models, e.g. "trapping,exp" final fitting model will be a linear combination of separate fitting models. Default value is "exp" - one exponent.
-
-**resolutionFunction**
-Number of Gaussians in resolution function. Currently support following: "1gauss", "2gauss" or "3gauss". Default value is "2gauss".
-
-**sourceComponents**
-Number of exponential components in source contribution. Use integer values: 1, 2, 3... For instance if e+ source is sealed in Kapton, use 1 - one component.
-
-**commonParameters**
-For multiple spectra fitting. Comma-separated list of fitting parameter names that have to be common across the fit. By default, common parameters are number of bins in spectrum (bins), channel width (channelWidth), parameters of the resolution function (FWHM_gauss1,FWHM_gauss2,FWHM_gauss3,Int_gauss2,Int_gauss3), and source contribution decay parameters (#tau_source,Int_source,#tau1_source,#tau2_source,#tau3_source,Int_expSource2,Int_expSource3).
+| Variable                  | Default value | Description |
+| ---                       | ---           | ---         |
+| `channels`                | 8192          | Total number of channels to read from input files |
+| `defaultChannelWidth`     | 0.006186      | Default width of analyzer channel, in nanoseconds. In case of fitting multiple spectra, individual channel width for every spectrum can be set later in 'parameters.txt' file. Default value is 0.006186. |
+| `skipLines`               | 12            | Number of lines to skip in input .Spe files. Usually Maestro files have header with some information. |
+| `minChannel`              | 600           | Trim spectra on the left by setting the minimum channel number for the fit. Please make sure the spectrum range [minChannel, minChannel+backgroundBins] is flat without humps. These bins are used for automatic background level evaluation. |
+| `maxChannel`              | 4000          | Trim spectra on the right end. |
+| `excludeMinChannel` and `excludeMaxChannel` | 0 | Exclude a range of channels from the spectra fit and chi^2. Useful if experimantal spectra have parasyte humps. Set values to 0 to avoid excluding refions from fit. |
+| `minimizerType`           | Minuit        | Type of minimizer function to be used during the fit. Use one of the following values: `Minuit`, `Minuit2`, `Fumili`, `GSLMultiMin`. Learn more [here](https://root.cern/doc/master/classROOT_1_1Math_1_1Minimizer.html). |
+| `decayModel`              | exp           | Comma-separated list of names of the fitting models to be used. Following models are currently available: `exp`, `2exp`, `3exp`, `trapping`, `grain`, `powder`, `liquid`. If specified two or more models, e.g. `trapping,exp` finazl fitting model will be a linear combination of separate fitting models. Default value is one exponent. |
+| `resolutionFunction`      | 2gauss        | Number of Gaussians in resolution function. Currently support following: `1gauss`, `2gauss` or `3gauss`. |
+| `sourceComponents`        | 1             | Number of exponential components in source contribution. Use integer values: `1`, `2`, `3`... For instance if e+ source is sealed in Kapton, use 1 - one component. |
+| `commonParameters`        | By default, common parameters are number of bins in spectrum (bins), channel width (channelWidth), parameters of the resolution function (FWHM_gauss1,FWHM_gauss2,FWHM_gauss3,Int_gauss2,Int_gauss3), and source contribution decay parameters (#tau_source,Int_source,#tau1_source,#tau2_source,#tau3_source,Int_expSource2,Int_expSource3). | For multiple spectra fitting. Comma-separated list of fitting parameter names that have to be common across the fit. |
 
 **bufferFraction**
 Convolution operation parameter Default value is 0.2 (20% of the spectrum width). Increase this value if the tail of your spectrum does not reach the background level.
