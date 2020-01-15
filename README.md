@@ -50,7 +50,23 @@ Application uses './constants.txt' located in the same folder, where spectrum pr
 
 First thing the application checks if Constants file is present in current folder. In case the file is missing the application with create Constants file with default values. Below find the list of variables in './constants.txt':
 
-Variable                  | Default value | Description
+<table style="table-layout: fixed; width: 100%">
+    <thead>
+        <tr>
+            <th width="200">Variable</th>
+            <th width="150">Default value</th>
+            <th width="*">Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>`channels`</td>
+            <td>8192</td>
+            <td>Default width of analyzer channel, in nanoseconds. In case of fitting multiple spectra, individual channel width for every spectrum can be set later in 'parameters.txt' file. Default value is 0.006186.</td>
+        </tr>
+    </tbody>
+</table>
+                  |  | Description
 ---                       | ---           | ---
 `channels`                | 8192          | Total number of channels to read from input files
 `defaultChannelWidth`     | 0.006186      | Default width of analyzer channel, in nanoseconds. In case of fitting multiple spectra, individual channel width for every spectrum can be set later in 'parameters.txt' file. Default value is 0.006186.
