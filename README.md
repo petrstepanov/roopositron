@@ -60,18 +60,42 @@ First thing the application checks if Constants file is present in current folde
     </thead>
     <tbody>
         <tr>
-            <td>
-            `channels`
-            </td>
+            <td>channels</td>
             <td>8192</td>
-            <td>Default width of analyzer channel, in nanoseconds. In case of fitting multiple spectra, individual channel width for every spectrum can be set later in 'parameters.txt' file. Default value is 0.006186.</td>
+            <td>Total number of channels to read from input files.</td>
+        </tr>
+        <tr>
+            <td>defaultChannelWidth</td>
+            <td>0.006186</td>
+            <td>Default width of analyzer channel, in nanoseconds. In case of fitting multiple spectra, individual channel width for every spectrum can be set later in 'parameters.txt' file.</td>
+        </tr>
+        <tr>
+            <td>skipLines</td>
+            <td>12</td>
+            <td>Number of lines to skip in input .Spe files. Usually Maestro files have header with some information.</td>
+        </tr>
+        <tr>
+            <td>minChannel</td>
+            <td>600</td>
+            <td>Trim spectra on the left by setting the minimum channel number for the fit. Please make sure the spectrum range [minChannel, minChannel+backgroundBins] is flat without humps. These bins are used for automatic background level evaluation.</td>
+        </tr>
+        <tr>
+            <td>maxChannel</td>
+            <td>4000</td>
+            <td>Trim spectra on the right end.</td>
+        </tr>
+        <tr>
+            <td>excludeMinChannel, excludeMaxChannel</td>
+            <td>0</td>
+            <td>Exclude a range of channels from the spectra fit and chi^2. Useful if experimantal spectra have parasyte humps. Set values to 0 to avoid excluding refions from fit.</td>
         </tr>
     </tbody>
 </table>
-                  |  | Description
+
+        Variable          | Default value | Description
 ---                       | ---           | ---
 `channels`                | 8192          | Total number of channels to read from input files
-`defaultChannelWidth`     | 0.006186      | Default width of analyzer channel, in nanoseconds. In case of fitting multiple spectra, individual channel width for every spectrum can be set later in 'parameters.txt' file. Default value is 0.006186.
+`defaultChannelWidth`     | 0.006186      | Default width of analyzer channel, in nanoseconds. In case of fitting multiple spectra, individual channel width for every spectrum can be set later in 'parameters.txt' file.
 `skipLines`               | 12            | Number of lines to skip in input .Spe files. Usually Maestro files have header with some information.
 `minChannel`              | 600           | Trim spectra on the left by setting the minimum channel number for the fit. Please make sure the spectrum range [minChannel, minChannel+backgroundBins] is flat without humps. These bins are used for automatic background level evaluation.
 `maxChannel`              | 4000          | Trim spectra on the right end.
