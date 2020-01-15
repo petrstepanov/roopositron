@@ -89,6 +89,31 @@ First thing the application checks if Constants file is present in current folde
             <td>0</td>
             <td>Exclude a range of channels from the spectra fit and chi^2. Useful if experimantal spectra have parasyte humps. Set values to 0 to avoid excluding refions from fit.</td>
         </tr>
+        <tr>
+            <td>minimizerType</td>
+            <td>Minuit</td>
+            <td>Type of minimizer function to be used during the fit. Use one of the following values: `Minuit`, `Minuit2`, `Fumili`, `GSLMultiMin`. Learn more <a href="https://root.cern/doc/master/classROOT_1_1Math_1_1Minimizer.html">here</a>.</td>
+        </tr>
+        <tr>
+            <td>decayModel</td>
+            <td>exp</td>
+            <td>Comma-separated list of names of the fitting models to be used. Following models are currently available: `exp`, `2exp`, `3exp`, `trapping`, `grain`, `powder`, `liquid`. If specified two or more models, e.g. `trapping,exp` finazl fitting model will be a linear combination of separate fitting models. Default value is one exponent.</td>
+        </tr>
+        <tr>
+            <td>resolutionFunction</td>
+            <td>2gauss</td>
+            <td>Number of Gaussians in resolution function. Currently support following: `1gauss`, `2gauss` or `3gauss`.</td>
+        </tr>
+        <tr>
+            <td>sourceComponents</td>
+            <td>1</td>
+            <td>Number of exponential components in source contribution. Use integer values: `1`, `2`, `3`... For instance if e+ source is sealed in Kapton, use 1 - one component.</td>
+        </tr>
+        <tr>
+            <td>commonParameters</td>
+            <td>...</td>
+            <td>For multiple spectra fitting. Comma-separated list of fitting parameter names that have to be common across the fit. By default, common parameters are number of bins in spectrum (bins), channel width (channelWidth), parameters of the resolution function (FWHM_gauss1,FWHM_gauss2,FWHM_gauss3,Int_gauss2,Int_gauss3), and source contribution decay parameters (#tau_source,Int_source,#tau1_source,#tau2_source,#tau3_source,Int_expSource2,Int_expSource3).</td>
+        </tr>
     </tbody>
 </table>
 
@@ -104,7 +129,7 @@ First thing the application checks if Constants file is present in current folde
 | `decayModel`              | exp           | Comma-separated list of names of the fitting models to be used. Following models are currently available: `exp`, `2exp`, `3exp`, `trapping`, `grain`, `powder`, `liquid`. If specified two or more models, e.g. `trapping,exp` finazl fitting model will be a linear combination of separate fitting models. Default value is one exponent. |
 | `resolutionFunction`      | 2gauss        | Number of Gaussians in resolution function. Currently support following: `1gauss`, `2gauss` or `3gauss`. |
 | `sourceComponents`        | 1             | Number of exponential components in source contribution. Use integer values: `1`, `2`, `3`... For instance if e+ source is sealed in Kapton, use 1 - one component. |
-| `commonParameters`        |               | For multiple spectra fitting. Comma-separated list of fitting parameter names that have to be common across the fit. By default, common parameters are number of bins in spectrum (bins), channel width (channelWidth), parameters of the resolution function (FWHM_gauss1,FWHM_gauss2,FWHM_gauss3,Int_gauss2,Int_gauss3), and source contribution decay parameters (#tau_source,Int_source,#tau1_source,#tau2_source,#tau3_source,Int_expSource2,Int_expSource3). |
+| `commonParameters`        | ...           | For multiple spectra fitting. Comma-separated list of fitting parameter names that have to be common across the fit. By default, common parameters are number of bins in spectrum (bins), channel width (channelWidth), parameters of the resolution function (FWHM_gauss1,FWHM_gauss2,FWHM_gauss3,Int_gauss2,Int_gauss3), and source contribution decay parameters (#tau_source,Int_source,#tau1_source,#tau2_source,#tau3_source,Int_expSource2,Int_expSource3). |
 | `bufferFraction`          | 0.2           | Convolution operation parameter Default value is 20% of the spectrum width. Increase this value if the tail of your spectrum does not approach the background level. |
 | `convolutionBins`         | 1024          | Binning of the the convolution observable. Affects the sampling density of the FFT convolution operation. Increase to 2048 or 4096 if working with shorter lifetimes or higher channel width. |
 | `backgroundBins`          | 150           | Number of first spectrum bins used for background level estimation. Set to 0 to make background free during the fit. Fitting works best with fixed automatic background. |
