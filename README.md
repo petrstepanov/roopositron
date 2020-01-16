@@ -11,7 +11,7 @@ A flexible terminal-based positron lifetime fitting software. Supports integrati
 Program is written in object-oriented C++ using CERN ROOT libraries. Fitting is performed via RooFit package functionality.
 
 <figure>
-  <img src="http://petrstepanov.com/static/screenshot-roopositron.png?123" alt="RooPositron desktop application" style="width: 100%;"/>
+  <img src="http://petrstepanov.com/static/screenshot-roopositron.png?123" alt="RooPositron desktop application" />
   <figcaption>Screenshot of the simultaneous fit of positron lifetime spectra made with RooPositron.</figcaption>
 </figure> 
 
@@ -100,7 +100,7 @@ After you done with setting the './constants.txt' next step is to set the defaul
 Alternatively you can interrupt the program by `CTRL+C` and navigate to the corresponding 'parameters.txt' file in a child folder. Use any text editor to open the correspondent file. Set starting values, limits and select certain parameters to be `fixed` or `free` during the fit. This option is useful when working with models that involve a lot of parameters.
 
  <figure>
-  <img src="http://petrstepanov.com/static/screenshot-roopositron-parameters.png" alt="Editing parameters of the RooPoritron fit" style="width: 100%;"/>
+  <img src="http://petrstepanov.com/static/screenshot-roopositron-parameters.png?123" alt="Editing parameters of the RooPoritron fit" style="width: 100%;"/>
   <figcaption>Editing fitting parameter values and limits in plain text editor.</figcaption>
 </figure> 
 
@@ -124,7 +124,16 @@ It is reasonable to use computational software (we used a Wolfram Mathematica in
 
 Next, implement a wrapper class for your custom model. Conventionally we name them `CustomModelProvider.class` and they are located in `./src/roofit/providers/`. In RooFit every function variable is an object. So the wrapper instantinates model parameter objects with default values. Next wrapper passes them to the Model and returns it.
 
+Optionally if you want your model to calculate some indirect parameters please override `getIndirectParameters()` method in your `CustomModelProvider` class. The list of formulas (`RooFormulaVar` objects) you return in this function will be displayed in the legend on the plots along with regular model parameters.
+
 #### Adding Model identificator
 
-Lastly we need to give 
+Lastly in order to be able to use our model we need to give it an identifier (char string used in './constants.txt'). In order to do so modify the `PdfFactory` class. First, in `PdfFactory.h` add a new value to the `PdfHashNames` enumeration.
 
+Come up with a model identifier and map it to the enumeration in `PdfFactory::hashPdfName`. Add a new case for the switch statement in `PdfFactory::getPdf()` and return your new `CustomModel` object.
+
+If your model has indirect parameters, add new case to the switch statement in `PdfFactory::getIndirectParameters` and return the list of your indidect parameters.
+
+### How to contribute
+
+Contributors are welcome. Please clone the repo, make your changes and submit the Pull Request on GitHub. Feel free to contact me with questions about RooPositron.
