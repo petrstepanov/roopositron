@@ -43,9 +43,9 @@ PdfHashNames PdfFactory::hashPdfName(const char* pdfName) {
 		return kTwoExponentPdf;
 	if (name == "3exp")
 		return kThreeExponentPdf;
-	if (name == "trapping")
+	if (name == "stm")
 		return kTrappingPdf;
-	if (name == "grain")
+	if (name == "dtm")
 		return kGrainPdf;
 	if (name == "powder")
 		return kPowderPdf;
