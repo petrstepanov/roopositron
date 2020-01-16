@@ -10,7 +10,10 @@ A flexible terminal-based positron lifetime fitting software. Supports integrati
 
 Program is written in object-oriented C++ using CERN ROOT libraries. Fitting is performed via RooFit package functionality.
 
-<img src="http://petrstepanov.com/static/screenshot-roopositron.png?123" alt="RooPositron desktop application" style="width: 100%;"/>
+<figure>
+  <img src="http://petrstepanov.com/static/screenshot-roopositron.png?123" alt="RooPositron desktop application" style="width: 100%;"/>
+  <figcaption>Screenshot of the simultaneous fit of positron lifetime spectra made with RooPositron.</figcaption>
+</figure> 
 
 Following fitting models are supported:
 * Multiexponential
@@ -96,8 +99,32 @@ After you done with setting the './constants.txt' next step is to set the defaul
 
 Alternatively you can interrupt the program by `CTRL+C` and navigate to the corresponding 'parameters.txt' file in a child folder. Use any text editor to open the correspondent file. Set starting values, limits and select certain parameters to be `fixed` or `free` during the fit. This option is useful when working with models that involve a lot of parameters.
 
-### How to implement a custom fitting model
+ <figure>
+  <img src="http://petrstepanov.com/static/screenshot-roopositron-parameters.png" alt="Editing parameters of the RooPoritron fit" style="width: 100%;"/>
+  <figcaption>Editing fitting parameter values and limits in plain text editor.</figcaption>
+</figure> 
 
-In order to implement a custom fitting model you would need some basic object-oriented C++ knowledge.
+### How to implement a custom fitting Model
 
-1. Extend a base `RooAbsPdf` class to define the model parameters and equation. Create your `CustomModel.cpp` and `CustomModel.h` files in ./src/roofit/pdfs/
+In order to implement a custom fitting model you would need some basic object-oriented C++ knowledge. We have to create two classes. One will be responsible for model equation and optional analytical integral. Another will provide default values for model parameters as well as formilas for the indirect model parameters calculated after the fit. Finally we will have to come up with the new model identifier (name) and map the model with its identifier in the ModelProvider class.
+
+#### Defining the Model equation
+
+Extend a base `RooAbsPdf` class to define the model parameters and equation. Create your `CustomModel.cpp` and `CustomModel.h` files. Conventional location for model classes is `./src/roofit/pdfs/`. Apparently your `CustomModel` filename has to be unique. Override `RooAbsPdf::evaluate()` function and return your model equation there.
+
+Optionally in order to dramatically improve the convolution speed please override `RooAbsPdf::getAnalyticalIntegral()` and `RooAbsPdf::analyticalIntegral()`. 
+
+Since lifetime spectra are one-dimentional and integration is carried out along one variable, just return `1` in `getAnalyticalIntegral`. For a given range provided as a `analyticalIntegral()` function argument you have to return the value of the definite integral of your model equation. 
+
+Is reasonable to calculate the definite integral uning the Newton-Leibniz formula. If you refer to the existing models you will see that `analyticalIntegral()` simply does `return indefiniteIntegral(x2) - indefiniteIntegral(x1);`. And indefinite integral is evaluated in `indefiniteIntegral()` finction of your model class.
+
+It is reasonable to use computational software (we used a Wolfram Mathematica in trial mode) to calculate the indefinite integrals for models' equations. Mathematica's `CForm[%]` command outputs any expression as C++ code. So user can copy expression from Mathematica and directly paste it in C++ `indefiniteIntegral()` function. Examples of Mathematica scripts that calculate indefinite integrals for already implemented models are located in `./wolfram` folder.
+
+#### Specifying default Model parameter values
+
+Next, implement a wrapper class for your custom model. Conventionally we name them `CustomModelProvider.class` and they are located in `./src/roofit/providers/`. In RooFit every function variable is an object. So the wrapper instantinates model parameter objects with default values. Next wrapper passes them to the Model and returns it.
+
+#### Adding Model identificator
+
+Lastly we need to give 
+
