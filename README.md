@@ -76,19 +76,19 @@ If parameter value is a combination of comma-separated items please make sure th
 
 Currently RooPositron supports a number of conventional fitting models. Below please find model descriptions along with their fitting parameter names and descriptions. On order to use a certain fitting model please set the `decayModel` variable value in './parameters.txt' to certain model's identifier. Additionally you can specify a comma-separated list odf models' identifyers as a value of `decayModel` parameter. For instance, `exp,exp,exp,exp` would give a four component exponential decay. A complete description of the fitting models will be published in my thesis in May 2020.
 
-| Model name           | Identifier      | Description |
-| ---                  | ---             | --- |
-| Single exponent      | `exp`             | Single-exponential decay with one lifetime. |
-| Two exponents        | `2exp`            | Two exponential decay. |
-| Three exponents      | `3exp`            | Three exponential decay. |
-| Multiple exponents   | `exp,exp,exp,exp` | Multi exponential decay. Please specify as many comma-separated 'exp' entries as you need. |
-| Trapping model       | `trapping`        | One state trapping model. |
-| Grain model          | `grain`           | Capturing of the positrons onto the grain border |
-| Powder               | `powder`          | Powder |
-| Powder 2             | `powder2`         | Powder 2 |
-| Ps in liquids        | `liquid`          | Model for stydying positron and positronium in liquids. Involves parameters for rates of e+ oxidation, ortho-para conversion and pick-off annihilation. |
-| Ps in liquids simple | 'liquidsim'       | Simplified model for liquids. |
+| Model name                   | Identifier        | Description |
+| ---                          | ---               | --- |
+| **Mono-exponential**         | `exp`             | For fitting spectra from reference defect-free samples. |
+| **Two exponenential**        | `2exp`            | For materials saturated with one type of defects. Trapping speed is supposed to be very high. |
+| **Three exponential**        | `3exp`            | Three exponential decay. Conventional deconvolution. |
+| **Mult-exponential**         | `exp,exp,exp,exp` | Multi exponential decay. Please specify as many comma-separated 'exp' entries as you need. |
+| **Trapping model**           | `trapping`        | One state trapping model. |
+| **Diffusion-trapping model** | `grain`           | For materials with grain structure and defects. Model accounts on: e+ annihilation in bulk; trapping of e+ into the vacancies with subsequent  annihilation; diffusion of the e+ towards the grain boundary of a certain radius; and annihilation from intergrain space. |
+| **Powder model**             | `powder`          | For dielectric nano powders. Model accounts for: e+ annihilation in bulk of crystallites; e+ trapping and annihilation in vacancies within crystallites; Ps formation and escape outside of the crystallites; Ps thermalization and annihilation in inter-crystalline space. |
+| **Two-state powder model**   | `powder2`         | **Powder model** with additional bounded state of the Ps atom on the powder surface. |
+| **Liquids and solutions**    | `liquid`          | For liquids and liquid solutions. Model accounts for: formation of qf-Ps and its annihilation; transformation of qf-Ps into a bubble state; pick-off annihilation of Ps from bubble state; possible reactions of Ps with solvents and intratrack radicals (oxidation and ortho-para conversion). |
 
+Every model accounts extra contribution of the annihilation of positrons in the source material.
 
 ### How to adjust model fitting parameters
 
@@ -100,4 +100,4 @@ Alternatively you can interrupt the program by `CTRL+C` and navigate to the corr
 
 In order to implement a custom fitting model you would need some basic object-oriented C++ knowledge.
 
-1. Extend a base `RooAbsPdf` class to define the reate a `CustomModel.cpp` 
+1. Extend a base `RooAbsPdf` class to define the model parameters and equation. Create your `CustomModel.cpp` and `CustomModel.h` files in ./src/roofit/pdfs/

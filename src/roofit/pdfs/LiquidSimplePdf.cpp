@@ -41,7 +41,7 @@ Pps("Pps", this, other.Pps),
 lplus("lplus", this, other.lplus),
 lpo("lpo", this, other.lpo),
 l2g("l2g", this, other.l2g),
-lopc("lpoc", this, other.lopc),
+lopc("lopc", this, other.lopc),
 chW("chW", this, other.chW){
 }
 
