@@ -1,6 +1,6 @@
 # RooPositron
 
-A flexible terminal-based positron lifetime fitting software. Supports the integration of custom models. The program works in Terminal. List of the implemented features:
+A flexible positron lifetime fitting software. Supports the integration of custom models. The program is a console application. List of the implemented features:
 * Implementation of custom fitting models (some c++ knowledge is required).
 * In-depth control of the convolution operation. Change convolution bins number to balance fitting speed and precision.
 * Fitting models support evaluation of the indirect parameters as functions of regular model parameters.
@@ -96,7 +96,7 @@ Every model accounts for an extra contribution of the annihilation of positrons 
 
 ### How to adjust model fitting parameters
 
-After you are done defining program's './constants.txt' the next step is to set the default model parameters for the fit. Run RooPositron from the Terminal. It will prompt to enter the starting parameters selected model. Input values using the keyboard. 
+ Once program constants are defined we move on to setting the default model parameters for the fit. Run RooPositron from the Terminal. It will prompt to enter the starting parameters selected model. Input values using the keyboard. 
 
 Alternatively, you can interrupt the program by `CTRL+C` and navigate to the automatically generated `parameters.txt` file in a child folder. Use any text editor to open the `parameters.txt`. Set starting values, limits and select certain parameters to be `fixed` or `free` during the fit. Using a text editor is much quicker rather than entering model values from the keyboard. Especially when working with models that have many parameters.
 
