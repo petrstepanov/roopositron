@@ -1,10 +1,14 @@
 # Select compiler command depending on environment
 OS:=$(shell uname)
+CXX=g++
 ifeq ($(OS),Darwin)
   CXX=clang++
-else
-  CXX=g++
 endif
+
+# Path for linking dynamic libraries
+# macOS system integrity protection blocks access to $(DYLD_LIBRARY_PATH)
+# https://github.com/nteract/nteract/issues/1523#issuecomment-284027093
+DYNAMIC_LIBRARY_PATH = $(ROOTSYS)/lib
 
 # Define variables for directories
 SRC_DIR=src
@@ -35,7 +39,8 @@ OBJECTS_TEMP = $(SOURCES:.cpp=.o)
 OBJECTS = $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(OBJECTS_TEMP))
 
 # Executable and shared library files path and name
-EXECUTABLE=$(BIN_DIR)/$(APP_NAME)       # src/app
+EXECUTABLE=$(BIN_DIR)/$(APP_NAME)
+EXECUTABLE_LOCAL=$(BIN_DIR)/$(APP_NAME)-local
 SHARED_LIBRARY=$(APP_NAME)-library.so           # app-library.so
 SHARED_LIBRARY_DS=$(APP_NAME)-library.so.dSYM   # .so debug symbols (generated on macOS)
 
@@ -43,36 +48,46 @@ SHARED_LIBRARY_DS=$(APP_NAME)-library.so.dSYM   # .so debug symbols (generated o
 dir_guard=@mkdir -p $(@D)
 
 # for 'install' target PREFIX is environment variable, but if it is not set, then set default value
+# https://stackoverflow.com/questions/39892692/how-to-implement-make-install-in-a-makefile
 ifeq ($(PREFIX),)
     PREFIX := /usr/local
 endif
 
 # Empty target ensures that list of all 'end products' are called
-all: release
+all: production
+
+# Add -O3 optimization level for the production release
+production: CXXFLAGS+=-O3
+production: directories $(DICT_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE) move_files
 
 # Add -O3 optimization level for the release
 release: CXXFLAGS+=-O3
-release: executable move_files
+release: directories $(DICT_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE_LOCAL) move_files
 
 # Also might add flags for debug optimizations: -Og -ggdb -DDEBUG
 debug: CXXFLAGS+=-g
-debug: executable move_files move_debug_symbols
+debug: directories $(DICT_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE_LOCAL) move_files move_debug_symbols
 
-executable: directories $(DICT_FILENAME) $(SHARED_LIBRARY) $(OBJECTS) $(EXECUTABLE)
-
+# Link executable for release
 $(EXECUTABLE): $(OBJECTS) $(SHARED_LIBRARY)
 	@echo "Linking "$@
+	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS)
+
+# Link executable for debug. 
+# We don't install .so to DYLD path. Instead we keep it relative to the executable
+# And assign relative .so search path (./) to the executable 
+$(EXECUTABLE_LOCAL):
 ifeq ($(OS),Darwin)
 	# for macOS just link against the shared library
 	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS)
 	# then change search location of the .so library in the executable - set as same directory (macOS only)
-	install_name_tool -change $(SHARED_LIBRARY) @executable_path/$(SHARED_LIBRARY) $(EXECUTABLE)
+	install_name_tool -change $(SHARED_LIBRARY) @executable_path/$(SHARED_LIBRARY) $(EXECUTABLE_LOCAL)
 else
 	# for Linux add runtime shared library search path ./ relative to the executable (gcc only)
 	# https://stackoverflow.com/questions/38058041/correct-usage-of-rpath-relative-vs-absolute
 	$(CXX) -o $@ $(OBJECTS) $(SHARED_LIBRARY) $(GLIBS) -Wl,-rpath,'$$ORIGIN'
 endif
-
+	
 $(DICT_FILENAME): $(HEADERS) $(SRC_DIR)/LinkDef.h
 	rootcling -f $@ -c $(CXXFLAGS) -p $^
 
@@ -110,7 +125,7 @@ move_files:
 	# move .so library to /dist folder
 	mv $(SHARED_LIBRARY) $(BIN_DIR)/$(SHARED_LIBRARY)
 
-	# move dictionary .pcm next to the app executable, remove dictionary .cxx
+	# move dictionary .pcm to /dist folder, remove dictionary .cxx
 	mv $(DICT_PCM_FILENAME) $(BIN_DIR)/$(DICT_PCM_FILENAME)
 	rm $(DICT_FILENAME)
 	# copy icon
@@ -123,10 +138,14 @@ ifeq ($(OS),Darwin)
 endif
 
 install:
-	install -d $(DESTDIR)$(PREFIX)/bin/
-	install -m 755 $(EXECUTABLE) $(DESTDIR)$(PREFIX)/bin/
-	install -m 755 $(BIN_DIR)/$(SHARED_LIBRARY) $(DESTDIR)$(PREFIX)/bin/
-	install -m 755 $(BIN_DIR)/$(DICT_PCM_FILENAME) $(DESTDIR)$(PREFIX)/bin/
+	# run 'make install' or 'sudo -E make install' to preserve user environment 
+	sudo install -m 755 $(EXECUTABLE) $(DESTDIR)$(PREFIX)/bin/
+	sudo install -m 755 $(BIN_DIR)/$(SHARED_LIBRARY) $(DYNAMIC_LIBRARY_PATH)/
+	sudo install -m 755 $(BIN_DIR)/$(DICT_PCM_FILENAME) $(DYNAMIC_LIBRARY_PATH)/
+
+install-linux-launcher:
+	xdg-icon-resource install --context apps --size 128 ./resources/tlist-processor.png tlist-processor
+	xdg-desktop-menu install ./resources/tlist-processor.desktop
 
 # List of special targets that do not generate files
-.PHONY: clean directories move_files move_debug_symbols echo install
+.PHONY: clean directories move_files move_debug_symbols echo
