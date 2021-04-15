@@ -16,6 +16,7 @@
 #include "Debug.h"
 #include <TUnixSystem.h>
 #include <RooWorkspace.h>
+#include <TObjString.h>
 #include <TMatrixDUtils.h>
 #include <RooHist.h>
 #include <RooCurve.h>

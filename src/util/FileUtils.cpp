@@ -14,6 +14,7 @@
 #include "FileUtils.h"
 #include <TUnixSystem.h>
 #include <TSystemDirectory.h>
+#include <TObjString.h>
 #include <TSystemFile.h>
 #include <TList.h>
 #include <RooPlot.h>
