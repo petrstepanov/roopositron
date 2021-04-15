@@ -11,7 +11,40 @@
   project(roopositron)
 
 # Locate the ROOT package and define a number of useful targets and variables.
-  find_package(ROOT REQUIRED COMPONENTS RIO Net)
+#  find_package(ROOT REQUIRED COMPONENTS RIO Net)
+  find_package(ROOT REQUIRED COMPONENTS)
+  
+  message(STATUS "Found ROOT libraries:")
+  message(STATUS "${ROOT_LIBRARIES}")
+  
+  #set(LIBS ${ROOT_LIBRARIES})
+# https://stackoverflow.com/questions/4346412/how-to-prepend-all-filenames-on-the-list-with-common-path/27630120
+  get_filename_component(LIB_NAMES "/petrstepanov/Applications/root-6.22.08/lib/libTreePlayer.so" NAME)
+  # cmake_path(GET ${ROOT_LIBRARIES} FILENAME LIB_NAMES)
+  # string(REGEX REPLACE "lib(\\w+).so" "$1" LIB_NAMES ${ROOT_LIBRARIES})
+  
+  set(LIB_NAMES "")
+  
+  FOREACH(X IN LISTS ROOT_LIBRARIES)
+    get_filename_component(FILENAME ${X} NAME)
+    string(REGEX REPLACE "lib([a-zA-Z0-9]+).so" "ROOT::\\1" FILENAME2 ${FILENAME})
+    # message(STATUS "${FILENAME}")
+    # message(STATUS "${FILENAME2}")
+    list(APPEND LIB_NAMES "${FILENAME2}")
+  ENDFOREACH()
+  
+# Manually add rest of libraries
+  list(APPEND LIB_NAMES "ROOT::Gui") # optional
+  list(APPEND LIB_NAMES "ROOT::RooFit")
+  list(APPEND LIB_NAMES "ROOT::RooFitCore")
+  list(APPEND LIB_NAMES "ROOT::Html")
+  list(APPEND LIB_NAMES "ROOT::Minuit")
+  list(APPEND LIB_NAMES "ROOT::Fumili")
+
+# Print ROOT libraries
+  message(STATUS "Modified ROOT libraries:")
+  message(STATUS "${LIB_NAMES}")
+  
   
 # Create list of ROOT libraries for Cmake
 # root-config --glibs
@@ -50,10 +83,10 @@
   message(STATUS "${SOURCES}")
   
 # Create a shared library with a generated dictionary.
-  add_library(L__${PROJECT_NAME} ${SOURCES} G__${PROJECT_NAME}.cxx)
+  add_library(SO_${PROJECT_NAME} ${SOURCES} G__${PROJECT_NAME}.cxx)
   
 # Obtain list 
-  target_link_libraries(L__${PROJECT_NAME} PUBLIC ROOT::RIO ROOT::Net)
+  target_link_libraries(SO_${PROJECT_NAME} PUBLIC ${LIB_NAMES})
 
 # Find main.cpp
   file(GLOB_RECURSE MAIN ${CMAKE_CURRENT_SOURCE_DIR}/*.cxx ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.cc ${CMAKE_CURRENT_SOURCE_DIR}/*.c)
@@ -61,5 +94,5 @@
   message(STATUS "Found main file: ${MAIN}")
   
 # Create the main program using the library.
-  add_executable(Main ${MAIN})
-  target_link_libraries(Main L__${PROJECT_NAME})
+  add_executable(${PROJECT_NAME} ${MAIN})
+  target_link_libraries(${PROJECT_NAME} SO_${PROJECT_NAME})
