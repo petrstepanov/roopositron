@@ -88,7 +88,9 @@ std::string FileUtils::getCurrentPath() {
 }
 
 std::vector<std::string> FileUtils::getFilenamesInCurrentDrectory(const char* ext) {
-	Debug("FileUtils::getFilenamesInCurrentDrectory", "Searching for \"" << ext << "\" files in current directory:");
+	#ifdef USEDEBUG
+		std::cout << "FileUtils::getFilenamesInCurrentDrectory" << std::endl <<  "Searching for \"" << ext << "\" files in current directory:" << std::endl;
+	#endif
 	// Grab spectra filenames from input directory
 	std::vector<std::string> lFileNames;
 	TSystemDirectory *dir = new TSystemDirectory(".", gSystem->WorkingDirectory());

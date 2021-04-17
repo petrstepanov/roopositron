@@ -50,7 +50,9 @@ const char* AdditiveConvolutionPdf::PDF_RESOLUTION_FUNCTION_NAME = "resolutionPd
 const char* AdditiveConvolutionPdf::PDF_CONVOLUTED_NAME = "modelConvolutedPdf";
 
 AdditiveConvolutionPdf::AdditiveConvolutionPdf(std::vector<std::string> componentIds, const char* resolutionId, int sourceComponents, RooRealVar* observable) {
-	Debug("AdditiveConvolutionPdf::AdditiveConvolutionPdf");
+	#ifdef USEDEBUG
+		std::cout << "AdditiveConvolutionPdf::AdditiveConvolutionPdf" << std::endl;
+	#endif
 	this->observable = observable;
 
 	Double_t channelWidthValue = Constants::getInstance()->getDefaultChannelWidth();
@@ -67,7 +69,9 @@ AdditiveConvolutionPdf::~AdditiveConvolutionPdf() {
 }
 
 void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentIds, int sourceComponents) {
-	Debug("AdditiveConvolutionPdf::initComponents")
+	#ifdef USEDEBUG
+		std:cout << "AdditiveConvolutionPdf::initComponents" << std::endl;
+	#endif
 	// Build component PDFs
 	for (std::vector<std::string>::const_iterator it = componentIds.begin(); it != componentIds.end(); ++it) {
 		const char* componentId = ((std::string) *it).c_str();
@@ -75,7 +79,7 @@ void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentId
 		componentsList->add(*pdf);
 	}
 	#ifdef USEDEBUG
-		Debug("componentsList")
+		std::cout << "componentsList" << std::endl;
 		componentsList->Print();
 	#endif
 
@@ -121,7 +125,7 @@ void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentId
 		}
 	}
 	#ifdef USEDEBUG
-		Debug("sourceComponentsList");
+		std::cout << "sourceComponentsList" std::endl;
 		sourceComponentsList->Print();
 	#endif
 }

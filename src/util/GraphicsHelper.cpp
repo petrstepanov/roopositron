@@ -49,7 +49,9 @@ void GraphicsHelper::drawRegion(RooPlot* frame, Int_t xMin, Int_t xMax) {
 	sBox->SetLineWidth(0);
 	sBox->SetFillColorAlpha(15, 0.2);
 	frame->addObject(sBox);
-	Debug("GraphicsHelper::drawRegion", "xMin: " << xMin << ", xMax: " << xMax << "yMin: " << yMin << ", yMax: " << yMax);
+	#ifdef USEDEBUG
+		std::cout << "GraphicsHelper::drawRegion" << std::endl << "xMin: " << xMin << ", xMax: " << xMax << "yMin: " << yMin << ", yMax: " << yMax << std::endl;
+	#endif
 }
 
 void GraphicsHelper::printVariable(Int_t sigDigits, const char* options, Int_t& currentLine, RooAbsArg* rooAbsArg, TPaveText* box) {
@@ -204,7 +206,9 @@ TPaveText* GraphicsHelper::makePaveText(const RooArgSet& params, Double_t xmin, 
 
 	// Draw horizontal rules
 	for (std::vector<int>::iterator it = hrLineNumbers.begin(); it != hrLineNumbers.end(); ++it){
-		Debug("GraphicsHelper::makePaveText", "line at: " << *it << "; total lines: " << linesNumber);
+		#ifdef USEDEBUG
+			std::cout << "GraphicsHelper::makePaveText" << std::endl << "line at: " << *it << "; total lines: " << linesNumber << std::endl;
+		#endif
 		Double_t y = ((Double_t)*it + 0.5)/(Double_t)linesNumber;
 		box->AddLine(0, 1-y, 1, 1-y);
 	}

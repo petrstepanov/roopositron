@@ -113,10 +113,15 @@ bool StringUtils::isSubstring(const char* parent, const char* child) {
 bool StringUtils::isSubstring(std::string parent, std::string child) {
 	std::size_t found = parent.find(child);
 	if (found != std::string::npos) {
-//		Debug("parent \"" << parent << "\" contains child \"" << child << "\"");
+		// #ifdef USEDEBUG
+			// std::cout << "parent \"" << parent << "\" contains child \"" << child << "\"" << std::endl;
+		// #endif
+
 		return true;
 	}
-//	Debug("parent \"" << parent << "\" not contains child \"" << child << "\"");
+	// #ifdef USEDEBUG
+		// std::Cout << "parent \"" << parent << "\" not contains child \"" << child << "\"" << std::endl;
+	// #endif
 	return false;
 }
 

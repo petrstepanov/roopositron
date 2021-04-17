@@ -42,7 +42,10 @@ ModelCommonizer::ModelCommonizer(RooAbsPdf* pdf, RooRealVar* observable, std::ve
 	}
 
 	// Output common parameters list
-	Debug("ModelCommonizer::ModelCommonizer", "Common parameters extracted from the first spectrum");
+	#ifdef USEDEBUG
+		std::cout << "ModelCommonizer::ModelCommonizer" << std::endl << "Common parameters extracted from the first spectrum") << std::endl;
+	#endif
+
 	TIterator* it2 = commonParameters->createIterator();
 	while (TObject* temp = it2->Next()) {
 		if (TNamed* named = dynamic_cast<TNamed*>(temp)) {
@@ -82,7 +85,9 @@ std::vector<std::string> ModelCommonizer::initCommonParameters(RooAbsPdf* pdf, s
 }
 
 RooAbsPdf* ModelCommonizer::replaceParametersWithCommon(RooAbsPdf* pdf) {
-	Debug("ModelCommonizer::replaceParametersWithCommon");
+	#ifdef USEDEBUG
+		std::cout << "ModelCommonizer::replaceParametersWithCommon" << std::endl;
+	#endif
 
 	// Instantiate Customizer that will replace model parameters
 //	RooCustomizer* customizer = new RooCustomizer(*pdf, TString::Format("%s_custom", pdf->GetName()));

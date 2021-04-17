@@ -134,8 +134,8 @@ bool Constants::extendFromFile(RooArgList* constants, std::string filename) {
 		}
 	}
 
-	Debug("\"" << filename << "\" found. Successfully read " << constantsFromFile->getSize() << " out of " << constants->getSize() << " values.");
 #ifdef USEDEBUG
+	std::cout << "\"" << filename << "\" found. Successfully read " << constantsFromFile->getSize() << " out of " << constants->getSize() << " values.";
 	constantsFromFile->Print();
 #endif
 	return true;

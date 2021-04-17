@@ -105,8 +105,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		std::cout << "No Maestro '.Spe' files found in current directory. Press CTRL+C." << std::endl;
 		return 0;
 	}
-	Debug("main", "Found " << filenames.size() << " spectra.");
-
+	#ifdef USEDEBUG
+		std::cout << "main" << std::endl << "Found " << filenames.size() << " spectra." << std::endl;
+	#endif
 	// Create constants object that stores values from "constants.txt" file
 	Constants* constants = Constants::getInstance();
 
@@ -139,7 +140,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		s.maximumCount = s.histogram->GetBinContent(s.binWithMaximumCount);
 		s.averageBackground = HistProcessor::getAverageBackground(s.histogram, Constants::getInstance()->getBackgroundBins());
 		spectra.push_back(s);
-		Debug("Spectrum " << i+1 << " file is \"" << s.filename << "\"" << std::endl << "  bins: " << s.numberOfBins << std::endl << "  integral: " << s.integral << std::endl << "  bin with minimum count: " << s.binWithMinimumCount << std::endl << "  bin with maximum count: " << s.binWithMaximumCount << std::endl << "  minimum count: " << s.minimumCount << std::endl << "  maximum count: " << s.maximumCount << std::endl << "  average background: " << s.averageBackground);
+		#ifdef USEDEBUG
+			std::cout << "Spectrum " << i+1 << " file is \"" << s.filename << "\"" << std::endl << "  bins: " << s.numberOfBins << std::endl << "  integral: " << s.integral << std::endl << "  bin with minimum count: " << s.binWithMinimumCount << std::endl << "  bin with maximum count: " << s.binWithMaximumCount << std::endl << "  minimum count: " << s.minimumCount << std::endl << "  maximum count: " << s.maximumCount << std::endl << "  average background: " << s.averageBackground;
+		#endif
 	}
 
 	// Initialize output path and storage for model parameters
@@ -210,7 +213,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 	// Output
 	#ifdef USEDEBUG
-		Debug("main", "Constructed following models:");
+		std::cout << "main" << std::endl << "Constructed following models:" << std::endl;
 		for (unsigned i = 0; i < spectra.size(); i++) {
 			spectra[i].model->Print();
 		}
@@ -305,8 +308,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 	Int_t resultMigrad = m->migrad();
 	Int_t resultHesse = m->hesse();
-	Debug("main", "Fitting completed: migrad=" << resultMigrad << ", hesse=" << resultHesse);
-
+	#ifdef USEDEBUG
+		std::cout << "main" << std::endl << "Fitting completed: migrad=" << resultMigrad << ", hesse=" << resultHesse << std::endl;
+	#endif
 	stopWatch->Stop();
 
 //	  ________                    .__    .__
@@ -504,7 +508,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			spectraPlot[i]->Print("V");
 		#endif
 	}
-	Debug("main", "Spectra plots successfully created.");
+	#ifdef USEDEBUG
+		std::cout << "main" << std::endl << "Spectra plots successfully created." << std::endl;
+	#endif
 
 	// Draw residuals plot (bottom)
 	RooPlot** residualsPlot = new RooPlot*[spectra.size()];
@@ -529,7 +535,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			// Draw options: "P" - with marker https://root.cern.ch/doc/v608/classTHistPainter.html
 			residualsPlot[i]->addPlotable(hresid1, "P");
 			residualsPlot[i]->addPlotable(hresid2, "P");
-			Debug("main", "hresid2 draw option: " << hresid2->GetDrawOption());
+			#ifdef USEDEBUG
+				std::cout << "main" << std::endl << "hresid2 draw option: " << hresid2->GetDrawOption()) << std::endl;
+			#endif
 			// Since "HIST" draw option (no error bars) makes no effect? We manually ser errors to zero
 			HistProcessor::setZeroErrors(hresid1);
 			HistProcessor::setZeroErrors(hresid2);
@@ -537,7 +545,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			hresid[i] = spectraPlot[i]->pullHist("data", "fit");
 			hresid[i]->SetMarkerSize(GraphicsHelper::MARKER_SIZE);
 			residualsPlot[i]->addPlotable(hresid[i], "P");
-			Debug("main", "hresid[" << i << "] draw option: " << hresid[i]->GetDrawOption());
+			#ifdef USEDEBUG
+				std::cout << "main" << std::endl << "hresid[" << i << "] draw option: " << hresid[i]->GetDrawOption()) << std::endl;
+			#endif
 			HistProcessor::setZeroErrors(hresid[i]);
 		}
 
@@ -584,7 +594,9 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			residualsPlot[i]->Print("V");
 		#endif
 	}
-	Debug("main", "Residual plots successfully created.");
+	#ifdef USEDEBUG
+		std::cout << "main" std::endl << "Residual plots successfully created." << std::endl;
+	#endif
 
 	// Draw plots on the pads
 	for (unsigned i = 0; i < spectra.size(); i++) {
@@ -612,7 +624,10 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		canvas[i]->SaveAs(pngURI);
 		canvas[i]->SaveAs(rootURI);
 	}
-	Debug("main", "Canvas images successfully exported.");
+	#ifdef USEDEBUG
+		std::cout << "main" << std::endl << "Canvas images successfully exported." std::endl;
+	#endif
+
 	gSystem->ProcessEvents();
 
 	// Ask user how the fit is. Interrupt if bad.

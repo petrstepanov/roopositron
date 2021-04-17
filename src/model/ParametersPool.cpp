@@ -46,7 +46,9 @@ ParametersPool::ParametersPool(std::string ioPath) {
 }
 
 RooArgSet* ParametersPool::readPoolParametersFromFile() {
-	Debug("ParametersPool::readPoolParametersFromFile" "Reading parameters pool from hard drive (" << filePathName.c_str() << ").");
+	#ifdef USEDEBUG
+		std::cout << "ParametersPool::readPoolParametersFromFile" << std::endl << "Reading parameters pool from hard drive (" << filePathName.c_str() << ")." << std::endl;
+	#endif
 	RooArgSet* params = new RooArgSet();
 	FILE * pFile;
 	pFile = fopen(filePathName.c_str(), "r");
@@ -74,18 +76,24 @@ RooArgSet* ParametersPool::readPoolParametersFromFile() {
 			// parameter->setError(error);
 		}
 		if (!StringUtils::stringContainsToken(parameter->GetName(), parametersExcludedFromImport)) {
-			Debug("Parameter imported:");
+			#ifdef USEDEBUG
+				std::cout << "Parameter imported:" << std::endl;
+			#endif
 			params->add(*parameter);
 		}
 		else {
-			Debug("Parameter not imported (in excluded list):");
+			#ifdef USEDEBUG
+				std::cout << "Parameter not imported (in excluded list):" << std::endl;
+			#endif
 		}
-#ifdef USEDEBUG
-		parameter->Print();
-#endif
+		#ifdef USEDEBUG
+			parameter->Print();
+		#endif
 	}
 	fclose(pFile);
-	Debug("\"" << filePathName.c_str() << "\" found. Successfully read " << params->getSize() << " values.");
+	#ifdef USEDEBUG
+		std::cout << "\"" << filePathName.c_str() << "\" found. Successfully read " << params->getSize() << " values." << std::endl;
+	#endif
 	return params;
 }
 
@@ -115,7 +123,11 @@ Bool_t ParametersPool::containsAllParameters(RooArgSet* modelParameters){
 //		 3. add model parameter to set.
 
 //void ParametersPool::addUpdateModelParameters(RooArgSet* modelParameters) {
-//	Debug("ParametersPool::addUpdateModelParameters");
+//	#ifdef USEDEBUG
+//		std::cout << "ParametersPool::addUpdateModelParameters" << std::endl;
+//	#endif
+
+//	
 //
 //	// Iterate through model parameters. Either extend values from pool parameters from hard drive.
 //	TIterator* it = modelParameters->createIterator();
@@ -138,7 +150,9 @@ Bool_t ParametersPool::containsAllParameters(RooArgSet* modelParameters){
 //}
 
 void ParametersPool::updateModelParameters(RooArgSet* modelParameters) {
-	Debug("ParametersPool::addUpdateModelParameters");
+	#ifdef USEDEBUG
+		std::cout << "ParametersPool::addUpdateModelParameters" << std::endl;
+	#endif
 
 	// Iterate through model parameters. Either extend values from pool parameters from hard drive.
 	TIterator* it = modelParameters->createIterator();
@@ -157,7 +171,9 @@ void ParametersPool::updateModelParameters(RooArgSet* modelParameters) {
 }
 
 void ParametersPool::addInputModelParameters(RooArgSet* modelParameters) {
-	Debug("ParametersPool::inputMissingPoolParameters", "Hit ENTER to use default parameter values.");
+	#ifdef USEDEBUG
+		std::cout << "ParametersPool::inputMissingPoolParameters" << std::endl << "Hit ENTER to use default parameter values." << std::endl;
+	#endif
 
 	// Iterate through model parameters. Either extend values from existing pool or user input and add to pool.
 	TIterator* it = modelParameters->createIterator();
@@ -233,7 +249,10 @@ void ParametersPool::userInput(RooRealVar* parameter) {
 
 // TODO: separate add and save()
 Bool_t ParametersPool::saveToFile() {
-	Debug("ParametersPool::saveToFile", "Saving parameters pool to hard drive (" << filePathName.c_str() << ").");
+	#ifdef USEDEBUG
+		std::cout << "ParametersPool::saveToFile" std::endl << "Saving parameters pool to hard drive (" << filePathName.c_str() << ")." << std::endl;
+	#endif
+
 	FILE* pFile = fopen(filePathName.c_str(), "w");
 	if (pFile == NULL) {
 		std::cout << "Error writing to file \"" << filePathName << "\"." << std::endl;

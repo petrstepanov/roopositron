@@ -71,7 +71,10 @@ void RootHelper::printPdfCoefficientNames(RooAbsPdf* pdf, RooRealVar* observable
 //}
 
 RooAbsPdf* RootHelper::suffixPdfAndNodes(RooAbsPdf* pdf, RooRealVar* observable, const char* suffix){
-	Debug("RootHelper::suffixPdfAndNodes");
+	#ifdef USEDEBUG
+		std::cout << "RootHelper::suffixPdfAndNodes" << std::endl;
+	#endif
+
 	RooWorkspace* w = new RooWorkspace("w", "w");
 	w->import(*pdf, RooFit::RenameAllVariablesExcept(suffix, observable->GetName()), RooFit::RenameAllNodes(suffix));
 	#ifdef USEDEBUG
@@ -260,9 +263,8 @@ std::pair<TMatrixD,TList*> RootHelper::rooPlotToMatrix(RooRealVar* axis, RooPlot
 	}
 
 	// Print matrix
-	Debug("RootHelper::rooPlotToMatrix");
-
 	#ifdef USEDEBUG
+		std::cout << "RootHelper::rooPlotToMatrix" << std::endl;
 //		columnNames->Print();
 //		matrix.Print();
 	#endif
