@@ -536,7 +536,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			residualsPlot[i]->addPlotable(hresid1, "P");
 			residualsPlot[i]->addPlotable(hresid2, "P");
 			#ifdef USEDEBUG
-				std::cout << "main" << std::endl << "hresid2 draw option: " << hresid2->GetDrawOption()) << std::endl;
+				std::cout << "main" << std::endl << "hresid2 draw option: " << hresid2->GetDrawOption() << std::endl;
 			#endif
 			// Since "HIST" draw option (no error bars) makes no effect? We manually ser errors to zero
 			HistProcessor::setZeroErrors(hresid1);
@@ -546,7 +546,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			hresid[i]->SetMarkerSize(GraphicsHelper::MARKER_SIZE);
 			residualsPlot[i]->addPlotable(hresid[i], "P");
 			#ifdef USEDEBUG
-				std::cout << "main" << std::endl << "hresid[" << i << "] draw option: " << hresid[i]->GetDrawOption()) << std::endl;
+				std::cout << "main" << std::endl << "hresid[" << i << "] draw option: " << hresid[i]->GetDrawOption() << std::endl;
 			#endif
 			HistProcessor::setZeroErrors(hresid[i]);
 		}
@@ -595,7 +595,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		#endif
 	}
 	#ifdef USEDEBUG
-		std::cout << "main" std::endl << "Residual plots successfully created." << std::endl;
+		std::cout << "main" << std::endl << "Residual plots successfully created." << std::endl;
 	#endif
 
 	// Draw plots on the pads
