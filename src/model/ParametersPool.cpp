@@ -250,7 +250,7 @@ void ParametersPool::userInput(RooRealVar* parameter) {
 // TODO: separate add and save()
 Bool_t ParametersPool::saveToFile() {
 	#ifdef USEDEBUG
-		std::cout << "ParametersPool::saveToFile" std::endl << "Saving parameters pool to hard drive (" << filePathName.c_str() << ")." << std::endl;
+		std::cout << "ParametersPool::saveToFile" << std::endl << "Saving parameters pool to hard drive (" << filePathName.c_str() << ")." << std::endl;
 	#endif
 
 	FILE* pFile = fopen(filePathName.c_str(), "w");

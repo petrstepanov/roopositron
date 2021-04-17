@@ -125,7 +125,7 @@ void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentId
 		}
 	}
 	#ifdef USEDEBUG
-		std::cout << "sourceComponentsList" std::endl;
+		std::cout << "sourceComponentsList" << std::endl;
 		sourceComponentsList->Print();
 	#endif
 }

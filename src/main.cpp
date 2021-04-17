@@ -625,7 +625,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 		canvas[i]->SaveAs(rootURI);
 	}
 	#ifdef USEDEBUG
-		std::cout << "main" << std::endl << "Canvas images successfully exported." std::endl;
+		std::cout << "main" << std::endl << "Canvas images successfully exported." << std::endl;
 	#endif
 
 	gSystem->ProcessEvents();
