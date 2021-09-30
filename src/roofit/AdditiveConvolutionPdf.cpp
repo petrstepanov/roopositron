@@ -70,7 +70,7 @@ AdditiveConvolutionPdf::~AdditiveConvolutionPdf() {
 
 void AdditiveConvolutionPdf::initComponents(std::vector<std::string> componentIds, int sourceComponents) {
 	#ifdef USEDEBUG
-		std:cout << "AdditiveConvolutionPdf::initComponents" << std::endl;
+		std::cout << "AdditiveConvolutionPdf::initComponents" << std::endl;
 	#endif
 	// Build component PDFs
 	for (std::vector<std::string>::const_iterator it = componentIds.begin(); it != componentIds.end(); ++it) {
