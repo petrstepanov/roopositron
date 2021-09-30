@@ -43,7 +43,7 @@ ModelCommonizer::ModelCommonizer(RooAbsPdf* pdf, RooRealVar* observable, std::ve
 
 	// Output common parameters list
 	#ifdef USEDEBUG
-		std::cout << "ModelCommonizer::ModelCommonizer" << std::endl << "Common parameters extracted from the first spectrum") << std::endl;
+		std::cout << "ModelCommonizer::ModelCommonizer" << std::endl << "Common parameters extracted from the first spectrum" << std::endl;
 	#endif
 
 	TIterator* it2 = commonParameters->createIterator();
