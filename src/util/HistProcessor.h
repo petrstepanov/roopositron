@@ -17,6 +17,7 @@
 #include "RtypesCore.h"
 #include "TH1F.h"
 #include "RooHist.h"
+#include "RooCurve.h"
 
 class HistProcessor {
 public:

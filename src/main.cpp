@@ -12,7 +12,7 @@
 #include <RooAddModel.h>
 #include <RooGenericPdf.h>
 #include <RooAddPdf.h>
-#include <RooMinuit.h>
+// #include <RooMinuit.h>
 #include <RooFFTConvPdf.h>
 #include <RooSimultaneous.h>
 #include <RooPolynomial.h>
@@ -286,14 +286,25 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	if (DO_RANGE) {
 		channels->setRange("LEFT", 1, constants->getExcludeMinChannel());
 		channels->setRange("RIGHT", constants->getExcludeMaxChannel(), BINS);
-		Int_t numCpu = RootHelper::getNumCpu();
 
 		// Read models' parameters from the pool file. numCpu = RootHelper::getNumCpu();
 		// RooChi2Var don't support ranges https://sft.its.cern.ch/jira/browse/ROOT-10038
-		simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::Range("LEFT,RIGHT"), RooFit::NumCPU(numCpu));
+		#ifdef _WIN32
+			simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData);
+		#else
+			RooAbsTestStatistic::Configuration chiConfig;
+			chiConfig.rangeName="LEFT,RIGHT";
+			chiConfig.nCPU=RootHelper::getNumCpu();
+			simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, kTRUE, RooAbsData::ErrorType::Poisson, chiConfig);
+		#endif
 	} else {
-		Int_t numCpu = RootHelper::getNumCpu();
-		simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::NumCPU(numCpu));
+		#ifdef _WIN32
+			simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::NumCPU(numCpu));
+		#else
+			RooAbsTestStatistic::Configuration chiConfig;
+			chiConfig.nCPU=RootHelper::getNumCpu();
+			simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, kTRUE, RooAbsData::ErrorType::Poisson, chiConfig);
+		#endif
 	}
 
 	// Start timer to track performance
@@ -517,7 +528,11 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	RooHist** hresid = new RooHist*[spectra.size()];
 	for (unsigned i = 0; i < spectra.size(); i++) {
 		residualsPlot[i] = channels->frame(RooFit::Title(" "));
-		RooChi2Var* chi2 = new RooChi2Var(TString::Format("#chi^{2}_{%d}", i + 1), "chi-square", *spectra[i].model, *spectra[i].dataHistogram);
+		#ifdef _WIN32
+			RooChi2Var* chi2 = new RooChi2Var(TString::Format("#chi^{2}_{%d}", i + 1), "chi-square", *spectra[i].model, *spectra[i].dataHistogram);
+		#else
+			RooChi2Var* chi2 = new RooChi2Var(TString::Format("#chi^{2}_{%d}", i + 1), "chi-square", *spectra[i].model, *spectra[i].dataHistogram, kTRUE, RooDataHist::ErrorType::Poisson);
+		#endif
 		RooAbsCollection* freeParameters = (spectra[i].model->getParameters(*spectra[i].dataHistogram))->selectByAttrib("Constant", kFALSE);
 		Int_t degreesFreedom = spectra[i].numberOfBins - freeParameters->getSize();
 		Double_t chi2Value = chi2->getVal() / degreesFreedom;
