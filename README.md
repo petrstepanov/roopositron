@@ -38,7 +38,7 @@ mkdir -p roopositron-build && cd roopositron-build
 Check program dependencies and create native makefile with CMake. Finally build and install. System will ask for your password to install the app.
 
 ```
-cmake ./
+cmake ../roopositron
 make
 sudo make install
 ```
