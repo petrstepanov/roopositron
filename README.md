@@ -26,11 +26,19 @@ Multiple spectra with various channel width can be fitted simultaneously.
 
 ## Installation on Linux or macOS
 
-1. Install CERN ROOT on your system. Details can be found [here](https://medium.com/@petrstepanov/install-cern-root-roofit-on-macos-and-linux-for-dummies-df787fd41ef4).
+1. Install CERN ROOT on your system. Refer to [official install page](https://root.cern/install/#linux-package-managers) for more details.
 
-2. Click on the "Clone or download" button on the top right. Extract the archive. Navigate to the extracted folder. In terminal run following:
+Open Terminal and clone program source files in your home folder:
 
 ```
+cd
+git clone https://github.com/petrstepanov/roopositron
+mkdir -p roopositron-build && cd roopositron-build
+```
+Check program dependencies and create native makefile with CMake. Finally build and install. System will ask for your password to install the app.
+
+```
+cmake ./
 make
 sudo make install
 ```
