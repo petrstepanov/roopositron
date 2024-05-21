@@ -33,6 +33,7 @@
 #include <RooFFTConvPdf.h>
 #include <TBrowser.h>
 #include <TRandom.h>
+#include <TROOT.h>
 #include <TApplication.h>
 #include <TFile.h>
 #include <TH1F.h>
@@ -289,21 +290,21 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 
 		// Read models' parameters from the pool file. numCpu = RootHelper::getNumCpu();
 		// RooChi2Var don't support ranges https://sft.its.cern.ch/jira/browse/ROOT-10038
-		#ifdef _WIN32
-			simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData);
-		#else
+		#if ROOT_VERSION_CODE >= ROOT_VERSION(6,31,0)
 			RooAbsTestStatistic::Configuration chiConfig;
 			chiConfig.rangeName="LEFT,RIGHT";
 			chiConfig.nCPU=RootHelper::getNumCpu();
 			simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, kTRUE, RooAbsData::ErrorType::Poisson, chiConfig);
+		#else
+			simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData);
 		#endif
 	} else {
-		#ifdef _WIN32
-			simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::NumCPU(numCpu));
-		#else
+		#if ROOT_VERSION_CODE >= ROOT_VERSION(6,31,0)
 			RooAbsTestStatistic::Configuration chiConfig;
 			chiConfig.nCPU=RootHelper::getNumCpu();
 			simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, kTRUE, RooAbsData::ErrorType::Poisson, chiConfig);
+		#else
+			simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::NumCPU(numCpu));
 		#endif
 	}
 
