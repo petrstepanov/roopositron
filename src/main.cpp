@@ -296,7 +296,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			chiConfig.nCPU=RootHelper::getNumCpu();
 			simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, kTRUE, RooAbsData::ErrorType::Poisson, chiConfig);
 		#else
-			simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData);
+			simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::NumCPU(RootHelper::getNumCpu()));
 		#endif
 	} else {
 		#if ROOT_VERSION_CODE >= ROOT_VERSION(6,31,0)
@@ -304,7 +304,7 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 			chiConfig.nCPU=RootHelper::getNumCpu();
 			simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, kTRUE, RooAbsData::ErrorType::Poisson, chiConfig);
 		#else
-			simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::NumCPU(numCpu));
+			simChi2 = new RooChi2Var("simChi2", "chi2", *simPdf, *combinedData, RooFit::NumCPU(RootHelper::getNumCpu()));
 		#endif
 	}
 
