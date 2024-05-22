@@ -529,10 +529,10 @@ int run(int argc, char* argv[], Bool_t isRoot = kFALSE) {
 	RooHist** hresid = new RooHist*[spectra.size()];
 	for (unsigned i = 0; i < spectra.size(); i++) {
 		residualsPlot[i] = channels->frame(RooFit::Title(" "));
-		#ifdef _WIN32
-			RooChi2Var* chi2 = new RooChi2Var(TString::Format("#chi^{2}_{%d}", i + 1), "chi-square", *spectra[i].model, *spectra[i].dataHistogram);
-		#else
+		#if ROOT_VERSION_CODE >= ROOT_VERSION(6,31,0)
 			RooChi2Var* chi2 = new RooChi2Var(TString::Format("#chi^{2}_{%d}", i + 1), "chi-square", *spectra[i].model, *spectra[i].dataHistogram, kTRUE, RooDataHist::ErrorType::Poisson);
+		#else
+			RooChi2Var* chi2 = new RooChi2Var(TString::Format("#chi^{2}_{%d}", i + 1), "chi-square", *spectra[i].model, *spectra[i].dataHistogram);
 		#endif
 		RooAbsCollection* freeParameters = (spectra[i].model->getParameters(*spectra[i].dataHistogram))->selectByAttrib("Constant", kFALSE);
 		Int_t degreesFreedom = spectra[i].numberOfBins - freeParameters->getSize();
